@@ -1,0 +1,9 @@
+*.jpg
+*.jpeg
+*.png
+*.psd
+*.gif
+*.svg
+*.json
+.DS_Store
+.claude/
