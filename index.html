@@ -1504,12 +1504,23 @@ function buildProvSel(){
 // ════════════════════════════════════════════════════
 // 地図（D3 + TopoJSON、地域別カラー）
 // ════════════════════════════════════════════════════
+// 地図再構築（初回／リサイズ）後に、選択中のマーカー・ハイライトを復元する。
+// 未選択時は何もしない（初回ロードでは no-op）。
+function reapplyMapSelection(){
+  if(st.person)      selPerson(st.person);
+  else if(st.emperor)selHistFig(st.emperor, EMPERORS, 'emperor');
+  else if(st.ruler)  selHistFig(st.ruler,   RULERS,   'ruler');
+  else if(st.prov)   selProv(st.prov);
+}
 function buildMap(){
   var svgEl=document.getElementById('msv'), mc=document.getElementById('mc');
   // SVGの実描画高さを優先（上部バー追加でオフセットが変動するため）
   var W=mc.clientWidth||300, H=Math.max(svgEl.clientHeight||(mc.clientHeight-74),200);
   _mapW=W; _mapH=H; _mapScale=1; _mapVX=0; _mapVY=0;
   svgEl.setAttribute('viewBox','0 0 '+W+' '+H);
+  // 再描画のたびにレイヤー／マーカーが重複しないよう、まずSVGの中身を消去（idempotent化）。
+  // これをしないと、リサイズ時の再構築で地図が二重に重なり前のマーカーが巨大化して残る。
+  while(svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
   if(!document._mapDragInit){
     document._mapDragInit=true;
     svgEl.addEventListener('mousedown',function(e){if(_mapScale>1){_mapDrag=true;_mapDragX=e.clientX;_mapDragY=e.clientY;e.preventDefault();}});
@@ -1562,6 +1573,7 @@ function buildMap(){
       .on('click',function(ev,d){clickPref(d);});
       svg2.append('g').attr('id','mkg');
       d3ready=true;document.getElementById('mload').style.display='none';
+      reapplyMapSelection(); // リサイズ再構築後も選択中マーカーを復元
     }).catch(function(){tryLoad(urls,i+1);});
   }
   tryLoad(topoUrls,0);
@@ -1584,6 +1596,7 @@ function buildMapFB(svgEl,W,H){
     t.textContent=FBRGNM[id];svgEl.appendChild(t);
   });
   var mg=document.createElementNS(ns,'g');mg.setAttribute('id','mkg');svgEl.appendChild(mg);
+  reapplyMapSelection(); // リサイズ再構築後も選択中マーカーを復元
 }
 
 function clickPref(d){
