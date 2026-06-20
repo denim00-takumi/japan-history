@@ -33,7 +33,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 }
 .era-chip.active{font-weight:600;color:#fff}
 /* スライド吹き出し */
-#era-slide-tooltip{position:absolute;bottom:calc(100% + 4px);left:0;background:#101828;border:.5px solid rgba(255,255,255,.25);border-radius:6px;padding:3px 8px;font-size:11px;color:#e0e8ff;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s;z-index:20;transform:translateX(-50%)}
+#era-slide-tooltip{position:fixed;top:0;left:0;background:#101828;border:.5px solid rgba(255,255,255,.25);border-radius:6px;padding:4px 12px;font-size:13px;color:#e0e8ff;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s;z-index:200;transform:translateX(-50%)}
 #era-slide-tooltip.show{opacity:1}
 
 /* ── TAB BAR ── */
@@ -605,9 +605,9 @@ function jumpToEra(eraId){
   }
   function showTip(clientX,era){
     const rect=chipsEl.getBoundingClientRect();
-    const x=clientX-rect.left;
     tip.textContent=eraName(era);
-    tip.style.left=Math.max(30,Math.min(x,rect.width-30))+'px';
+    tip.style.left=Math.max(rect.left+30,Math.min(clientX,rect.right-30))+'px';
+    tip.style.top=(rect.bottom+6)+'px';
     tip.classList.add('show');
   }
   chipsEl.addEventListener('touchstart',e=>{
