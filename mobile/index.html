@@ -74,10 +74,20 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
 /* ── 地図 ── */
 #tab-chizu{overflow:hidden;display:flex;flex-direction:column}
-#map-selectors{flex-shrink:0;padding:5px 8px;background:#0f0f18;border-bottom:.5px solid rgba(255,255,255,.07);display:flex;gap:6px}
-#map-selectors select{flex:1;background:#0a0a18;border:.5px solid #222238;border-radius:6px;padding:5px 8px;font-size:12px;color:#80a0d0;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;text-align:left}
-#map-selectors select option{color:#80a0d0}
-#map-selectors select option:checked{color:#ff8040;background:#0a0a18}
+#map-selectors{flex-shrink:0;padding:5px 8px;background:#0f0f18;border-bottom:.5px solid rgba(255,255,255,.07);display:flex;gap:6px;position:relative;z-index:10}
+#kuni-dropdown{flex:1;position:relative}
+#kuni-btn{width:100%;background:#0a0a18;border:.5px solid #222238;border-radius:6px;padding:5px 8px;font-size:12px;color:#80a0d0;font-family:inherit;outline:none;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between}
+#kuni-btn.has-value{color:#ff8040}
+#kuni-btn i{font-size:10px;opacity:.6;transition:transform .15s}
+#kuni-btn.open i{transform:rotate(180deg)}
+#kuni-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#0d0d1e;border:.5px solid #2a2a48;border-radius:8px;max-height:260px;overflow-y:auto;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+#kuni-panel.open{display:block}
+.kuni-group{padding:4px 10px 2px;font-size:10px;color:#5050a0;font-weight:600;letter-spacing:.05em;border-top:.5px solid rgba(255,255,255,.05);margin-top:2px}
+.kuni-group:first-child{border-top:none;margin-top:0}
+.kuni-item{padding:7px 12px;font-size:12px;color:#a0b0d0;cursor:pointer;transition:background .1s}
+.kuni-item:active{background:#1a1a30}
+.kuni-item.selected{color:#ff8040}
+.kuni-clear{padding:7px 12px;font-size:12px;color:#505080;cursor:pointer;border-bottom:.5px solid rgba(255,255,255,.06)}
 #map-svg-wrap{flex:1;background:#050c14;position:relative;overflow:hidden}
 #map-svg{width:100%;height:100%}
 #map-badge{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(6,12,26,.92);border:.5px solid rgba(64,192,255,.3);border-radius:8px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .3s}
@@ -240,7 +250,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div class="screen hidden" id="tab-chizu">
     <div id="map-selectors">
       <button id="map-back-btn" style="display:none;font-size:13px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;flex-shrink:0;padding:0 4px 0 0;align-items:center;gap:2px"><i class="ti ti-chevron-left"></i>戻る</button>
-      <select id="sel-kuni"><option value="">— 旧国名を選択 —</option></select>
+      <div id="kuni-dropdown">
+        <button id="kuni-btn"><span id="kuni-label">— 旧国名を選択 —</span><i class="ti ti-chevron-down"></i></button>
+        <div id="kuni-panel"></div>
+      </div>
     </div>
     <div id="map-svg-wrap">
       <svg id="map-svg"></svg>
@@ -581,11 +594,7 @@ function jumpToEra(eraId){
     const hdr = document.getElementById('era-hdr-'+eraId);
     if(hdr) hdr.scrollIntoView({behavior:'auto',block:'start'});
   }
-  // if on 地図, update era select
-  if(currentTab==='chizu'){
-    document.getElementById('sel-era').value=eraId;
-    updateMapEra();
-  }
+  if(currentTab==='chizu') updateMapEra();
 }
 
 // ── TAB NAVIGATION ─────────────────────────────────────────
@@ -663,7 +672,7 @@ function switchTab(tab){
   });
   if(tab==='chizu'){
     mapRendered=false;
-    document.getElementById('sel-kuni').value='';
+    setKuni('','— 旧国名を選択 —');
     // hide back button (only shown when navigating from person detail)
     const mapBackBtn=document.getElementById('map-back-btn');
     if(mapBackBtn) mapBackBtn.style.display='none';
@@ -825,28 +834,70 @@ const KUNI_LABELS={kanto:'関東',kinki:'畿内',chubu:'中部',tohoku:'東北',
 let selectedProvPrefs=[];
 
 function buildMap(){
-  // 旧国名フルリスト（地域グループヘッダー付き、ひらがな付き）
-  const kuniSelect=document.getElementById('sel-kuni');
   const rgNames={hokkaido:'北海道',tohoku:'東北',kanto:'関東',chubu:'中部・北陸',kinki:'近畿',chugoku:'中国',shikoku:'四国',kyushu:'九州・沖縄'};
+  const panel=document.getElementById('kuni-panel');
+  const btn=document.getElementById('kuni-btn');
+  const label=document.getElementById('kuni-label');
+
+  // クリア行
+  const clearEl=document.createElement('div');
+  clearEl.className='kuni-clear';
+  clearEl.textContent='— 旧国名を選択 —';
+  clearEl.addEventListener('click',()=>{
+    setKuni('','— 旧国名を選択 —');
+    closeKuniPanel();
+  });
+  panel.appendChild(clearEl);
+
   let lastRg='';
   PROVS.forEach(p=>{
     if(p.rg!==lastRg){
-      const og=document.createElement('optgroup');
-      og.label=rgNames[p.rg]||p.rg;
-      kuniSelect.appendChild(og);
+      const grp=document.createElement('div');
+      grp.className='kuni-group';
+      grp.textContent=rgNames[p.rg]||p.rg;
+      panel.appendChild(grp);
       lastRg=p.rg;
     }
-    const opt=document.createElement('option');
-    opt.value=p.v;
-    opt.textContent=p.lb+(p.fg?' ('+p.fg+')':'');
-    kuniSelect.lastChild.appendChild(opt);
+    const item=document.createElement('div');
+    item.className='kuni-item';
+    item.dataset.value=p.v;
+    item.textContent=p.lb;
+    item.addEventListener('click',()=>{
+      setKuni(p.v,p.lb);
+      closeKuniPanel();
+    });
+    panel.appendChild(item);
   });
 
-  kuniSelect.addEventListener('change',()=>{
-    selectedKuni=kuniSelect.value;
-    selectedProvPrefs=selectedKuni?(PROVPREF[selectedKuni]||[]):[];
-    updateMapEra();
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const isOpen=panel.classList.contains('open');
+    if(isOpen){ closeKuniPanel(); } else { openKuniPanel(); }
   });
+  document.addEventListener('click',()=>closeKuniPanel());
+  panel.addEventListener('click',e=>e.stopPropagation());
+}
+
+function openKuniPanel(){
+  document.getElementById('kuni-panel').classList.add('open');
+  document.getElementById('kuni-btn').classList.add('open');
+}
+function closeKuniPanel(){
+  document.getElementById('kuni-panel').classList.remove('open');
+  document.getElementById('kuni-btn').classList.remove('open');
+}
+function setKuni(value,text){
+  selectedKuni=value;
+  selectedProvPrefs=value?(PROVPREF[value]||[]):[];
+  const label=document.getElementById('kuni-label');
+  const btn=document.getElementById('kuni-btn');
+  label.textContent=text;
+  btn.classList.toggle('has-value',!!value);
+  // 選択中アイテムの色更新
+  document.querySelectorAll('.kuni-item').forEach(el=>{
+    el.classList.toggle('selected',el.dataset.value===value);
+  });
+  updateMapEra();
 }
 
 let mapRendered=false;
