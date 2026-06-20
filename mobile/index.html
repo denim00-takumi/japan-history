@@ -324,8 +324,14 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
     <div id="tokaido-nav" style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:#0a0a12;border-top:.5px solid rgba(255,255,255,.06)">
-      <button id="tk-prev-btn" style="font-size:13px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px">◀ 三条大橋</button>
-      <button id="tk-next-btn" style="font-size:13px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px">日本橋 ▶</button>
+      <button id="tk-prev-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;opacity:0.3;pointer-events:none">
+        <span style="font-size:13px;color:#5090ff">三条大橋 ▶</span>
+        <span style="font-size:10px;color:#c03030;border-left:2px solid #c03030;padding-left:4px">◀ 前の宿場</span>
+      </button>
+      <button id="tk-next-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+        <span style="font-size:13px;color:#c03030">◀ 日本橋</span>
+        <span style="font-size:10px;color:#5090ff;border-right:2px solid #5090ff;padding-right:4px">次の宿場 ▶</span>
+      </button>
 
     </div>
     <div id="tokaido-progress">
@@ -1345,21 +1351,41 @@ document.getElementById('tk-to-list-btn').addEventListener('click',()=>{
   showScreen('screen-tokaido-list');
 });
 
-// ◀三条大橋（次の宿場=高番号） / 日本橋▶（前の宿場=低番号）
+// 三条大橋▶（日本橋方向へ戻る） / ◀日本橋（三条大橋方向へ進む）
 document.getElementById('tk-prev-btn').addEventListener('click',()=>{
-  if(!activeStation||activeStation.special)return;
+  if(!activeStation) return;
+  // 三条大橋(終点)から → 最後の通常宿場へ
+  if(activeStation.special && activeStation.label==='終点'){
+    const last=[...TOKAIDO].reverse().find(s=>!s.special&&!s.midpoint);
+    if(last) selectStation(last);
+    return;
+  }
+  if(activeStation.special) return; // 日本橋では無効
   const idx=TOKAIDO.findIndex(s=>!s.special&&s.num===activeStation.num);
-  if(idx>=0){
-    const next=TOKAIDO.slice(idx+1).find(s=>!s.special&&!s.midpoint);
-    if(next) selectStation(next);
+  // 前の宿場、または日本橋(起点)へ
+  const prev=idx>0?TOKAIDO.slice(0,idx).reverse().find(s=>!s.midpoint):null;
+  if(prev) selectStation(prev);
+  else {
+    const nihon=TOKAIDO.find(s=>s.special&&s.label==='起点');
+    if(nihon) selectStation(nihon);
   }
 });
 document.getElementById('tk-next-btn').addEventListener('click',()=>{
-  if(!activeStation||activeStation.special)return;
+  if(!activeStation) return;
+  // 日本橋(起点)から → 最初の通常宿場へ
+  if(activeStation.special && activeStation.label==='起点'){
+    const first=TOKAIDO.find(s=>!s.special&&!s.midpoint&&s.num);
+    if(first) selectStation(first);
+    return;
+  }
+  if(activeStation.special) return; // 三条大橋では無効
   const idx=TOKAIDO.findIndex(s=>!s.special&&s.num===activeStation.num);
-  if(idx>0){
-    const prev=TOKAIDO.slice(0,idx).reverse().find(s=>!s.special&&!s.midpoint);
-    if(prev) selectStation(prev);
+  // 次の宿場、または三条大橋(終点)へ
+  const next=TOKAIDO.slice(idx+1).find(s=>!s.special&&!s.midpoint);
+  if(next) selectStation(next);
+  else {
+    const sanjo=TOKAIDO.find(s=>s.special&&s.label==='終点');
+    if(sanjo) selectStation(sanjo);
   }
 });
 document.getElementById('tk-to-map-btn').addEventListener('click',()=>{
@@ -1427,7 +1453,7 @@ function buildTokaidoMap(){
     const [cx,cy]=proj([s.lon,s.lat]);
     if(isNaN(cx)||isNaN(cy))return;
     const sg=g.append('g').attr('class','tk-station').attr('data-num',s.num||i)
-      .attr('data-special',s.special?'1':'0')
+      .attr('data-special',s.special?'1':'0').attr('data-label',s.label||'')
       .attr('transform','translate('+cx+','+cy+')')
       .style('cursor','pointer');
 
@@ -1520,20 +1546,23 @@ function selectStation(s){
     if(special){return num===0?'#ff6060':'#5090ff';}
     return '#ff9040';
   }).attr('stroke-width',1);
-  if(!s.special&&s.num){
-    const svgEl=document.getElementById('tokaido-svg');
-    const gEl=svgEl.querySelector('g');
-    if(gEl){
-      // フォーカスノードを最前面に移動（他ドットに隠れない）
-      const sg=d3.select(gEl).select('.tk-station[data-num="'+s.num+'"][data-special="0"]');
-      if(!sg.empty()){
-        sg.raise(); // SVG内で最後に描画 = 最前面
-        sg.select('.tk-dot').attr('r',11).attr('fill','#ff8030').attr('stroke','#ffb060').attr('stroke-width',2);
-        sg.append('text').attr('class','tk-focus-label')
-          .attr('text-anchor','middle').attr('dy','0.38em')
-          .attr('font-size','10').attr('font-weight','bold').attr('fill','#fff')
-          .attr('pointer-events','none').text(String(s.num));
-      }
+  const svgEl=document.getElementById('tokaido-svg');
+  const gEl=svgEl.querySelector('g');
+  if(gEl){
+    let sg;
+    if(s.special){
+      sg=d3.select(gEl).select('.tk-station[data-label="'+(s.label||'')+'"][data-special="1"]');
+    } else {
+      sg=d3.select(gEl).select('.tk-station[data-num="'+s.num+'"][data-special="0"]');
+    }
+    if(sg&&!sg.empty()){
+      sg.raise();
+      sg.select('.tk-dot').attr('r',11).attr('fill','#ff8030').attr('stroke','#ffb060').attr('stroke-width',2);
+      sg.append('text').attr('class','tk-focus-label')
+        .attr('text-anchor','middle').attr('dy','0.38em')
+        .attr('font-size','10').attr('font-weight','bold').attr('fill','#fff')
+        .attr('pointer-events','none')
+        .text(s.special?(s.label==='起点'?'発':'着'):String(s.num));
     }
   }
 
@@ -1544,10 +1573,21 @@ function selectStation(s){
   document.getElementById('tk-badge-desc').textContent=s.desc||'';
   badge.classList.add('show');
 
-  // progress
-  const pct=s.km/549*100;
-  document.getElementById('tk-prog-fill').style.width=pct+'%';
-  document.getElementById('tk-prog-label').textContent=s.km+' / 549km';
+  // progress — 残距離（日本橋=満タン、三条大橋=0）
+  const km=s.km||0;
+  const remaining=549-km;
+  document.getElementById('tk-prog-fill').style.width=(remaining/549*100)+'%';
+  document.getElementById('tk-prog-label').textContent=remaining+' / 549km';
+
+  // ボタン有効/無効
+  const atStart=s.special&&s.label==='起点';
+  const atEnd=s.special&&s.label==='終点';
+  const prevBtn=document.getElementById('tk-prev-btn');
+  const nextBtn=document.getElementById('tk-next-btn');
+  prevBtn.style.opacity=atStart?'0.3':'1';
+  prevBtn.style.pointerEvents=atStart?'none':'auto';
+  nextBtn.style.opacity=atEnd?'0.3':'1';
+  nextBtn.style.pointerEvents=atEnd?'none':'auto';
 
   // highlight in list
   document.querySelectorAll('.tk-list-item').forEach(el=>{
