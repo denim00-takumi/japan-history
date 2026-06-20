@@ -14,7 +14,7 @@ html,body{height:100%;overflow:hidden;background:#0a0a0f;color:#e0e0e8;font-fami
 body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 
 /* ── ERA HEADER ── */
-#era-header{flex-shrink:0;background:#0d0d16;border-bottom:.5px solid rgba(255,255,255,.08)}
+#era-header{flex-shrink:0;background:#0d0d16;border-bottom:.5px solid rgba(255,255,255,.08);padding:0 5px}
 #century-bar{height:14px;display:flex;position:relative;background:#060610;overflow:hidden;border-bottom:.5px solid rgba(255,255,255,.04)}
 .cent-seg{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:flex-start;padding-left:2px;border-right:.5px solid rgba(255,255,255,.08)}
 .cent-label{font-size:7px;color:#4a4a68;white-space:nowrap;pointer-events:none}
@@ -58,7 +58,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .nav-action.muted{color:#555;background:#111118;border-color:#1a1a24}
 
 /* ── 年表 ── */
-#tab-nenpyo{overflow:hidden;display:flex;flex-direction:column}
+#tab-nenpyo{overflow:hidden;display:flex;flex-direction:column;padding:0 5px}
 #nenpyo-filter{flex-shrink:0;display:flex;overflow-x:auto;padding:4px 8px;gap:4px;background:#0c0c16;border-bottom:.5px solid rgba(255,255,255,.06);scrollbar-width:none}
 #nenpyo-filter::-webkit-scrollbar{display:none}
 .cat-chip{flex-shrink:0;height:22px;padding:0 10px;border-radius:11px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:13px;color:#666;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s}
@@ -84,7 +84,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #map-tt{position:absolute;display:none;background:rgba(5,15,30,.96);color:rgba(255,255,255,.85);padding:3px 8px;font-size:12px;border-radius:4px;pointer-events:none;border:.5px solid rgba(64,192,255,.3);white-space:nowrap;z-index:10}
 
 /* ── 人物 ── */
-#tab-jinbutsu{overflow:hidden;display:flex;flex-direction:column}
+#tab-jinbutsu{overflow:hidden;display:flex;flex-direction:column;padding:0 5px}
 #jinbutsu-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .person-acc-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0f0f18;border-top:.5px solid rgba(255,255,255,.05);cursor:pointer;user-select:none}
 .person-acc-left{display:flex;align-items:center;gap:8px}
@@ -104,7 +104,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .person-sub{font-size:12px;color:#aaa;margin-top:1px}
 
 /* ── 検索 ── */
-#tab-kensaku{overflow:hidden;display:flex;flex-direction:column}
+#tab-kensaku{overflow:hidden;display:flex;flex-direction:column;padding:0 5px}
 #search-box-wrap{flex-shrink:0;padding:8px 10px;background:#0c0c16;border-bottom:.5px solid rgba(255,255,255,.06)}
 #search-box{display:flex;align-items:center;gap:8px;background:#0a0a18;border:.5px solid #2a2a40;border-radius:10px;padding:8px 12px}
 #search-box.active{border-color:#3a5080}
@@ -843,7 +843,7 @@ function renderMap(){
   const LAT_N=45.5, LAT_S=30.9, LON_C=137.5;
   const merc=φ=>Math.log(Math.tan(Math.PI/4+φ*Math.PI/360));
   const latSpan=merc(LAT_N)-merc(LAT_S);
-  const scale=h*0.90/latSpan;
+  const scale=h*0.81/latSpan;
   const tx=w/2-scale*LON_C*Math.PI/180;
   const ty=h/2+scale*(merc(LAT_N)+merc(LAT_S))/2;
   projection=d3.geoMercator().scale(scale).translate([tx,ty]);
@@ -868,11 +868,12 @@ function renderMap(){
   // 沖縄県 — 左上に小さく表示
   const okiFeat=allFeat.features.filter(d=>getPrefName(d.properties||{})==='沖縄県');
   if(okiFeat.length){
-    const okiProj=d3.geoMercator().fitExtent([[6,6],[120,120]],{type:'FeatureCollection',features:okiFeat});
+    const OKI_SZ=175;
+    const okiProj=d3.geoMercator().fitExtent([[5,5],[OKI_SZ,OKI_SZ]],{type:'FeatureCollection',features:okiFeat});
     const okiPath=d3.geoPath().projection(okiProj);
     const okiG=svg.append('g').attr('class','oki-group');
     // 枠
-    okiG.append('rect').attr('x',3).attr('y',3).attr('width',120).attr('height',120)
+    okiG.append('rect').attr('x',2).attr('y',2).attr('width',OKI_SZ).attr('height',OKI_SZ)
       .attr('fill','#050c14').attr('stroke','rgba(255,255,255,0.12)').attr('rx',4);
     okiG.selectAll('path.oki')
       .data(okiFeat)
@@ -883,7 +884,7 @@ function renderMap(){
       .attr('stroke','rgba(0,0,0,0.5)')
       .attr('stroke-width',0.4)
       .on('click',()=>showMapBadge('沖縄県','琉球国'));
-    okiG.append('text').attr('x',63).attr('y',130).attr('text-anchor','middle')
+    okiG.append('text').attr('x',OKI_SZ/2).attr('y',OKI_SZ+12).attr('text-anchor','middle')
       .attr('font-size','9').attr('fill','rgba(255,255,255,0.4)').text('沖縄');
   }
 
