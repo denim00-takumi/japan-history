@@ -17,11 +17,11 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #era-header{flex-shrink:0;background:#0d0d16;border-bottom:.5px solid rgba(255,255,255,.08);padding:0 5px}
 #century-bar{height:14px;display:flex;position:relative;background:#060610;overflow:hidden;border-bottom:.5px solid rgba(255,255,255,.04)}
 .cent-seg{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:flex-start;padding-left:2px;border-right:.5px solid rgba(255,255,255,.08)}
-.cent-label{font-size:7px;color:#4a4a68;white-space:nowrap;pointer-events:none}
-#era-indicator{height:20px;display:flex;position:relative;background:#080810;overflow:hidden}
+.cent-label{font-size:7px;color:#9898b8;white-space:nowrap;pointer-events:none}
+#era-indicator{height:20px;display:flex;position:relative;background:#080810;overflow-x:clip;overflow-y:visible}
 .ei-seg{border-right:.5px solid rgba(255,255,255,.2);position:relative;transition:opacity .2s;flex-shrink:0}
 .ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#c8c8e0;white-space:nowrap;pointer-events:none}
-#era-redline{position:absolute;top:0;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none;transition:left .4s ease}
+#era-redline{position:absolute;top:-14px;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none;transition:left .4s ease}
 #era-chips{display:flex;overflow:hidden;height:50px;align-items:flex-start;padding-top:3px;position:relative;user-select:none}
 .era-chip{
   flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
@@ -38,7 +38,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 
 /* ── TAB BAR ── */
 #tab-bar{flex-shrink:0;display:flex;background:#0d0d14;border-top:.5px solid rgba(255,255,255,.08);padding:4px 0;padding-bottom:calc(4px + env(safe-area-inset-bottom))}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#888;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#888;background:none;border:none;cursor:pointer;font-family:inherit;padding:9px 0 0}
 .tab-btn.active{color:#5090ff}
 .tab-btn i{font-size:23px;line-height:1}
 
@@ -74,7 +74,8 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 /* ── 地図 ── */
 #tab-chizu{overflow:hidden;display:flex;flex-direction:column}
 #map-selectors{flex-shrink:0;padding:5px 8px;background:#0f0f18;border-bottom:.5px solid rgba(255,255,255,.07);display:flex;gap:6px}
-#map-selectors select{flex:1;background:#0a0a18;border:.5px solid #222238;border-radius:6px;padding:5px 8px;font-size:14px;color:#80a0d0;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer}
+#map-selectors select{flex:1;background:#0a0a18;border:.5px solid #222238;border-radius:6px;padding:5px 8px;font-size:12px;color:#80a0d0;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;text-align:left}
+#map-selectors select option:checked{color:#ff8040}
 #map-svg-wrap{flex:1;background:#050c14;position:relative;overflow:hidden}
 #map-svg{width:100%;height:100%}
 #map-badge{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(6,12,26,.92);border:.5px solid rgba(64,192,255,.3);border-radius:8px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .3s}
@@ -109,7 +110,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #search-box{display:flex;align-items:center;gap:8px;background:#0a0a18;border:.5px solid #2a2a40;border-radius:10px;padding:8px 12px}
 #search-box.active{border-color:#3a5080}
 #search-input{flex:1;font-size:16px;color:#e0e8ff;background:none;border:none;outline:none;font-family:inherit}
-#search-input::placeholder{color:#2a2a3a}
+#search-input::placeholder{color:#555}
 #search-clear{color:#888;background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0}
 #search-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #search-initial{padding:12px 10px}
@@ -138,7 +139,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .det-map-stub{height:80px;background:#050c14;border-radius:8px;border:.5px solid #0f1e30;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;cursor:pointer}
 .det-map-label{font-size:12px;color:#0f2030}
 .det-map-goto{position:absolute;right:8px;bottom:6px;font-size:12px;color:#3060a0;background:rgba(5,12,28,.8);padding:2px 6px;border-radius:3px}
-.det-section{font-size:12px;color:#2a2a40;font-weight:500;margin-bottom:6px;margin-top:4px}
+.det-section{font-size:12px;color:#888;font-weight:500;margin-bottom:6px;margin-top:4px}
 .det-person-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#111120;border-radius:6px;border:.5px solid #1a1a2a;cursor:pointer;margin-right:5px;margin-bottom:5px}
 .det-scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
 
@@ -236,6 +237,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
   <!-- ② 地図 -->
   <div class="screen hidden" id="tab-chizu">
     <div id="map-selectors">
+      <button id="map-back-btn" style="display:none;font-size:13px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;flex-shrink:0;padding:0 4px 0 0;align-items:center;gap:2px"><i class="ti ti-chevron-left"></i>戻る</button>
       <select id="sel-kuni"><option value="">— 旧国名を選択 —</option></select>
     </div>
     <div id="map-svg-wrap">
@@ -254,7 +256,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
   <div class="screen hidden" id="tab-kensaku">
     <div id="search-box-wrap">
       <div id="search-box">
-        <i class="ti ti-search" style="font-size:20px;color:#444"></i>
+        <i class="ti ti-search" style="font-size:20px;color:#888"></i>
         <input id="search-input" type="search" placeholder="イベント・人物・宿場を検索..." autocomplete="off" autocorrect="off" spellcheck="false">
         <button id="search-clear" style="display:none">✕</button>
       </div>
@@ -268,7 +270,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
         </div>
         <div class="search-shortcut" data-goto="population">
           <i class="ti ti-chart-line" style="color:#60c060"></i>
-          <div><div class="search-shortcut-t">日本人口の変遷</div><div class="search-shortcut-s">縄文〜現代 2000年の人口推移</div></div>
+          <div><div class="search-shortcut-t">日本の人口</div><div class="search-shortcut-s">縄文〜現代 2000年の人口推移</div></div>
         </div>
       </div>
       <div id="search-results"></div>
@@ -296,7 +298,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
     <div class="nav-row">
       <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索</button>
       <span class="nav-title">東海道五十三次</span>
-      <button class="nav-action muted" id="tk-to-list-btn">一覧</button>
+      <button class="nav-action" id="tk-to-list-btn" style="color:#5090ff">宿場一覧</button>
     </div>
     <div id="tokaido-map-wrap">
       <svg id="tokaido-svg"></svg>
@@ -305,6 +307,10 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
         <div id="tk-badge-name"></div>
         <div id="tk-badge-desc"></div>
       </div>
+    </div>
+    <div id="tokaido-nav" style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:#0a0a12;border-top:.5px solid rgba(255,255,255,.06)">
+      <button id="tk-prev-btn" style="font-size:13px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px">◀ 前の宿場</button>
+      <button id="tk-next-btn" style="font-size:13px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px">次の宿場 ▶</button>
     </div>
     <div id="tokaido-progress">
       <div id="tk-prog-bar"><div id="tk-prog-fill"></div></div>
@@ -326,7 +332,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
   <div class="screen hidden" id="screen-population">
     <div class="nav-row">
       <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索</button>
-      <span class="nav-title">日本人口の変遷</span>
+      <span class="nav-title">日本の人口</span>
     </div>
     <div id="pop-canvas-wrap">
       <canvas id="pop-canvas"></canvas>
@@ -645,7 +651,14 @@ function switchTab(tab){
     const el=document.getElementById('tab-'+id);
     el.classList.toggle('hidden',id!==tab);
   });
-  if(tab==='chizu') requestAnimationFrame(()=>requestAnimationFrame(renderMap));
+  if(tab==='chizu'){
+    mapRendered=false;
+    document.getElementById('sel-kuni').value='';
+    // hide back button (only shown when navigating from person detail)
+    const mapBackBtn=document.getElementById('map-back-btn');
+    if(mapBackBtn) mapBackBtn.style.display='none';
+    requestAnimationFrame(()=>requestAnimationFrame(renderMap));
+  }
 }
 
 // ── L2 SCREEN NAVIGATION ───────────────────────────────────
@@ -1032,13 +1045,23 @@ function showPersonDetail(p, color, sq){
   `;
   if(hasLocs){
     document.getElementById('person-map-btn').addEventListener('click',()=>{
-      // 地図タブへ移動し、時代を合わせる
       closeAllScreens();
-      switchTab('chizu');
-      if(era){
-        document.getElementById('sel-era').value=era.id;
-        setTimeout(()=>updateMapEra(),100);
+      // 地図タブへ（mapRenderedリセットなし：再描画を避ける）
+      currentTab='chizu';
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='chizu'));
+      ['nenpyo','chizu','jinbutsu','kensaku'].forEach(id=>{
+        document.getElementById('tab-'+id).classList.toggle('hidden',id!=='chizu');
+      });
+      // 戻るボタンを表示
+      const mapBackBtn=document.getElementById('map-back-btn');
+      if(mapBackBtn){
+        mapBackBtn.style.display='flex';
+        mapBackBtn.onclick=()=>{
+          mapBackBtn.style.display='none';
+          showPersonDetail(p,color,sq);
+        };
       }
+      if(!mapRendered) requestAnimationFrame(()=>requestAnimationFrame(renderMap));
     });
   }
 
@@ -1182,6 +1205,24 @@ function openTokaido(){
 
 document.getElementById('tk-to-list-btn').addEventListener('click',()=>{
   showScreen('screen-tokaido-list');
+});
+
+// 前の宿場・次の宿場ボタン
+document.getElementById('tk-prev-btn').addEventListener('click',()=>{
+  if(!activeStation||activeStation.special)return;
+  const idx=TOKAIDO.findIndex(s=>!s.special&&s.num===activeStation.num);
+  if(idx>0){
+    const prev=TOKAIDO.slice(0,idx).reverse().find(s=>!s.special&&!s.midpoint);
+    if(prev) selectStation(prev);
+  }
+});
+document.getElementById('tk-next-btn').addEventListener('click',()=>{
+  if(!activeStation||activeStation.special)return;
+  const idx=TOKAIDO.findIndex(s=>!s.special&&s.num===activeStation.num);
+  if(idx>=0){
+    const next=TOKAIDO.slice(idx+1).find(s=>!s.special&&!s.midpoint);
+    if(next) selectStation(next);
+  }
 });
 document.getElementById('tk-to-map-btn').addEventListener('click',()=>{
   const stack=[...screenStack];
@@ -1328,7 +1369,19 @@ function selectStation(s){
     const sg=this.parentNode;
     const special=sg.getAttribute('data-special')==='1';
     return special?5:3;
-  });
+  }).attr('fill',function(){
+    const sg=this.parentNode;
+    const num=parseInt(sg.getAttribute('data-num'));
+    const special=sg.getAttribute('data-special')==='1';
+    if(special){return num===0?'#ff4040':'#3060b0';}
+    return '#4a6a40';
+  }).attr('stroke',function(){
+    const sg=this.parentNode;
+    const num=parseInt(sg.getAttribute('data-num'));
+    const special=sg.getAttribute('data-special')==='1';
+    if(special){return num===0?'#ff6060':'#5090ff';}
+    return '#90c070';
+  }).attr('stroke-width',1);
   if(!s.special&&s.num){
     const svgEl=document.getElementById('tokaido-svg');
     const gEl=svgEl.querySelector('g');
@@ -1337,7 +1390,7 @@ function selectStation(s){
       const sg=d3.select(gEl).select('.tk-station[data-num="'+s.num+'"][data-special="0"]');
       if(!sg.empty()){
         sg.raise(); // SVG内で最後に描画 = 最前面
-        sg.select('.tk-dot').attr('r',11).attr('fill','#c08040').attr('stroke','#ffd080').attr('stroke-width',2);
+        sg.select('.tk-dot').attr('r',11);
         sg.append('text').attr('class','tk-focus-label')
           .attr('text-anchor','middle').attr('dy','0.38em')
           .attr('font-size','10').attr('font-weight','bold').attr('fill','#fff')
@@ -1423,7 +1476,7 @@ function drawPopulation(){
   const ctx=canvas.getContext('2d');
   ctx.scale(dpr,dpr);
 
-  const pad={t:15,r:52,b:30,l:48};
+  const pad={t:15,r:10,b:30,l:68};
   const iw=w-pad.l-pad.r, ih=h-pad.t-pad.b;
   const maxP=Math.max(...POP_DATA.map(d=>d.p));
   const minY=POP_DATA[0].y, maxY=POP_DATA[POP_DATA.length-1].y;
@@ -1440,13 +1493,13 @@ function drawPopulation(){
   });
 
   // grid lines
-  ctx.strokeStyle='rgba(255,255,255,0.05)';
+  ctx.strokeStyle='rgba(255,255,255,0.15)';
   ctx.lineWidth=1;
   [2000,5000,8000,12000].forEach(p=>{
     const y=yScale(p);
     ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
-    ctx.fillStyle='#888';ctx.font='9px -apple-system,sans-serif';
-    ctx.textAlign='left';ctx.fillText((p/1).toLocaleString()+'万',w-pad.r+4,y+3);
+    ctx.fillStyle='#aaa';ctx.font='9px -apple-system,sans-serif';
+    ctx.textAlign='right';ctx.fillText((p/1).toLocaleString()+'万',pad.l-4,y+3);
   });
 
   // year labels
