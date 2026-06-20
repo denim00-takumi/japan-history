@@ -193,7 +193,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .tk-row-sub.active-station{color:#3a5080}
 
 /* ── L2: 人口グラフ ── */
-#pop-canvas-wrap{flex:1;padding:12px;display:flex;flex-direction:column;gap:8px}
+#pop-canvas-wrap{flex:1;padding:12px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
 #pop-canvas{width:100%;flex:1}
 .pop-stat-row{display:flex;gap:8px}
 .pop-stat{flex:1;background:#111120;border-radius:8px;border:.5px solid #1a1a2a;padding:8px 10px}
@@ -355,6 +355,26 @@ input,textarea{-webkit-user-select:text;user-select:text}
       <div class="pop-stat-row">
         <div class="pop-stat"><div class="pop-stat-label">最大人口</div><div class="pop-stat-value">12,806万人</div><div class="pop-stat-sub">2008年（平成20）</div></div>
         <div class="pop-stat"><div class="pop-stat-label">現在（令和）</div><div class="pop-stat-value" style="color:#aaa">12,435万人</div><div class="pop-stat-sub" style="color:#ff5050">▼ 減少傾向</div></div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:#080812;border-radius:8px;border:.5px solid #1a1a2a">
+        <div style="font-size:12px;color:#8888aa;margin-bottom:10px">時代ごとの日本の人口（推定）</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tbody>
+            <tr><td style="color:#b0b8d0;padding:3px 0">古墳時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">150<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">飛鳥時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">500<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">奈良時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">600<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">平安時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">700<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">鎌倉時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">800<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">室町時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1,000<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">安土桃山時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1,500<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">江戸時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">3,000<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">明治時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">5,000<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">大正時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">6,000<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">昭和時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1億2,300<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">平成時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1億2,800<span style="color:#888">万</span><span style="color:#888;font-size:11px">（ピーク）</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">令和時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1億2,300<span style="color:#888">万</span></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -936,7 +956,7 @@ function renderMap(){
     .on('click',function(ev,d){
       const nm=getPrefName(d.properties||{});
       clearMap();
-      d3.select(this).classed('pref-highlighted',true);
+      d3.select(this).attr('fill','#60c0ff').classed('pref-highlighted',true);
       showMapBadge(nm, PREFRG[nm]?(KUNI_LABELS[PREFRG[nm]]||''):'');
     });
 
@@ -966,7 +986,7 @@ function renderMap(){
       .attr('stroke-width',0.4)
       .on('click',function(){
         clearMap();
-        d3.select(this).classed('pref-highlighted',true);
+        d3.select(this).attr('fill','#60c0ff').classed('pref-highlighted',true);
         showMapBadge('沖縄県','琉球国');
       });
     okiG.append('text').attr('x',OKI_SZ/2).attr('y',OKI_SZ+12).attr('text-anchor','middle')
@@ -996,7 +1016,7 @@ function renderMap(){
   });
 
   updateMapEra();
-  if(personMapLocs) drawPersonLocsOnMap(rgCentroids);
+  drawPersonLocsOnMap(rgCentroids); // rgCentroids_を常に更新。personMapLocsがnullなら内部でreturn
 }
 
 // rgCentroidsをモジュールレベルで保持
