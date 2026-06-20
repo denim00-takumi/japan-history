@@ -834,13 +834,19 @@ function renderMap(){
   mapRendered=true;
   const wrap=document.getElementById('map-svg-wrap');
   const w=wrap.clientWidth,h=wrap.clientHeight;
+  if(!w||!h){mapRendered=false;return;}
   const svg=d3.select('#map-svg').attr('viewBox','0 0 '+w+' '+h);
 
   const allFeat=topojson.feature(TOPO,TOPO.objects.japan);
-  // 本州・四国・九州・北海道のみでfitExtent（沖縄除外で本土を大きく表示）
-  const mainlandFeat={type:'FeatureCollection',features:allFeat.features.filter(d=>getPrefName(d.properties||{})!=='沖縄県')};
-
-  projection=d3.geoMercator().fitExtent([[4,4],[w-4,h*0.96]],mainlandFeat);
+  // 手動投影：日本本土（130-146°E, 30.9-45.5°N）が縦90%に収まるようスケール算出
+  // 小笠原・南鳥島などの離島はSVG範囲外になるため自然にクリップされる
+  const LAT_N=45.5, LAT_S=30.9, LON_C=137.5;
+  const merc=φ=>Math.log(Math.tan(Math.PI/4+φ*Math.PI/360));
+  const latSpan=merc(LAT_N)-merc(LAT_S);
+  const scale=h*0.90/latSpan;
+  const tx=w/2-scale*LON_C*Math.PI/180;
+  const ty=h/2+scale*(merc(LAT_N)+merc(LAT_S))/2;
+  projection=d3.geoMercator().scale(scale).translate([tx,ty]);
   path=d3.geoPath().projection(projection);
 
   mapG=svg.append('g');
