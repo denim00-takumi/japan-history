@@ -1611,7 +1611,7 @@ function drawPopulation(){
   const ctx=canvas.getContext('2d');
   ctx.scale(dpr,dpr);
 
-  const pad={t:15,r:10,b:30,l:48};
+  const pad={t:15,r:10,b:30,l:43};
   const iw=w-pad.l-pad.r, ih=h-pad.t-pad.b;
   const maxP=Math.max(...POP_DATA.map(d=>d.p));
   const minY=POP_DATA[0].y, maxY=POP_DATA[POP_DATA.length-1].y;
