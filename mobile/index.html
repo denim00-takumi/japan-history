@@ -1602,7 +1602,7 @@ function drawPopulation(){
   const canvas=document.getElementById('pop-canvas');
   const wrap=document.getElementById('pop-canvas-wrap');
   const dpr=window.devicePixelRatio||1;
-  const w=wrap.getBoundingClientRect().width||370;
+  const w=(wrap.getBoundingClientRect().width-24)||346; // subtract wrap padding (12px×2)
   const h=canvas.parentElement.clientHeight-120||220;
   canvas.width=w*dpr;
   canvas.height=h*dpr;
