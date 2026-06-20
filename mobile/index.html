@@ -77,7 +77,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 #map-selectors{flex-shrink:0;padding:5px 8px;background:#0f0f18;border-bottom:.5px solid rgba(255,255,255,.07);display:flex;gap:6px;position:relative;z-index:10}
 #kuni-dropdown{flex:1;position:relative}
 #kuni-btn{width:100%;background:#0a0a18;border:.5px solid #222238;border-radius:6px;padding:5px 8px;font-size:12px;color:#80a0d0;font-family:inherit;outline:none;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between}
-#kuni-btn.has-value{color:#ff8040}
+#kuni-btn.has-value{color:#80a0d0}
 #kuni-btn i{font-size:10px;opacity:.6;transition:transform .15s}
 #kuni-btn.open i{transform:rotate(180deg)}
 #kuni-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#0d0d1e;border:.5px solid #2a2a48;border-radius:8px;max-height:260px;overflow-y:auto;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.6)}
@@ -324,7 +324,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
     <div id="tokaido-nav" style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:#0a0a12;border-top:.5px solid rgba(255,255,255,.06)">
-      <button id="tk-prev-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;font-size:13px;color:#5090ff;opacity:0.3;pointer-events:none">三条大橋 ▶</button>
+      <button id="tk-prev-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;font-size:13px;color:#5090ff">三条大橋 ▶</button>
       <button id="tk-next-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;font-size:13px;color:#c03030">◀ 日本橋</button>
 
     </div>
@@ -509,7 +509,7 @@ function buildEraHeader(){
   // 世紀バー
   const centBar=document.getElementById('century-bar');
   const totalYrs=2030-250;
-  for(let c=3;c<=21;c++){
+  for(let c=3;c<=19;c++){
     const yr=c*100;
     const pct=(yr-250)/totalYrs*100;
     if(pct<0||pct>100)continue;
@@ -846,16 +846,6 @@ function buildMap(){
   const btn=document.getElementById('kuni-btn');
   const label=document.getElementById('kuni-label');
 
-  // クリア行
-  const clearEl=document.createElement('div');
-  clearEl.className='kuni-clear';
-  clearEl.textContent='— 旧国名を選択 —';
-  clearEl.addEventListener('click',()=>{
-    setKuni('','— 旧国名を選択 —');
-    closeKuniPanel();
-  });
-  panel.appendChild(clearEl);
-
   let lastRg='';
   PROVS.forEach(p=>{
     if(p.rg!==lastRg){
@@ -904,6 +894,9 @@ function setKuni(value,text){
   document.querySelectorAll('.kuni-item').forEach(el=>{
     el.classList.toggle('selected',el.dataset.value===value);
   });
+  // 旧国名選択時は人物マーカーをクリア
+  if(mapG) mapG.selectAll('.person-loc-marker').remove();
+  if(value) personMapLocs=null;
   updateMapEra();
 }
 
@@ -1015,7 +1008,7 @@ function drawPersonLocsOnMap(rgC){
   if(!mapRendered||!mapG) return;
   mapG.selectAll('.person-loc-marker').remove();
   if(!personMapLocs) return;
-  const typeColors={birth:'#60a0ff',active:'#ff8030',exile:'#ff4060',death:'#909090'};
+  const typeColors={birth:'#40b060',active:'#5090ff',exile:'#ff8030',death:'#909090'};
   const typeLabel={birth:'生',active:'活',exile:'流',death:'没'};
   personMapLocs.forEach(loc=>{
     // loc.r は旧国名コード or 地域コード
@@ -1141,12 +1134,14 @@ function showPersonDetail(p, color, sq){
   let locsHtml='';
   const typeMap={birth:'出生地',active:'活躍の地',exile:'流刑地',death:'没地'};
   const typeIcon={birth:'ti-home',active:'ti-star',exile:'ti-arrow-right',death:'ti-skull'};
+  const typeClr={birth:'#40b060',active:'#5090ff',exile:'#ff8030',death:'#909090'};
   if(p.locs&&p.locs.length){
     p.locs.forEach(loc=>{
       const icon=typeIcon[loc.tp]||'ti-map-pin';
+      const clr=typeClr[loc.tp]||loc.c||'#888';
       locsHtml+=`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;padding:6px 0;border-bottom:.5px solid rgba(255,255,255,.05)">
-        <div style="width:26px;height:26px;border-radius:50%;background:${loc.c}33;border:.5px solid ${loc.c};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="ti ${icon}" style="font-size:13px;color:${loc.c}"></i></div>
+        <div style="width:26px;height:26px;border-radius:50%;background:${clr}33;border:.5px solid ${clr};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="ti ${icon}" style="font-size:13px;color:${clr}"></i></div>
         <div><div style="font-size:11px;color:#888;margin-bottom:2px">${escHtml(typeMap[loc.tp]||loc.tp)}</div>
         <div style="font-size:14px;color:#ccc">${escHtml(loc.lb||KUNI_LABELS[loc.r]||loc.r)}</div></div>
       </div>`;
@@ -1179,6 +1174,8 @@ function showPersonDetail(p, color, sq){
   if(hasLocs){
     document.getElementById('person-map-btn').addEventListener('click',()=>{
       closeAllScreens();
+      // 既存マーカーをクリアしてから新しい人物ロケーションをセット
+      if(mapG) mapG.selectAll('.person-loc-marker').remove();
       personMapLocs=p.locs||null;
       // 地図タブへ（mapRenderedリセットなし：既存描画を活かす）
       currentTab='chizu';
@@ -1573,15 +1570,11 @@ function selectStation(s){
   document.getElementById('tk-prog-fill').style.width=(remaining/549*100)+'%';
   document.getElementById('tk-prog-label').textContent=remaining+' / 549km';
 
-  // ボタン有効/無効
-  const atStart=s.special&&s.label==='起点';
-  const atEnd=s.special&&s.label==='終点';
-  const prevBtn=document.getElementById('tk-prev-btn');
-  const nextBtn=document.getElementById('tk-next-btn');
-  prevBtn.style.opacity=atStart?'0.3':'1';
-  prevBtn.style.pointerEvents=atStart?'none':'auto';
-  nextBtn.style.opacity=atEnd?'0.3':'1';
-  nextBtn.style.pointerEvents=atEnd?'none':'auto';
+  // ボタンは常に有効
+  document.getElementById('tk-prev-btn').style.opacity='1';
+  document.getElementById('tk-prev-btn').style.pointerEvents='auto';
+  document.getElementById('tk-next-btn').style.opacity='1';
+  document.getElementById('tk-next-btn').style.pointerEvents='auto';
 
   // highlight in list
   document.querySelectorAll('.tk-list-item').forEach(el=>{
