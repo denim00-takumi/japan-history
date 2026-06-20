@@ -844,7 +844,7 @@ function renderMap(){
   const merc=φ=>Math.log(Math.tan(Math.PI/4+φ*Math.PI/360));
   const latSpan=merc(LAT_N)-merc(LAT_S);
   const scale=h*0.778/latSpan;
-  const tx=w/2-scale*LON_C*Math.PI/180;
+  const tx=w/2-5-scale*LON_C*Math.PI/180;
   const ty=h/2+scale*(merc(LAT_N)+merc(LAT_S))/2;
   projection=d3.geoMercator().scale(scale).translate([tx,ty]);
   path=d3.geoPath().projection(projection);
@@ -868,14 +868,20 @@ function renderMap(){
   // 沖縄県 — 左上に小さく表示
   const okiFeat=allFeat.features.filter(d=>getPrefName(d.properties||{})==='沖縄県');
   if(okiFeat.length){
-    const OKI_SZ=175;
-    const okiProj=d3.geoMercator().fitExtent([[5,5],[OKI_SZ,OKI_SZ]],{type:'FeatureCollection',features:okiFeat});
+    // 大東諸島（131°E）を除外し主要琉球弧のみ表示
+    // center=[125.75,25.5]でfit、大東島はSVG外にクリップされる
+    const OKI_SZ=140, OKI_SCALE=1147;
+    const okiProj=d3.geoMercator().center([125.75,25.5]).scale(OKI_SCALE).translate([OKI_SZ/2,OKI_SZ/2]);
     const okiPath=d3.geoPath().projection(okiProj);
     const okiG=svg.append('g').attr('class','oki-group');
-    // 枠
+    // 枠（クリップ付き）
+    const okiClipId='oki-clip';
+    svg.append('defs').append('clipPath').attr('id',okiClipId)
+      .append('rect').attr('x',2).attr('y',2).attr('width',OKI_SZ).attr('height',OKI_SZ);
     okiG.append('rect').attr('x',2).attr('y',2).attr('width',OKI_SZ).attr('height',OKI_SZ)
       .attr('fill','#050c14').attr('stroke','rgba(255,255,255,0.12)').attr('rx',4);
-    okiG.selectAll('path.oki')
+    okiG.append('g').attr('clip-path','url(#oki-clip)')
+      .selectAll('path.oki')
       .data(okiFeat)
       .join('path')
       .attr('class','oki pref')
