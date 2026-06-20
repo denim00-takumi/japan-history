@@ -663,6 +663,11 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 
 function switchTab(tab){
   if(screenStack.length>0) closeAllScreens();
+  // 地図以外のタブに切り替えたらロケーションマーカーをクリア
+  if(tab!=='chizu'){
+    personMapLocs=null;
+    if(mapG) mapG.selectAll('.person-loc-marker').remove();
+  }
   currentTab=tab;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   const screens=['nenpyo','chizu','jinbutsu','kensaku'];
@@ -812,6 +817,8 @@ function showEventDetail(ev, era){
 
 // ── 地図 ──────────────────────────────────────────────────
 let projection, path, mapG;
+let prefCentroids={};  // 都道府県名 → [x,y] セントロイド
+let personMapLocs=null; // 地図タブに表示中の人物ロケーション
 // WEB版準拠 地域色
 const RGFILL={hokkaido:'#3a7a44',tohoku:'#3d7848',kanto:'#4a6080',chubu:'#7a6a38',kinki:'#7a4060',chugoku:'#3a6860',shikoku:'#447050',kyushu:'#6a4838',other:'#2e4060'};
 // 都道府県 → 地域
@@ -968,7 +975,40 @@ function renderMap(){
       .attr('font-size','9').attr('fill','rgba(255,255,255,0.4)').text('沖縄');
   }
 
+  // セントロイド記録（本土）
+  prefCentroids={};
+  mapG.selectAll('path.pref').each(function(d){
+    const nm=getPrefName(d.properties||{});
+    const c=path.centroid(d);
+    if(nm&&!isNaN(c[0])) prefCentroids[nm]=c;
+  });
+  prefCentroids['沖縄県']=[72,72]; // oki box center (2+140/2)
+
   updateMapEra();
+  if(personMapLocs) drawPersonLocsOnMap();
+}
+
+function drawPersonLocsOnMap(){
+  if(!mapRendered||!mapG) return;
+  mapG.selectAll('.person-loc-marker').remove();
+  if(!personMapLocs) return;
+  const typeColors={birth:'#60a0ff',active:'#ff8030',exile:'#ff4060',death:'#909090'};
+  const typeLabel={birth:'生',active:'活',exile:'流',death:'没'};
+  personMapLocs.forEach(loc=>{
+    const prefs=PROVPREF[loc.r]||[];
+    prefs.forEach(pref=>{
+      const c=prefCentroids[pref];
+      if(!c||isNaN(c[0])) return;
+      const clr=typeColors[loc.tp]||'#888';
+      const lbl=typeLabel[loc.tp]||'●';
+      const mg=mapG.append('g').attr('class','person-loc-marker')
+        .attr('transform','translate('+c[0]+','+c[1]+')');
+      mg.append('circle').attr('r',9).attr('fill',clr+'aa').attr('stroke',clr).attr('stroke-width',1.5);
+      mg.append('text').attr('text-anchor','middle').attr('dy','0.38em')
+        .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
+        .attr('pointer-events','none').text(lbl);
+    });
+  });
 }
 
 function updateMapEra(){
@@ -1110,7 +1150,8 @@ function showPersonDetail(p, color, sq){
   if(hasLocs){
     document.getElementById('person-map-btn').addEventListener('click',()=>{
       closeAllScreens();
-      // 地図タブへ（mapRenderedリセットなし：再描画を避ける）
+      personMapLocs=p.locs||null;
+      // 地図タブへ（mapRenderedリセットなし：既存描画を活かす）
       currentTab='chizu';
       document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='chizu'));
       ['nenpyo','chizu','jinbutsu','kensaku'].forEach(id=>{
@@ -1122,10 +1163,13 @@ function showPersonDetail(p, color, sq){
         mapBackBtn.style.display='flex';
         mapBackBtn.onclick=()=>{
           mapBackBtn.style.display='none';
+          personMapLocs=null;
+          if(mapG) mapG.selectAll('.person-loc-marker').remove();
           showPersonDetail(p,color,sq);
         };
       }
-      if(!mapRendered) requestAnimationFrame(()=>requestAnimationFrame(renderMap));
+      if(mapRendered) drawPersonLocsOnMap();
+      else requestAnimationFrame(()=>requestAnimationFrame(renderMap));
     });
   }
 
