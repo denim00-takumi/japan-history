@@ -645,7 +645,7 @@ function switchTab(tab){
     const el=document.getElementById('tab-'+id);
     el.classList.toggle('hidden',id!==tab);
   });
-  if(tab==='chizu') renderMap();
+  if(tab==='chizu') requestAnimationFrame(()=>requestAnimationFrame(renderMap));
 }
 
 // ── L2 SCREEN NAVIGATION ───────────────────────────────────

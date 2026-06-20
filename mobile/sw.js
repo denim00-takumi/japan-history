@@ -1,4 +1,5 @@
-const CACHE = 'jhm-v1';
+// バージョンを上げるたびに古いキャッシュが自動削除される
+const CACHE = 'jhm-v5';
 const ASSETS = [
   '/japan-history/mobile/',
   '/japan-history/mobile/index.html',
@@ -12,23 +13,22 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
+  // 古いキャッシュを全て削除
   e.waitUntil(caches.keys().then(keys =>
     Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
   ));
   self.clients.claim();
 });
 
+// ネットワークファースト：常に最新を取得し、失敗時のみキャッシュ使用
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(res => {
-        if (res.ok) {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return res;
-      }).catch(() => cached);
-    })
+    fetch(e.request).then(res => {
+      if (res.ok) {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+      }
+      return res;
+    }).catch(() => caches.match(e.request))
   );
 });
