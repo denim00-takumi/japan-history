@@ -15,16 +15,19 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 
 /* ── ERA HEADER ── */
 #era-header{flex-shrink:0;background:#0d0d16;border-bottom:.5px solid rgba(255,255,255,.08)}
-#era-indicator{height:14px;display:flex;position:relative;background:#080810;overflow:hidden}
+#century-bar{height:14px;display:flex;position:relative;background:#060610;overflow:hidden;border-bottom:.5px solid rgba(255,255,255,.04)}
+.cent-seg{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:flex-start;padding-left:2px;border-right:.5px solid rgba(255,255,255,.08)}
+.cent-label{font-size:7px;color:#4a4a68;white-space:nowrap;pointer-events:none}
+#era-indicator{height:20px;display:flex;position:relative;background:#080810;overflow:hidden}
 .ei-seg{border-right:.5px solid rgba(255,255,255,.12);position:relative;transition:opacity .2s;flex-shrink:0}
-.ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#6a6a80;white-space:nowrap;pointer-events:none}
+.ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#8a8aaa;white-space:nowrap;pointer-events:none}
 #era-redline{position:absolute;top:0;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none;transition:left .4s ease}
-#era-chips{display:flex;overflow:hidden;height:50px;align-items:stretch}
+#era-chips{display:flex;overflow:hidden;height:50px;align-items:flex-start;padding-top:3px}
 .era-chip{
-  flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   border:none;border-right:.5px solid rgba(255,255,255,.06);background:transparent;
   writing-mode:vertical-rl;text-orientation:upright;
-  font-size:10px;color:#888;line-height:1.1;letter-spacing:.02em;
+  font-size:8px;color:#888;line-height:1.1;letter-spacing:.02em;
   cursor:pointer;font-family:inherit;overflow:hidden;padding:2px 0;
   transition:all .15s
 }
@@ -34,7 +37,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #tab-bar{flex-shrink:0;display:flex;background:#0d0d14;border-top:.5px solid rgba(255,255,255,.08);padding:4px 0;padding-bottom:calc(4px + env(safe-area-inset-bottom))}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#888;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0}
 .tab-btn.active{color:#5090ff}
-.tab-btn i{font-size:29px;line-height:1}
+.tab-btn i{font-size:23px;line-height:1}
 
 /* ── CONTENT ── */
 #content{flex:1;position:relative;overflow:hidden;min-height:0}
@@ -151,9 +154,9 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #tokaido-svg{width:100%;height:100%}
 #tokaido-station-badge{position:absolute;top:8px;left:8px;right:8px;background:rgba(4,10,24,.92);border:.5px solid rgba(80,144,255,.4);border-radius:8px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .3s}
 #tokaido-station-badge.show{opacity:1}
-#tk-badge-num{font-size:12px;color:#3a5080;margin-bottom:2px}
+#tk-badge-num{font-size:12px;color:#7aace0;margin-bottom:2px}
 #tk-badge-name{font-size:16px;color:#80b0ff;font-weight:500}
-#tk-badge-desc{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.5}
+#tk-badge-desc{font-size:14px;color:rgba(255,255,255,.7);margin-top:3px;line-height:1.5}
 #tokaido-progress{flex-shrink:0;padding:5px 12px;display:flex;align-items:center;gap:8px;background:#0a0a12;border-top:.5px solid rgba(255,255,255,.06)}
 #tk-prog-bar{flex:1;height:3px;background:#161624;border-radius:2px;overflow:hidden}
 #tk-prog-fill{height:100%;background:linear-gradient(to right,#ff4040,#c08040,#3060b0);width:0%;border-radius:2px;transition:width .4s ease}
@@ -179,7 +182,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .pop-stat{flex:1;background:#111120;border-radius:8px;border:.5px solid #1a1a2a;padding:8px 10px}
 .pop-stat-label{font-size:12px;color:#aaa;margin-bottom:3px}
 .pop-stat-value{font-size:18px;font-weight:500;color:#60c0ff}
-.pop-stat-sub{font-size:11px;color:#333;margin-top:2px}
+.pop-stat-sub{font-size:11px;color:#888;margin-top:2px}
 
 /* ── LOADING ── */
 #loading{position:fixed;inset:0;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999}
@@ -187,6 +190,10 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .loading-text{font-size:16px;color:#888}
 .loading-spinner{width:32px;height:32px;border:2px solid #1a1a2a;border-top-color:#604578;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* 旧国ハイライト点滅 */
+@keyframes pref-blink{0%,100%{opacity:1}50%{opacity:.35}}
+.pref-highlighted{animation:pref-blink 1.2s ease-in-out infinite}
 
 /* scrollbars */
 ::-webkit-scrollbar{width:2px;height:2px}
@@ -201,6 +208,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 
 <!-- ERA HEADER -->
 <div id="era-header">
+  <div id="century-bar"><!-- JS fills --></div>
   <div id="era-indicator"><!-- JS fills --><div id="era-redline"></div></div>
   <div id="era-chips"><!-- JS fills --></div>
 </div>
@@ -222,7 +230,6 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
   <!-- ② 地図 -->
   <div class="screen hidden" id="tab-chizu">
     <div id="map-selectors">
-      <select id="sel-era"><option value="">— 時代を選択 —</option></select>
       <select id="sel-kuni"><option value="">— 旧国名を選択 —</option></select>
     </div>
     <div id="map-svg-wrap">
@@ -472,6 +479,23 @@ function registerSW(){
 
 // ── ERA HEADER ─────────────────────────────────────────────
 function buildEraHeader(){
+  // 世紀バー
+  const centBar=document.getElementById('century-bar');
+  const totalYrs=2030-250;
+  for(let c=3;c<=21;c++){
+    const yr=c*100;
+    const pct=(yr-250)/totalYrs*100;
+    if(pct<0||pct>100)continue;
+    const seg=document.createElement('div');
+    seg.className='cent-seg';
+    seg.style.left=pct.toFixed(2)+'%';
+    const lbl=document.createElement('span');
+    lbl.className='cent-label';
+    lbl.textContent=c+'C';
+    seg.appendChild(lbl);
+    centBar.appendChild(seg);
+  }
+
   const ind = document.getElementById('era-indicator');
   const chips = document.getElementById('era-chips');
   ERAS.forEach((era,i)=>{
@@ -710,13 +734,13 @@ const PREFRG={'北海道':'hokkaido','青森県':'tohoku','岩手県':'tohoku','
 const PROVPREF={ezo:['北海道'],mutsu:['青森県','岩手県','宮城県','福島県'],rikuchu:['岩手県'],rikuzen:['宮城県','岩手県'],dewa:['山形県','秋田県'],ugo:['秋田県'],uzen:['山形県'],hitachi:['茨城県'],shimozuke:['栃木県'],kozuke:['群馬県'],shimosa:['千葉県','茨城県'],kazusa:['千葉県'],awa_k:['千葉県'],musashi:['東京都','埼玉県','神奈川県'],sagami:['神奈川県'],izu:['静岡県'],echigo:['新潟県'],sado:['新潟県'],etchu:['富山県'],noto:['石川県'],kaga:['石川県'],echizen:['福井県'],wakasa:['福井県'],kai:['山梨県'],shinano:['長野県'],hida:['岐阜県'],mino:['岐阜県'],owari:['愛知県'],mikawa:['愛知県'],totomi:['静岡県'],suruga:['静岡県'],tango:['京都府'],tanba:['京都府','兵庫県'],tajima:['兵庫県'],omi:['滋賀県'],yamashiro:['京都府'],settsu:['大阪府','兵庫県'],kawachi:['大阪府'],izumi:['大阪府'],yamato:['奈良県'],iga:['三重県'],ise:['三重県'],shima:['三重県'],kii:['和歌山県','三重県'],awaji:['兵庫県'],harima:['兵庫県'],inaba:['鳥取県'],hoki:['鳥取県'],izumo:['島根県'],iwami:['島根県'],mimasaka:['岡山県'],bizen:['岡山県'],bitchu:['岡山県'],bingo:['広島県'],aki:['広島県'],suo:['山口県'],nagato:['山口県'],awa_s:['徳島県'],sanuki:['香川県'],iyo:['愛媛県'],tosa:['高知県'],chikuzen:['福岡県'],chikugo:['福岡県'],buzen:['福岡県','大分県'],bungo:['大分県'],hizen:['佐賀県','長崎県'],higo:['熊本県'],hyuga:['宮崎県'],osumi:['鹿児島県'],satsuma:['鹿児島県'],iki:['長崎県'],tsushima:['長崎県'],ryukyu:['沖縄県']};
 // 旧国一覧 (WEB版 PROVS準拠、北→南順)
 const PROVS=[
-  {v:'ezo',lb:'蝦夷地',rg:'hokkaido'},{v:'mutsu',lb:'陸奥国',rg:'tohoku'},{v:'rikuchu',lb:'陸中国',rg:'tohoku'},{v:'rikuzen',lb:'陸前国',rg:'tohoku'},{v:'dewa',lb:'出羽国',rg:'tohoku'},{v:'ugo',lb:'羽後国',rg:'tohoku'},{v:'uzen',lb:'羽前国',rg:'tohoku'},
-  {v:'hitachi',lb:'常陸国',rg:'kanto'},{v:'shimozuke',lb:'下野国',rg:'kanto'},{v:'kozuke',lb:'上野国',rg:'kanto'},{v:'shimosa',lb:'下総国',rg:'kanto'},{v:'kazusa',lb:'上総国',rg:'kanto'},{v:'awa_k',lb:'安房国',rg:'kanto'},{v:'musashi',lb:'武蔵国',rg:'kanto'},{v:'sagami',lb:'相模国',rg:'kanto'},{v:'izu',lb:'伊豆国',rg:'kanto'},
-  {v:'echigo',lb:'越後国',rg:'chubu'},{v:'sado',lb:'佐渡国',rg:'chubu'},{v:'etchu',lb:'越中国',rg:'chubu'},{v:'noto',lb:'能登国',rg:'chubu'},{v:'kaga',lb:'加賀国',rg:'chubu'},{v:'echizen',lb:'越前国',rg:'chubu'},{v:'wakasa',lb:'若狭国',rg:'chubu'},{v:'kai',lb:'甲斐国',rg:'chubu'},{v:'shinano',lb:'信濃国',rg:'chubu'},{v:'hida',lb:'飛騨国',rg:'chubu'},{v:'mino',lb:'美濃国',rg:'chubu'},{v:'owari',lb:'尾張国',rg:'chubu'},{v:'mikawa',lb:'三河国',rg:'chubu'},{v:'totomi',lb:'遠江国',rg:'chubu'},{v:'suruga',lb:'駿河国',rg:'chubu'},
-  {v:'tango',lb:'丹後国',rg:'kinki'},{v:'tanba',lb:'丹波国',rg:'kinki'},{v:'tajima',lb:'但馬国',rg:'kinki'},{v:'omi',lb:'近江国',rg:'kinki'},{v:'yamashiro',lb:'山城国',rg:'kinki'},{v:'settsu',lb:'摂津国',rg:'kinki'},{v:'kawachi',lb:'河内国',rg:'kinki'},{v:'izumi',lb:'和泉国',rg:'kinki'},{v:'yamato',lb:'大和国',rg:'kinki'},{v:'iga',lb:'伊賀国',rg:'kinki'},{v:'ise',lb:'伊勢国',rg:'kinki'},{v:'shima',lb:'志摩国',rg:'kinki'},{v:'kii',lb:'紀伊国',rg:'kinki'},{v:'awaji',lb:'淡路国',rg:'kinki'},{v:'harima',lb:'播磨国',rg:'kinki'},
-  {v:'inaba',lb:'因幡国',rg:'chugoku'},{v:'hoki',lb:'伯耆国',rg:'chugoku'},{v:'izumo',lb:'出雲国',rg:'chugoku'},{v:'iwami',lb:'石見国',rg:'chugoku'},{v:'mimasaka',lb:'美作国',rg:'chugoku'},{v:'bizen',lb:'備前国',rg:'chugoku'},{v:'bitchu',lb:'備中国',rg:'chugoku'},{v:'bingo',lb:'備後国',rg:'chugoku'},{v:'aki',lb:'安芸国',rg:'chugoku'},{v:'suo',lb:'周防国',rg:'chugoku'},{v:'nagato',lb:'長門国',rg:'chugoku'},
-  {v:'awa_s',lb:'阿波国',rg:'shikoku'},{v:'sanuki',lb:'讃岐国',rg:'shikoku'},{v:'iyo',lb:'伊予国',rg:'shikoku'},{v:'tosa',lb:'土佐国',rg:'shikoku'},
-  {v:'chikuzen',lb:'筑前国',rg:'kyushu'},{v:'chikugo',lb:'筑後国',rg:'kyushu'},{v:'buzen',lb:'豊前国',rg:'kyushu'},{v:'bungo',lb:'豊後国',rg:'kyushu'},{v:'hizen',lb:'肥前国',rg:'kyushu'},{v:'higo',lb:'肥後国',rg:'kyushu'},{v:'hyuga',lb:'日向国',rg:'kyushu'},{v:'osumi',lb:'大隅国',rg:'kyushu'},{v:'satsuma',lb:'薩摩国',rg:'kyushu'},{v:'iki',lb:'壱岐国',rg:'kyushu'},{v:'tsushima',lb:'対馬国',rg:'kyushu'},{v:'ryukyu',lb:'琉球国',rg:'kyushu'},
+  {v:'ezo',lb:'蝦夷地',fg:'えぞち',rg:'hokkaido'},{v:'mutsu',lb:'陸奥国',fg:'むつのくに',rg:'tohoku'},{v:'rikuchu',lb:'陸中国',fg:'りくちゅうのくに',rg:'tohoku'},{v:'rikuzen',lb:'陸前国',fg:'りくぜんのくに',rg:'tohoku'},{v:'dewa',lb:'出羽国',fg:'でわのくに',rg:'tohoku'},{v:'ugo',lb:'羽後国',fg:'うごのくに',rg:'tohoku'},{v:'uzen',lb:'羽前国',fg:'うぜんのくに',rg:'tohoku'},
+  {v:'hitachi',lb:'常陸国',fg:'ひたちのくに',rg:'kanto'},{v:'shimozuke',lb:'下野国',fg:'しもつけのくに',rg:'kanto'},{v:'kozuke',lb:'上野国',fg:'こうずけのくに',rg:'kanto'},{v:'shimosa',lb:'下総国',fg:'しもうさのくに',rg:'kanto'},{v:'kazusa',lb:'上総国',fg:'かずさのくに',rg:'kanto'},{v:'awa_k',lb:'安房国',fg:'あわのくに',rg:'kanto'},{v:'musashi',lb:'武蔵国',fg:'むさしのくに',rg:'kanto'},{v:'sagami',lb:'相模国',fg:'さがみのくに',rg:'kanto'},{v:'izu',lb:'伊豆国',fg:'いずのくに',rg:'kanto'},
+  {v:'echigo',lb:'越後国',fg:'えちごのくに',rg:'chubu'},{v:'sado',lb:'佐渡国',fg:'さどのくに',rg:'chubu'},{v:'etchu',lb:'越中国',fg:'えっちゅうのくに',rg:'chubu'},{v:'noto',lb:'能登国',fg:'のとのくに',rg:'chubu'},{v:'kaga',lb:'加賀国',fg:'かがのくに',rg:'chubu'},{v:'echizen',lb:'越前国',fg:'えちぜんのくに',rg:'chubu'},{v:'wakasa',lb:'若狭国',fg:'わかさのくに',rg:'chubu'},{v:'kai',lb:'甲斐国',fg:'かいのくに',rg:'chubu'},{v:'shinano',lb:'信濃国',fg:'しなののくに',rg:'chubu'},{v:'hida',lb:'飛騨国',fg:'ひだのくに',rg:'chubu'},{v:'mino',lb:'美濃国',fg:'みののくに',rg:'chubu'},{v:'owari',lb:'尾張国',fg:'おわりのくに',rg:'chubu'},{v:'mikawa',lb:'三河国',fg:'みかわのくに',rg:'chubu'},{v:'totomi',lb:'遠江国',fg:'とおとうみのくに',rg:'chubu'},{v:'suruga',lb:'駿河国',fg:'するがのくに',rg:'chubu'},
+  {v:'tango',lb:'丹後国',fg:'たんごのくに',rg:'kinki'},{v:'tanba',lb:'丹波国',fg:'たんばのくに',rg:'kinki'},{v:'tajima',lb:'但馬国',fg:'たじまのくに',rg:'kinki'},{v:'omi',lb:'近江国',fg:'おうみのくに',rg:'kinki'},{v:'yamashiro',lb:'山城国',fg:'やましろのくに',rg:'kinki'},{v:'settsu',lb:'摂津国',fg:'せっつのくに',rg:'kinki'},{v:'kawachi',lb:'河内国',fg:'かわちのくに',rg:'kinki'},{v:'izumi',lb:'和泉国',fg:'いずみのくに',rg:'kinki'},{v:'yamato',lb:'大和国',fg:'やまとのくに',rg:'kinki'},{v:'iga',lb:'伊賀国',fg:'いがのくに',rg:'kinki'},{v:'ise',lb:'伊勢国',fg:'いせのくに',rg:'kinki'},{v:'shima',lb:'志摩国',fg:'しまのくに',rg:'kinki'},{v:'kii',lb:'紀伊国',fg:'きいのくに',rg:'kinki'},{v:'awaji',lb:'淡路国',fg:'あわじのくに',rg:'kinki'},{v:'harima',lb:'播磨国',fg:'はりまのくに',rg:'kinki'},
+  {v:'inaba',lb:'因幡国',fg:'いなばのくに',rg:'chugoku'},{v:'hoki',lb:'伯耆国',fg:'ほうきのくに',rg:'chugoku'},{v:'izumo',lb:'出雲国',fg:'いずものくに',rg:'chugoku'},{v:'iwami',lb:'石見国',fg:'いわみのくに',rg:'chugoku'},{v:'mimasaka',lb:'美作国',fg:'みまさかのくに',rg:'chugoku'},{v:'bizen',lb:'備前国',fg:'びぜんのくに',rg:'chugoku'},{v:'bitchu',lb:'備中国',fg:'びっちゅうのくに',rg:'chugoku'},{v:'bingo',lb:'備後国',fg:'びんごのくに',rg:'chugoku'},{v:'aki',lb:'安芸国',fg:'あきのくに',rg:'chugoku'},{v:'suo',lb:'周防国',fg:'すおうのくに',rg:'chugoku'},{v:'nagato',lb:'長門国',fg:'ながとのくに',rg:'chugoku'},
+  {v:'awa_s',lb:'阿波国',fg:'あわのくに',rg:'shikoku'},{v:'sanuki',lb:'讃岐国',fg:'さぬきのくに',rg:'shikoku'},{v:'iyo',lb:'伊予国',fg:'いよのくに',rg:'shikoku'},{v:'tosa',lb:'土佐国',fg:'とさのくに',rg:'shikoku'},
+  {v:'chikuzen',lb:'筑前国',fg:'ちくぜんのくに',rg:'kyushu'},{v:'chikugo',lb:'筑後国',fg:'ちくごのくに',rg:'kyushu'},{v:'buzen',lb:'豊前国',fg:'ぶぜんのくに',rg:'kyushu'},{v:'bungo',lb:'豊後国',fg:'ぶんごのくに',rg:'kyushu'},{v:'hizen',lb:'肥前国',fg:'ひぜんのくに',rg:'kyushu'},{v:'higo',lb:'肥後国',fg:'ひごのくに',rg:'kyushu'},{v:'hyuga',lb:'日向国',fg:'ひゅうがのくに',rg:'kyushu'},{v:'osumi',lb:'大隅国',fg:'おおすみのくに',rg:'kyushu'},{v:'satsuma',lb:'薩摩国',fg:'さつまのくに',rg:'kyushu'},{v:'iki',lb:'壱岐国',fg:'いきのくに',rg:'kyushu'},{v:'tsushima',lb:'対馬国',fg:'つしまのくに',rg:'kyushu'},{v:'ryukyu',lb:'琉球国',fg:'りゅうきゅうのくに',rg:'kyushu'},
 ];
 const KUNI_LABELS={kanto:'関東',kinki:'畿内',chubu:'中部',tohoku:'東北',chugoku:'中国',kyushu:'九州',hokkaido:'北海道',shikoku:'四国'};
 
@@ -724,16 +748,7 @@ const KUNI_LABELS={kanto:'関東',kinki:'畿内',chubu:'中部',tohoku:'東北',
 let selectedProvPrefs=[];
 
 function buildMap(){
-  const eraSelect=document.getElementById('sel-era');
-  ERAS.forEach(era=>{
-    const opt=document.createElement('option');
-    opt.value=era.id;
-    opt.textContent=eraName(era)+'（'+era.s+'–'+era.e+'）';
-    eraSelect.appendChild(opt);
-  });
-  eraSelect.value=currentEraId||'heian';
-
-  // 旧国名フルリスト（地域グループヘッダー付き）
+  // 旧国名フルリスト（地域グループヘッダー付き、ひらがな付き）
   const kuniSelect=document.getElementById('sel-kuni');
   const rgNames={hokkaido:'北海道',tohoku:'東北',kanto:'関東',chubu:'中部・北陸',kinki:'近畿',chugoku:'中国',shikoku:'四国',kyushu:'九州・沖縄'};
   let lastRg='';
@@ -746,17 +761,10 @@ function buildMap(){
     }
     const opt=document.createElement('option');
     opt.value=p.v;
-    opt.textContent=p.lb;
+    opt.textContent=p.lb+(p.fg?' ('+p.fg+')':'');
     kuniSelect.lastChild.appendChild(opt);
   });
 
-  eraSelect.addEventListener('change',()=>{
-    currentEraId=eraSelect.value;
-    highlightEra(currentEraId);
-    const era=ERAS.find(e=>e.id===currentEraId);
-    if(era)updateRedline((era.s+era.e)/2);
-    updateMapEra();
-  });
   kuniSelect.addEventListener('change',()=>{
     selectedKuni=kuniSelect.value;
     selectedProvPrefs=selectedKuni?(PROVPREF[selectedKuni]||[]):[];
@@ -778,7 +786,7 @@ function renderMap(){
   // 本州・四国・九州・北海道のみでfitExtent（沖縄除外で本土を大きく表示）
   const mainlandFeat={type:'FeatureCollection',features:allFeat.features.filter(d=>getPrefName(d.properties||{})!=='沖縄県')};
 
-  projection=d3.geoMercator().fitExtent([[10,10],[w-10,h*0.88]],mainlandFeat);
+  projection=d3.geoMercator().fitExtent([[4,4],[w-4,h*0.96]],mainlandFeat);
   path=d3.geoPath().projection(projection);
 
   mapG=svg.append('g');
@@ -800,12 +808,12 @@ function renderMap(){
   // 沖縄県 — 左上に小さく表示
   const okiFeat=allFeat.features.filter(d=>getPrefName(d.properties||{})==='沖縄県');
   if(okiFeat.length){
-    const okiProj=d3.geoMercator().fitExtent([[6,6],[90,90]],{type:'FeatureCollection',features:okiFeat});
+    const okiProj=d3.geoMercator().fitExtent([[6,6],[120,120]],{type:'FeatureCollection',features:okiFeat});
     const okiPath=d3.geoPath().projection(okiProj);
     const okiG=svg.append('g').attr('class','oki-group');
     // 枠
-    okiG.append('rect').attr('x',4).attr('y',4).attr('width',88).attr('height',88)
-      .attr('fill','#050c14').attr('stroke','rgba(255,255,255,0.1)').attr('rx',3);
+    okiG.append('rect').attr('x',3).attr('y',3).attr('width',120).attr('height',120)
+      .attr('fill','#050c14').attr('stroke','rgba(255,255,255,0.12)').attr('rx',4);
     okiG.selectAll('path.oki')
       .data(okiFeat)
       .join('path')
@@ -815,8 +823,8 @@ function renderMap(){
       .attr('stroke','rgba(0,0,0,0.5)')
       .attr('stroke-width',0.4)
       .on('click',()=>showMapBadge('沖縄県','琉球国'));
-    okiG.append('text').attr('x',48).attr('y',98).attr('text-anchor','middle')
-      .attr('font-size','8').attr('fill','rgba(255,255,255,0.35)').text('沖縄');
+    okiG.append('text').attr('x',63).attr('y',130).attr('text-anchor','middle')
+      .attr('font-size','9').attr('fill','rgba(255,255,255,0.4)').text('沖縄');
   }
 
   updateMapEra();
@@ -824,43 +832,36 @@ function renderMap(){
 
 function updateMapEra(){
   if(!mapRendered||!DATA)return;
-  const eraId=document.getElementById('sel-era').value||currentEraId||'heian';
+  const eraId=currentEraId||'heian';
   const era=ERAS.find(e=>e.id===eraId);
   if(!era)return;
 
-  // 地域色でリセット
-  d3.selectAll('path.pref').attr('fill',d=>{
-    const nm=getPrefName(d.properties||{});
-    const rg=PREFRG[nm];
-    // 旧国フィルター時はハイライト/非ハイライト
-    if(selectedProvPrefs.length){
-      return selectedProvPrefs.includes(nm)?'#60c0ff':(rg?(RGFILL[rg]||RGFILL.other):RGFILL.other);
-    }
-    return rg?(RGFILL[rg]||RGFILL.other):RGFILL.other;
-  });
-
-  d3.selectAll('.person-marker').remove();
-  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers]
-    .filter(p=>p.era===eraId||(p.s!=null&&p.e!=null&&p.s<era.e&&p.e>era.s));
-  persons.forEach(p=>{
-    if(!p.locs)return;
-    p.locs.forEach(loc=>{
-      const c=getRegionCenter(loc.r);if(!c)return;
-      const [cx,cy]=projection(c);if(isNaN(cx)||isNaN(cy))return;
-      const g=mapG.append('g').attr('class','person-marker').attr('transform','translate('+cx+','+cy+')');
-      g.append('circle').attr('r',7).attr('fill',loc.c||'#5090ff').attr('opacity',0.85)
-        .attr('stroke','rgba(255,255,255,0.4)').attr('stroke-width',0.8);
-      g.on('click',()=>showMapBadge(p.n,(p.l||'')+(loc.lb?' · '+loc.lb:'')));
+  // 地域色でリセット・点滅クラスをクリア
+  d3.selectAll('path.pref')
+    .classed('pref-highlighted',false)
+    .attr('fill',d=>{
+      const nm=getPrefName(d.properties||{});
+      const rg=PREFRG[nm];
+      return rg?(RGFILL[rg]||RGFILL.other):RGFILL.other;
     });
-  });
 
-  // 旧国フィルターバッジ
+  // 旧国ハイライト（点滅）
   if(selectedProvPrefs.length){
-    const p=PROVS.find(x=>x.v===selectedKuni);
-    if(p){
-      const prefsText=selectedProvPrefs.join('・');
-      showMapBadge(p.lb, prefsText);
-    }
+    d3.selectAll('path.pref').each(function(d){
+      const nm=getPrefName(d.properties||{});
+      if(selectedProvPrefs.includes(nm)){
+        d3.select(this).attr('fill','#60c0ff').classed('pref-highlighted',true);
+      }
+    });
+    // 沖縄グループも
+    d3.selectAll('path.oki').each(function(d){
+      const nm=getPrefName(d.properties||{});
+      if(selectedProvPrefs.includes(nm)){
+        d3.select(this).attr('fill','#60c0ff').classed('pref-highlighted',true);
+      }
+    });
+    const prov=PROVS.find(x=>x.v===selectedKuni);
+    if(prov) showMapBadge(prov.lb+(prov.fg?' ('+prov.fg+')':''), selectedProvPrefs.join('・'));
   }
 }
 
@@ -941,18 +942,27 @@ function showPersonDetail(p, color, sq){
   }
 
   const hasLocs=p.locs&&p.locs.length;
+  // locsHtmlに地図ボタンを統合
+  let locsSection='';
+  if(hasLocs){
+    locsSection=`<div class="det-divider"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="det-section" style="margin:0">足跡・ゆかりの地</div>
+      <button id="person-map-btn" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#0f1e30;border:.5px solid #2a5080;border-radius:6px;color:#60b0ff;font-size:12px;font-family:inherit;cursor:pointer"><i class="ti ti-map" style="font-size:14px"></i>地図</button>
+    </div>
+    ${locsHtml}`;
+  }
   body.innerHTML=`
-    <div class="det-tag">${era?eraName(era)+' · ':''}</div>
+    <div class="det-tag">${era?eraName(era):''}</div>
     <div class="det-name" style="display:flex;align-items:baseline;gap:8px">
       <div class="person-dot${sq?' sq':''}" style="background:${color};width:10px;height:10px;flex-shrink:0;margin-top:4px"></div>
       ${escHtml(p.n)}
     </div>
     ${p.fg?`<div class="person-furigana">${escHtml(p.fg)}</div>`:''}
     <div class="person-period">${escHtml(p.l||'')}${p.role?' | '+escHtml(p.role):''}</div>
-    ${hasLocs?`<button id="person-map-btn" style="margin:4px 0 10px;display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:#0f1e30;border:.5px solid #2a5080;border-radius:6px;color:#60b0ff;font-size:13px;font-family:inherit;cursor:pointer"><i class="ti ti-map-pin" style="font-size:16px"></i>ゆかりの地を地図で見る</button>`:''}
     <div class="det-divider"></div>
     <div class="det-desc">${escHtml(p.desc||'')}</div>
-    ${locsHtml}
+    ${locsSection}
   `;
   if(hasLocs){
     document.getElementById('person-map-btn').addEventListener('click',()=>{
@@ -1174,36 +1184,73 @@ function buildTokaidoMap(){
     .attr('stroke-linecap','round')
     .attr('opacity',0.9);
 
-  // station dots
+  // station dots — 非フォーカスは小さいドットのみ
   TOKAIDO.forEach((s,i)=>{
+    if(s.midpoint)return; // 中間点は非表示
     const [cx,cy]=proj([s.lon,s.lat]);
     if(isNaN(cx)||isNaN(cy))return;
     const sg=g.append('g').attr('class','tk-station').attr('data-num',s.num||i)
+      .attr('data-special',s.special?'1':'0')
       .attr('transform','translate('+cx+','+cy+')')
       .style('cursor','pointer');
 
-    const r=s.special?5:s.midpoint?6:4;
-    const fill=s.special?(s.label==='起点'?'#cc3020':'#3060b0'):s.midpoint?'#1a300a':'#0d0d18';
-    const stroke=s.special?(s.label==='起点'?'#ff5040':'#5090ff'):s.midpoint?'#60c040':'#b07030';
-
-    sg.append('circle').attr('r',r).attr('fill',fill).attr('stroke',stroke).attr('stroke-width',1.2);
-
-    // number label for non-special
-    if(!s.special){
-      const txt=s.midpoint?'中':String(s.num);
-      sg.append('text').attr('text-anchor','middle').attr('dy','0.35em')
-        .attr('font-size','5').attr('fill',s.midpoint?'#80e060':'#c09050')
-        .attr('pointer-events','none').text(txt);
-    }
+    const r=s.special?5:3;
+    const fill=s.special?(s.label==='起点'?'#cc3020':'#3060b0'):'#0d0d18';
+    const stroke=s.special?(s.label==='起点'?'#ff5040':'#5090ff'):'#b07030';
+    sg.append('circle').attr('r',r).attr('fill',fill).attr('stroke',stroke).attr('stroke-width',1.2).attr('class','tk-dot');
 
     sg.on('click',()=>selectStation(s));
   });
+
+  // ピンチズーム（地図SVG内のみ）
+  let tkScale=1,tkTx=0,tkTy=0;
+  let pinchStartDist=null,pinchStartScale=1,pinchMidX=0,pinchMidY=0;
+  const svgEl=document.getElementById('tokaido-svg');
+  svgEl.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){
+      e.preventDefault();
+      const t=e.touches;
+      pinchStartDist=Math.hypot(t[1].clientX-t[0].clientX,t[1].clientY-t[0].clientY);
+      pinchStartScale=tkScale;
+      pinchMidX=(t[0].clientX+t[1].clientX)/2;
+      pinchMidY=(t[0].clientY+t[1].clientY)/2;
+    }
+  },{passive:false});
+  svgEl.addEventListener('touchmove',e=>{
+    if(e.touches.length===2&&pinchStartDist){
+      e.preventDefault();
+      const t=e.touches;
+      const dist=Math.hypot(t[1].clientX-t[0].clientX,t[1].clientY-t[0].clientY);
+      tkScale=Math.max(1,Math.min(6,pinchStartScale*dist/pinchStartDist));
+      g.attr('transform','translate('+tkTx+','+tkTy+') scale('+tkScale+')');
+    }
+  },{passive:false});
+  svgEl.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStartDist=null;});
 
   if(activeStation) selectStation(activeStation);
 }
 
 function selectStation(s){
   activeStation=s;
+
+  // 既存のフォーカスラベルを削除し、新しく大きな数字を描画
+  d3.selectAll('.tk-focus-label').remove();
+  d3.selectAll('.tk-dot').attr('r',function(){
+    const sg=this.parentNode;
+    const special=sg.getAttribute('data-special')==='1';
+    return special?5:3;
+  });
+  if(!s.special&&s.num){
+    const sg=d3.select('.tk-station[data-num="'+s.num+'"][data-special="0"]');
+    if(!sg.empty()){
+      sg.select('.tk-dot').attr('r',8).attr('fill','#c08040').attr('stroke','#ffd080').attr('stroke-width',1.5);
+      sg.append('text').attr('class','tk-focus-label')
+        .attr('text-anchor','middle').attr('dy','0.38em')
+        .attr('font-size','9').attr('font-weight','bold').attr('fill','#fff')
+        .attr('pointer-events','none').text(String(s.num));
+    }
+  }
+
   const badge=document.getElementById('tokaido-station-badge');
   document.getElementById('tk-badge-num').textContent=
     s.special?(s.label||''):'第'+s.num+'次 · '+s.pref;
@@ -1303,12 +1350,12 @@ function drawPopulation(){
   [2000,5000,8000,12000].forEach(p=>{
     const y=yScale(p);
     ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
-    ctx.fillStyle='#333';ctx.font='9px -apple-system,sans-serif';
+    ctx.fillStyle='#888';ctx.font='9px -apple-system,sans-serif';
     ctx.textAlign='right';ctx.fillText((p/1).toLocaleString(),pad.l-4,y+3);
   });
 
   // year labels
-  ctx.fillStyle='#2a2a40';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';
+  ctx.fillStyle='#777';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';
   [500,1000,1600,1868,2000].forEach(y=>{
     if(y>=minY&&y<=maxY){
       ctx.fillText(y,xScale(y),h-pad.b+12);
