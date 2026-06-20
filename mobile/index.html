@@ -663,10 +663,9 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 
 function switchTab(tab){
   if(screenStack.length>0) closeAllScreens();
-  // 地図以外のタブに切り替えたらロケーションマーカーをクリア
+  // 地図以外のタブに切り替えたら地図をクリア（kuni選択・マーカー・pref-highlighted）
   if(tab!=='chizu'){
-    personMapLocs=null;
-    if(mapG) mapG.selectAll('.person-loc-marker').remove();
+    clearMap();
   }
   currentTab=tab;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
@@ -936,7 +935,7 @@ function renderMap(){
     .attr('stroke-width',0.4)
     .on('click',function(ev,d){
       const nm=getPrefName(d.properties||{});
-      d3.selectAll('path.pref').classed('pref-highlighted',false);
+      clearMap();
       d3.select(this).classed('pref-highlighted',true);
       showMapBadge(nm, PREFRG[nm]?(KUNI_LABELS[PREFRG[nm]]||''):'');
     });
@@ -966,7 +965,7 @@ function renderMap(){
       .attr('stroke','rgba(0,0,0,0.5)')
       .attr('stroke-width',0.4)
       .on('click',function(){
-        d3.selectAll('path.pref').classed('pref-highlighted',false);
+        clearMap();
         d3.select(this).classed('pref-highlighted',true);
         showMapBadge('沖縄県','琉球国');
       });
@@ -1031,6 +1030,12 @@ function drawPersonLocsOnMap(rgC){
       .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
       .attr('pointer-events','none').text(lbl);
   });
+}
+
+function clearMap(){
+  setKuni('','— 旧国名を選択 —'); // kuni選択クリア＋updateMapEra（pref-highlighted リセット）
+  if(mapG) mapG.selectAll('.person-loc-marker').remove();
+  personMapLocs=null;
 }
 
 function updateMapEra(){
@@ -1174,8 +1179,8 @@ function showPersonDetail(p, color, sq){
   if(hasLocs){
     document.getElementById('person-map-btn').addEventListener('click',()=>{
       closeAllScreens();
-      // 既存マーカーをクリアしてから新しい人物ロケーションをセット
-      if(mapG) mapG.selectAll('.person-loc-marker').remove();
+      // 地図とkuni選択をクリアしてから人物マーカーをセット
+      clearMap();
       personMapLocs=p.locs||null;
       // 地図タブへ（mapRenderedリセットなし：既存描画を活かす）
       currentTab='chizu';
