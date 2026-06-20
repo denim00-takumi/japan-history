@@ -843,7 +843,7 @@ function renderMap(){
   const LAT_N=45.5, LAT_S=30.9, LON_C=137.5;
   const merc=φ=>Math.log(Math.tan(Math.PI/4+φ*Math.PI/360));
   const latSpan=merc(LAT_N)-merc(LAT_S);
-  const scale=h*0.81/latSpan;
+  const scale=h*0.778/latSpan;
   const tx=w/2-scale*LON_C*Math.PI/180;
   const ty=h/2+scale*(merc(LAT_N)+merc(LAT_S))/2;
   projection=d3.geoMercator().scale(scale).translate([tx,ty]);
