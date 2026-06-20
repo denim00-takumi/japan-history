@@ -16,20 +16,25 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 /* ── ERA HEADER ── */
 #era-header{flex-shrink:0;background:#0d0d16;border-bottom:.5px solid rgba(255,255,255,.08)}
 #era-indicator{height:14px;display:flex;position:relative;background:#080810;overflow:hidden}
-.ei-seg{flex-shrink:0;border-right:.5px solid rgba(255,255,255,.07);position:relative;transition:opacity .2s}
-.ei-seg.active{opacity:1}
-.ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#2a2a40;white-space:nowrap;pointer-events:none}
+.ei-seg{border-right:.5px solid rgba(255,255,255,.12);position:relative;transition:opacity .2s;flex-shrink:0}
+.ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#6a6a80;white-space:nowrap;pointer-events:none}
 #era-redline{position:absolute;top:0;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none;transition:left .4s ease}
-#era-chips{display:flex;overflow-x:auto;padding:3px 5px;gap:3px;scrollbar-width:none;height:28px;align-items:center}
-#era-chips::-webkit-scrollbar{display:none}
-.era-chip{flex-shrink:0;height:20px;padding:0 8px;border-radius:10px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:10px;color:#666;display:flex;align-items:center;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s}
-.era-chip.active{font-weight:500}
+#era-chips{display:flex;overflow:hidden;height:50px;align-items:stretch}
+.era-chip{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:none;border-right:.5px solid rgba(255,255,255,.06);background:transparent;
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-size:10px;color:#888;line-height:1.1;letter-spacing:.02em;
+  cursor:pointer;font-family:inherit;overflow:hidden;padding:2px 0;
+  transition:all .15s
+}
+.era-chip.active{font-weight:600;color:#fff}
 
 /* ── TAB BAR ── */
 #tab-bar{flex-shrink:0;display:flex;background:#0d0d14;border-top:.5px solid rgba(255,255,255,.08);padding:4px 0;padding-bottom:calc(4px + env(safe-area-inset-bottom))}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#444;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#888;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0}
 .tab-btn.active{color:#5090ff}
-.tab-btn i{font-size:22px;line-height:1}
+.tab-btn i{font-size:29px;line-height:1}
 
 /* ── CONTENT ── */
 #content{flex:1;position:relative;overflow:hidden;min-height:0}
@@ -53,12 +58,12 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .cat-chip{flex-shrink:0;height:22px;padding:0 10px;border-radius:11px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:13px;color:#666;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s}
 .cat-chip.active{background:rgba(80,144,255,.18);border-color:#4080ee;color:#a0c8ff}
 #nenpyo-list{flex:1;overflow-y:auto;padding:4px 0 16px;-webkit-overflow-scrolling:touch}
-.era-section-hdr{padding:6px 12px 3px;font-size:12px;color:#3a3a60;font-weight:500;letter-spacing:.05em;border-left:2px solid;margin-left:10px;margin-bottom:2px}
+.era-section-hdr{padding:6px 12px 3px;font-size:12px;font-weight:500;letter-spacing:.05em;border-left:2px solid;margin-left:10px;margin-bottom:2px}
 .event-card{margin:2px 10px;background:#161624;border-radius:8px;border:.5px solid #1e1e30;padding:8px 10px;display:flex;gap:8px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
 .event-card:active{background:#1e1e30}
 .event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
 .event-title{font-size:15px;color:#ddd}
-.event-year{font-size:12px;color:#555;margin-top:2px}
+.event-year{font-size:12px;color:#aaa;margin-top:2px}
 
 /* ── 地図 ── */
 #tab-chizu{overflow:hidden;display:flex;flex-direction:column}
@@ -78,9 +83,9 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .person-acc-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0f0f18;border-top:.5px solid rgba(255,255,255,.05);cursor:pointer;user-select:none}
 .person-acc-left{display:flex;align-items:center;gap:8px}
 .person-acc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.person-acc-title{font-size:14px;color:#999;font-weight:500}
-.person-acc-count{font-size:12px;color:#555;background:#1a1a24;border-radius:8px;padding:1px 7px}
-.person-acc-arrow{font-size:13px;color:#333;transition:transform .2s}
+.person-acc-title{font-size:14px;color:#ccc;font-weight:500}
+.person-acc-count{font-size:12px;color:#aaa;background:#222230;border-radius:8px;padding:1px 7px}
+.person-acc-arrow{font-size:13px;color:#888;transition:transform .2s}
 .person-acc-hdr.open .person-acc-arrow{transform:rotate(90deg)}
 .person-acc-body{display:none;background:#080810}
 .person-acc-body.open{display:block}
@@ -89,7 +94,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .person-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .person-dot.sq{border-radius:2px}
 .person-name{font-size:15px;color:#ddd;flex:1}
-.person-sub{font-size:12px;color:#555;margin-top:1px}
+.person-sub{font-size:12px;color:#aaa;margin-top:1px}
 
 /* ── 検索 ── */
 #tab-kensaku{overflow:hidden;display:flex;flex-direction:column}
@@ -98,29 +103,29 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #search-box.active{border-color:#3a5080}
 #search-input{flex:1;font-size:16px;color:#e0e8ff;background:none;border:none;outline:none;font-family:inherit}
 #search-input::placeholder{color:#2a2a3a}
-#search-clear{color:#444;background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0}
+#search-clear{color:#888;background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0}
 #search-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #search-initial{padding:12px 10px}
 .search-shortcut{background:#141420;border-radius:10px;border:.5px solid #1e1e30;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;transition:background .15s}
 .search-shortcut:active{background:#1e1e2c}
 .search-shortcut i{font-size:22px;color:#5090ff;flex-shrink:0}
 .search-shortcut-t{font-size:15px;color:#ddd;font-weight:500}
-.search-shortcut-s{font-size:12px;color:#555;margin-top:2px}
+.search-shortcut-s{font-size:12px;color:#aaa;margin-top:2px}
 #search-results{display:none;padding:0}
-.result-type-hdr{padding:6px 12px 3px;font-size:12px;color:#3a3a60;font-weight:500;letter-spacing:.05em}
+.result-type-hdr{padding:6px 12px 3px;font-size:12px;color:#7070b0;font-weight:500;letter-spacing:.05em}
 .result-row{padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
 .result-row:active{background:#141420}
-.result-icon{font-size:18px;color:#444;width:18px;text-align:center;flex-shrink:0}
+.result-icon{font-size:23px;color:#888;width:24px;text-align:center;flex-shrink:0}
 .result-main{font-size:15px;color:#ddd;flex:1}
-.result-sub{font-size:12px;color:#555;margin-top:1px}
+.result-sub{font-size:12px;color:#aaa;margin-top:1px}
 .result-badge{font-size:12px;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
 .hl{color:#5090ff;font-weight:500}
-.no-results{padding:30px;text-align:center;font-size:15px;color:#333}
+.no-results{padding:30px;text-align:center;font-size:15px;color:#888}
 
 /* ── L2: イベント詳細 ── */
 .det-tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:8px;background:#1a2238;color:#7090c0;margin-bottom:8px}
 .det-name{font-size:22px;font-weight:600;color:#e0e0f0;line-height:1.3;margin-bottom:3px}
-.det-sub{font-size:13px;color:#555;margin-bottom:10px}
+.det-sub{font-size:13px;color:#aaa;margin-bottom:10px}
 .det-divider{height:.5px;background:rgba(255,255,255,.07);margin:10px 0}
 .det-desc{font-size:15px;color:#999;line-height:1.8;margin-bottom:12px}
 .det-map-stub{height:80px;background:#050c14;border-radius:8px;border:.5px solid #0f1e30;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;cursor:pointer}
@@ -131,13 +136,13 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .det-scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
 
 /* ── L2: 人物詳細 ── */
-.person-furigana{font-size:13px;color:#3a3a55;margin-bottom:4px}
-.person-period{font-size:13px;color:#444;margin-bottom:10px}
+.person-furigana{font-size:13px;color:#8888aa;margin-bottom:4px}
+.person-period{font-size:13px;color:#aaa;margin-bottom:10px}
 .person-locs{display:flex;gap:8px;margin-bottom:12px}
 .person-loc-card{flex:1;background:#111120;border-radius:6px;border:.5px solid #1a1a2a;padding:6px 8px}
-.person-loc-type{font-size:11px;color:#444;margin-bottom:2px}
+.person-loc-type{font-size:11px;color:#999;margin-bottom:2px}
 .person-loc-name{font-size:13px;color:#ccc}
-.loc-legend{padding:8px 12px;font-size:12px;color:#555;border-top:.5px solid rgba(255,255,255,.05);display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0}
+.loc-legend{padding:8px 12px;font-size:12px;color:#aaa;border-top:.5px solid rgba(255,255,255,.05);display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0}
 .loc-item{display:flex;align-items:center;gap:4px}
 .loc-dot-sm{width:7px;height:7px;border-radius:50%}
 
@@ -152,19 +157,19 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #tokaido-progress{flex-shrink:0;padding:5px 12px;display:flex;align-items:center;gap:8px;background:#0a0a12;border-top:.5px solid rgba(255,255,255,.06)}
 #tk-prog-bar{flex:1;height:3px;background:#161624;border-radius:2px;overflow:hidden}
 #tk-prog-fill{height:100%;background:linear-gradient(to right,#ff4040,#c08040,#3060b0);width:0%;border-radius:2px;transition:width .4s ease}
-#tk-prog-label{font-size:12px;color:#555;white-space:nowrap}
+#tk-prog-label{font-size:12px;color:#aaa;white-space:nowrap}
 
 /* ── L2: 東海道 一覧 ── */
 #tokaido-list-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .tk-list-item{padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
 .tk-list-item:active{background:#141420}
 .tk-list-item.active-station{background:#0c1422;border-bottom:.5px solid rgba(80,144,255,.2)}
-.tk-num{width:20px;font-size:12px;color:#555;text-align:right;flex-shrink:0}
+.tk-num{width:20px;font-size:12px;color:#aaa;text-align:right;flex-shrink:0}
 .tk-num.active-station{color:#5090ff;font-weight:500}
 .tk-dot-row{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .tk-row-name{font-size:15px;color:#ddd}
 .tk-row-name.active-station{color:#90c0ff;font-weight:500}
-.tk-row-sub{font-size:12px;color:#555}
+.tk-row-sub{font-size:12px;color:#aaa}
 .tk-row-sub.active-station{color:#3a5080}
 
 /* ── L2: 人口グラフ ── */
@@ -172,14 +177,14 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #pop-canvas{width:100%;flex:1}
 .pop-stat-row{display:flex;gap:8px}
 .pop-stat{flex:1;background:#111120;border-radius:8px;border:.5px solid #1a1a2a;padding:8px 10px}
-.pop-stat-label{font-size:12px;color:#444;margin-bottom:3px}
+.pop-stat-label{font-size:12px;color:#aaa;margin-bottom:3px}
 .pop-stat-value{font-size:18px;font-weight:500;color:#60c0ff}
 .pop-stat-sub{font-size:11px;color:#333;margin-top:2px}
 
 /* ── LOADING ── */
 #loading{position:fixed;inset:0;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999}
 #loading.done{display:none}
-.loading-text{font-size:16px;color:#333}
+.loading-text{font-size:16px;color:#888}
 .loading-spinner{width:32px;height:32px;border:2px solid #1a1a2a;border-top-color:#604578;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -475,8 +480,8 @@ function buildEraHeader(){
     seg.className = 'ei-seg';
     seg.id = 'ei-'+era.id;
     seg.style.width = ERA_WIDTHS[i].toFixed(2)+'%';
-    seg.style.background = era.c+'44';
-    seg.style.borderRight = '.5px solid '+era.c+'55';
+    seg.style.background = era.c+'99';
+    seg.style.borderRight = '.5px solid '+era.c+'80';
     // year label on major eras
     if([0,3,7,10].includes(i)){
       const yr = document.createElement('div');
@@ -486,12 +491,13 @@ function buildEraHeader(){
     }
     ind.insertBefore(seg, document.getElementById('era-redline'));
 
-    // chip
+    // chip — proportional flex width, vertical text
     const chip = document.createElement('button');
     chip.className='era-chip';
     chip.id='chip-'+era.id;
     chip.textContent=era.n;
-    chip.style.borderColor=era.c+'80';
+    chip.style.flex=ERA_WIDTHS[i].toFixed(2);
+    chip.style.borderRightColor=era.c+'50';
     chip.onclick=()=>jumpToEra(era.id);
     chips.appendChild(chip);
   });
@@ -507,19 +513,18 @@ function setEraByYear(y){
 }
 
 function highlightEra(eraId){
-  document.querySelectorAll('.era-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.era-chip').forEach(c=>{
+    c.classList.remove('active');
+    const e=ERAS.find(x=>'chip-'+x.id===c.id);
+    if(e){c.style.background='transparent';c.style.color='#888';}
+  });
   const chip = document.getElementById('chip-'+eraId);
   if(chip){
     chip.classList.add('active');
     const era = ERAS.find(e=>e.id===eraId);
-    chip.style.background=era.c+'55';
+    chip.style.background=era.c+'66';
     chip.style.color='#fff';
-    chip.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
   }
-  document.querySelectorAll('.era-chip:not(.active)').forEach(c=>{
-    const e=ERAS.find(x=>'chip-'+x.id===c.id);
-    if(e){c.style.background='transparent';c.style.color='#666';}
-  });
 }
 
 function updateRedline(y){
@@ -627,7 +632,7 @@ function buildNenpyo(){
     hdr.id='era-hdr-'+era.id;
     hdr.textContent=eraName(era)+' '+era.s+'–'+era.e;
     hdr.style.borderColor=era.c;
-    hdr.style.color=era.c+'cc';
+    hdr.style.color=era.c;
     list.appendChild(hdr);
 
     items.forEach(ev=>{
@@ -697,11 +702,26 @@ function showEventDetail(ev, era){
 
 // ── 地図 ──────────────────────────────────────────────────
 let projection, path, mapG;
-const KUNI_LABELS={
-  kanto:'関東（東京・神奈川など）',kinki:'畿内（京都・大阪など）',
-  chubu:'中部（愛知・静岡など）',tohoku:'東北',chugoku:'中国地方',
-  kyushu:'九州',hokkaido:'北海道',shikoku:'四国',
-};
+// WEB版準拠 地域色
+const RGFILL={hokkaido:'#3a7a44',tohoku:'#3d7848',kanto:'#4a6080',chubu:'#7a6a38',kinki:'#7a4060',chugoku:'#3a6860',shikoku:'#447050',kyushu:'#6a4838',other:'#2e4060'};
+// 都道府県 → 地域
+const PREFRG={'北海道':'hokkaido','青森県':'tohoku','岩手県':'tohoku','宮城県':'tohoku','秋田県':'tohoku','山形県':'tohoku','福島県':'tohoku','茨城県':'kanto','栃木県':'kanto','群馬県':'kanto','埼玉県':'kanto','千葉県':'kanto','東京都':'kanto','神奈川県':'kanto','新潟県':'chubu','富山県':'chubu','石川県':'chubu','福井県':'chubu','山梨県':'chubu','長野県':'chubu','岐阜県':'chubu','静岡県':'chubu','愛知県':'chubu','三重県':'kinki','滋賀県':'kinki','京都府':'kinki','大阪府':'kinki','兵庫県':'kinki','奈良県':'kinki','和歌山県':'kinki','鳥取県':'chugoku','島根県':'chugoku','岡山県':'chugoku','広島県':'chugoku','山口県':'chugoku','徳島県':'shikoku','香川県':'shikoku','愛媛県':'shikoku','高知県':'shikoku','福岡県':'kyushu','佐賀県':'kyushu','長崎県':'kyushu','熊本県':'kyushu','大分県':'kyushu','宮崎県':'kyushu','鹿児島県':'kyushu','沖縄県':'kyushu'};
+// 旧国 → 都道府県リスト (WEB版準拠)
+const PROVPREF={ezo:['北海道'],mutsu:['青森県','岩手県','宮城県','福島県'],rikuchu:['岩手県'],rikuzen:['宮城県','岩手県'],dewa:['山形県','秋田県'],ugo:['秋田県'],uzen:['山形県'],hitachi:['茨城県'],shimozuke:['栃木県'],kozuke:['群馬県'],shimosa:['千葉県','茨城県'],kazusa:['千葉県'],awa_k:['千葉県'],musashi:['東京都','埼玉県','神奈川県'],sagami:['神奈川県'],izu:['静岡県'],echigo:['新潟県'],sado:['新潟県'],etchu:['富山県'],noto:['石川県'],kaga:['石川県'],echizen:['福井県'],wakasa:['福井県'],kai:['山梨県'],shinano:['長野県'],hida:['岐阜県'],mino:['岐阜県'],owari:['愛知県'],mikawa:['愛知県'],totomi:['静岡県'],suruga:['静岡県'],tango:['京都府'],tanba:['京都府','兵庫県'],tajima:['兵庫県'],omi:['滋賀県'],yamashiro:['京都府'],settsu:['大阪府','兵庫県'],kawachi:['大阪府'],izumi:['大阪府'],yamato:['奈良県'],iga:['三重県'],ise:['三重県'],shima:['三重県'],kii:['和歌山県','三重県'],awaji:['兵庫県'],harima:['兵庫県'],inaba:['鳥取県'],hoki:['鳥取県'],izumo:['島根県'],iwami:['島根県'],mimasaka:['岡山県'],bizen:['岡山県'],bitchu:['岡山県'],bingo:['広島県'],aki:['広島県'],suo:['山口県'],nagato:['山口県'],awa_s:['徳島県'],sanuki:['香川県'],iyo:['愛媛県'],tosa:['高知県'],chikuzen:['福岡県'],chikugo:['福岡県'],buzen:['福岡県','大分県'],bungo:['大分県'],hizen:['佐賀県','長崎県'],higo:['熊本県'],hyuga:['宮崎県'],osumi:['鹿児島県'],satsuma:['鹿児島県'],iki:['長崎県'],tsushima:['長崎県'],ryukyu:['沖縄県']};
+// 旧国一覧 (WEB版 PROVS準拠、北→南順)
+const PROVS=[
+  {v:'ezo',lb:'蝦夷地',rg:'hokkaido'},{v:'mutsu',lb:'陸奥国',rg:'tohoku'},{v:'rikuchu',lb:'陸中国',rg:'tohoku'},{v:'rikuzen',lb:'陸前国',rg:'tohoku'},{v:'dewa',lb:'出羽国',rg:'tohoku'},{v:'ugo',lb:'羽後国',rg:'tohoku'},{v:'uzen',lb:'羽前国',rg:'tohoku'},
+  {v:'hitachi',lb:'常陸国',rg:'kanto'},{v:'shimozuke',lb:'下野国',rg:'kanto'},{v:'kozuke',lb:'上野国',rg:'kanto'},{v:'shimosa',lb:'下総国',rg:'kanto'},{v:'kazusa',lb:'上総国',rg:'kanto'},{v:'awa_k',lb:'安房国',rg:'kanto'},{v:'musashi',lb:'武蔵国',rg:'kanto'},{v:'sagami',lb:'相模国',rg:'kanto'},{v:'izu',lb:'伊豆国',rg:'kanto'},
+  {v:'echigo',lb:'越後国',rg:'chubu'},{v:'sado',lb:'佐渡国',rg:'chubu'},{v:'etchu',lb:'越中国',rg:'chubu'},{v:'noto',lb:'能登国',rg:'chubu'},{v:'kaga',lb:'加賀国',rg:'chubu'},{v:'echizen',lb:'越前国',rg:'chubu'},{v:'wakasa',lb:'若狭国',rg:'chubu'},{v:'kai',lb:'甲斐国',rg:'chubu'},{v:'shinano',lb:'信濃国',rg:'chubu'},{v:'hida',lb:'飛騨国',rg:'chubu'},{v:'mino',lb:'美濃国',rg:'chubu'},{v:'owari',lb:'尾張国',rg:'chubu'},{v:'mikawa',lb:'三河国',rg:'chubu'},{v:'totomi',lb:'遠江国',rg:'chubu'},{v:'suruga',lb:'駿河国',rg:'chubu'},
+  {v:'tango',lb:'丹後国',rg:'kinki'},{v:'tanba',lb:'丹波国',rg:'kinki'},{v:'tajima',lb:'但馬国',rg:'kinki'},{v:'omi',lb:'近江国',rg:'kinki'},{v:'yamashiro',lb:'山城国',rg:'kinki'},{v:'settsu',lb:'摂津国',rg:'kinki'},{v:'kawachi',lb:'河内国',rg:'kinki'},{v:'izumi',lb:'和泉国',rg:'kinki'},{v:'yamato',lb:'大和国',rg:'kinki'},{v:'iga',lb:'伊賀国',rg:'kinki'},{v:'ise',lb:'伊勢国',rg:'kinki'},{v:'shima',lb:'志摩国',rg:'kinki'},{v:'kii',lb:'紀伊国',rg:'kinki'},{v:'awaji',lb:'淡路国',rg:'kinki'},{v:'harima',lb:'播磨国',rg:'kinki'},
+  {v:'inaba',lb:'因幡国',rg:'chugoku'},{v:'hoki',lb:'伯耆国',rg:'chugoku'},{v:'izumo',lb:'出雲国',rg:'chugoku'},{v:'iwami',lb:'石見国',rg:'chugoku'},{v:'mimasaka',lb:'美作国',rg:'chugoku'},{v:'bizen',lb:'備前国',rg:'chugoku'},{v:'bitchu',lb:'備中国',rg:'chugoku'},{v:'bingo',lb:'備後国',rg:'chugoku'},{v:'aki',lb:'安芸国',rg:'chugoku'},{v:'suo',lb:'周防国',rg:'chugoku'},{v:'nagato',lb:'長門国',rg:'chugoku'},
+  {v:'awa_s',lb:'阿波国',rg:'shikoku'},{v:'sanuki',lb:'讃岐国',rg:'shikoku'},{v:'iyo',lb:'伊予国',rg:'shikoku'},{v:'tosa',lb:'土佐国',rg:'shikoku'},
+  {v:'chikuzen',lb:'筑前国',rg:'kyushu'},{v:'chikugo',lb:'筑後国',rg:'kyushu'},{v:'buzen',lb:'豊前国',rg:'kyushu'},{v:'bungo',lb:'豊後国',rg:'kyushu'},{v:'hizen',lb:'肥前国',rg:'kyushu'},{v:'higo',lb:'肥後国',rg:'kyushu'},{v:'hyuga',lb:'日向国',rg:'kyushu'},{v:'osumi',lb:'大隅国',rg:'kyushu'},{v:'satsuma',lb:'薩摩国',rg:'kyushu'},{v:'iki',lb:'壱岐国',rg:'kyushu'},{v:'tsushima',lb:'対馬国',rg:'kyushu'},{v:'ryukyu',lb:'琉球国',rg:'kyushu'},
+];
+const KUNI_LABELS={kanto:'関東',kinki:'畿内',chubu:'中部',tohoku:'東北',chugoku:'中国',kyushu:'九州',hokkaido:'北海道',shikoku:'四国'};
+
+// 旧国選択中の都道府県リスト
+let selectedProvPrefs=[];
 
 function buildMap(){
   const eraSelect=document.getElementById('sel-era');
@@ -713,10 +733,21 @@ function buildMap(){
   });
   eraSelect.value=currentEraId||'heian';
 
+  // 旧国名フルリスト（地域グループヘッダー付き）
   const kuniSelect=document.getElementById('sel-kuni');
-  Object.entries(KUNI_LABELS).forEach(([k,v])=>{
+  const rgNames={hokkaido:'北海道',tohoku:'東北',kanto:'関東',chubu:'中部・北陸',kinki:'近畿',chugoku:'中国',shikoku:'四国',kyushu:'九州・沖縄'};
+  let lastRg='';
+  PROVS.forEach(p=>{
+    if(p.rg!==lastRg){
+      const og=document.createElement('optgroup');
+      og.label=rgNames[p.rg]||p.rg;
+      kuniSelect.appendChild(og);
+      lastRg=p.rg;
+    }
     const opt=document.createElement('option');
-    opt.value=k;opt.textContent=v;kuniSelect.appendChild(opt);
+    opt.value=p.v;
+    opt.textContent=p.lb;
+    kuniSelect.lastChild.appendChild(opt);
   });
 
   eraSelect.addEventListener('change',()=>{
@@ -728,11 +759,14 @@ function buildMap(){
   });
   kuniSelect.addEventListener('change',()=>{
     selectedKuni=kuniSelect.value;
+    selectedProvPrefs=selectedKuni?(PROVPREF[selectedKuni]||[]):[];
     updateMapEra();
   });
 }
 
 let mapRendered=false;
+function getPrefName(props){return props.nam_ja||props.NAM_JA||props.name||'';}
+
 function renderMap(){
   if(mapRendered||!TOPO)return;
   mapRendered=true;
@@ -740,65 +774,93 @@ function renderMap(){
   const w=wrap.clientWidth,h=wrap.clientHeight;
   const svg=d3.select('#map-svg').attr('viewBox','0 0 '+w+' '+h);
 
-  projection=d3.geoMercator().fitSize([w,h],topojson.feature(TOPO,TOPO.objects.japan));
+  const allFeat=topojson.feature(TOPO,TOPO.objects.japan);
+  // 本州・四国・九州・北海道のみでfitExtent（沖縄除外で本土を大きく表示）
+  const mainlandFeat={type:'FeatureCollection',features:allFeat.features.filter(d=>getPrefName(d.properties||{})!=='沖縄県')};
+
+  projection=d3.geoMercator().fitExtent([[10,10],[w-10,h*0.88]],mainlandFeat);
   path=d3.geoPath().projection(projection);
 
   mapG=svg.append('g');
 
-  // prefectures
-  const feat=topojson.feature(TOPO,TOPO.objects.japan);
+  // 本土都道府県
   mapG.selectAll('path.pref')
-    .data(feat.features)
+    .data(allFeat.features.filter(d=>getPrefName(d.properties||{})!=='沖縄県'))
     .join('path')
     .attr('class','pref')
     .attr('d',path)
-    .attr('fill','#162030')
-    .attr('stroke','#0a1a28')
-    .attr('stroke-width',0.3)
+    .attr('fill',d=>{const rg=PREFRG[getPrefName(d.properties||{})];return rg?(RGFILL[rg]||RGFILL.other):RGFILL.other;})
+    .attr('stroke','rgba(0,0,0,0.5)')
+    .attr('stroke-width',0.4)
     .on('click',function(ev,d){
-      const props=d.properties||{};
-      showMapBadge(props.name||'',props.name_en||'');
+      const nm=getPrefName(d.properties||{});
+      showMapBadge(nm, PREFRG[nm]?(KUNI_LABELS[PREFRG[nm]]||''):'');
     });
 
-  // add person location markers
+  // 沖縄県 — 左上に小さく表示
+  const okiFeat=allFeat.features.filter(d=>getPrefName(d.properties||{})==='沖縄県');
+  if(okiFeat.length){
+    const okiProj=d3.geoMercator().fitExtent([[6,6],[90,90]],{type:'FeatureCollection',features:okiFeat});
+    const okiPath=d3.geoPath().projection(okiProj);
+    const okiG=svg.append('g').attr('class','oki-group');
+    // 枠
+    okiG.append('rect').attr('x',4).attr('y',4).attr('width',88).attr('height',88)
+      .attr('fill','#050c14').attr('stroke','rgba(255,255,255,0.1)').attr('rx',3);
+    okiG.selectAll('path.oki')
+      .data(okiFeat)
+      .join('path')
+      .attr('class','oki pref')
+      .attr('d',okiPath)
+      .attr('fill',RGFILL.kyushu)
+      .attr('stroke','rgba(0,0,0,0.5)')
+      .attr('stroke-width',0.4)
+      .on('click',()=>showMapBadge('沖縄県','琉球国'));
+    okiG.append('text').attr('x',48).attr('y',98).attr('text-anchor','middle')
+      .attr('font-size','8').attr('fill','rgba(255,255,255,0.35)').text('沖縄');
+  }
+
   updateMapEra();
 }
 
 function updateMapEra(){
   if(!mapRendered||!DATA)return;
-  const eraId=document.getElementById('sel-era').value||currentEraId;
+  const eraId=document.getElementById('sel-era').value||currentEraId||'heian';
   const era=ERAS.find(e=>e.id===eraId);
   if(!era)return;
 
-  // reset prefecture colors
-  d3.selectAll('path.pref').attr('fill','#162030');
+  // 地域色でリセット
+  d3.selectAll('path.pref').attr('fill',d=>{
+    const nm=getPrefName(d.properties||{});
+    const rg=PREFRG[nm];
+    // 旧国フィルター時はハイライト/非ハイライト
+    if(selectedProvPrefs.length){
+      return selectedProvPrefs.includes(nm)?'#60c0ff':(rg?(RGFILL[rg]||RGFILL.other):RGFILL.other);
+    }
+    return rg?(RGFILL[rg]||RGFILL.other):RGFILL.other;
+  });
 
-  // highlight persons in this era
-  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers]
-    .filter(p=>p.era===eraId||(p.s&&p.s<era.e&&p.e&&p.e>era.s));
-
-  // remove old markers
   d3.selectAll('.person-marker').remove();
-
+  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers]
+    .filter(p=>p.era===eraId||(p.s!=null&&p.e!=null&&p.s<era.e&&p.e>era.s));
   persons.forEach(p=>{
     if(!p.locs)return;
     p.locs.forEach(loc=>{
-      const regionCenter=getRegionCenter(loc.r);
-      if(!regionCenter)return;
-      const [cx,cy]=projection(regionCenter);
-      if(isNaN(cx)||isNaN(cy))return;
+      const c=getRegionCenter(loc.r);if(!c)return;
+      const [cx,cy]=projection(c);if(isNaN(cx)||isNaN(cy))return;
       const g=mapG.append('g').attr('class','person-marker').attr('transform','translate('+cx+','+cy+')');
-      g.append('circle').attr('r',6).attr('fill',loc.c||'#5090ff').attr('opacity',0.8)
-        .attr('stroke','rgba(255,255,255,0.3)').attr('stroke-width',0.5);
-      g.on('click',()=>showMapBadge(p.n, (p.l||'')+(loc.lb?' · '+loc.lb:'')));
+      g.append('circle').attr('r',7).attr('fill',loc.c||'#5090ff').attr('opacity',0.85)
+        .attr('stroke','rgba(255,255,255,0.4)').attr('stroke-width',0.8);
+      g.on('click',()=>showMapBadge(p.n,(p.l||'')+(loc.lb?' · '+loc.lb:'')));
     });
   });
 
-  // kuni filter highlight
-  if(selectedKuni){
-    d3.selectAll('path.pref').attr('fill',function(d){
-      return (d.properties&&d.properties.region===selectedKuni)?'#1a3a60':'#162030';
-    });
+  // 旧国フィルターバッジ
+  if(selectedProvPrefs.length){
+    const p=PROVS.find(x=>x.v===selectedKuni);
+    if(p){
+      const prefsText=selectedProvPrefs.join('・');
+      showMapBadge(p.lb, prefsText);
+    }
   }
 }
 
@@ -818,33 +880,6 @@ function showMapBadge(title, desc){
   b.classList.add('show');
   clearTimeout(b._t);
   b._t=setTimeout(()=>b.classList.remove('show'),4000);
-}
-
-function updateMapEra(){ // redeclare to also handle initial call without sel-era
-  if(!mapRendered||!DATA)return;
-  const eraId=document.getElementById('sel-era').value||currentEraId||'heian';
-  const era=ERAS.find(e=>e.id===eraId);
-  if(!era)return;
-  d3.selectAll('path.pref').attr('fill','#162030');
-  d3.selectAll('.person-marker').remove();
-  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers]
-    .filter(p=>p.era===eraId||(p.s!=null&&p.e!=null&&p.s<era.e&&p.e>era.s));
-  persons.forEach(p=>{
-    if(!p.locs)return;
-    p.locs.forEach(loc=>{
-      const c=getRegionCenter(loc.r);if(!c)return;
-      const [cx,cy]=projection(c);if(isNaN(cx)||isNaN(cy))return;
-      const g=mapG.append('g').attr('class','person-marker').attr('transform','translate('+cx+','+cy+')');
-      g.append('circle').attr('r',6).attr('fill',loc.c||'#5090ff').attr('opacity',0.8)
-        .attr('stroke','rgba(255,255,255,0.3)').attr('stroke-width',0.5);
-      g.on('click',()=>showMapBadge(p.n,(p.l||'')+(loc.lb?' · '+loc.lb:'')));
-    });
-  });
-  if(selectedKuni){
-    d3.selectAll('path.pref').attr('fill',function(d){
-      return(d.properties&&d.properties.region===selectedKuni)?'#1a3a60':'#162030';
-    });
-  }
 }
 
 // ── 人物 ──────────────────────────────────────────────────
@@ -905,6 +940,7 @@ function showPersonDetail(p, color, sq){
     });
   }
 
+  const hasLocs=p.locs&&p.locs.length;
   body.innerHTML=`
     <div class="det-tag">${era?eraName(era)+' · ':''}</div>
     <div class="det-name" style="display:flex;align-items:baseline;gap:8px">
@@ -913,10 +949,22 @@ function showPersonDetail(p, color, sq){
     </div>
     ${p.fg?`<div class="person-furigana">${escHtml(p.fg)}</div>`:''}
     <div class="person-period">${escHtml(p.l||'')}${p.role?' | '+escHtml(p.role):''}</div>
+    ${hasLocs?`<button id="person-map-btn" style="margin:4px 0 10px;display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:#0f1e30;border:.5px solid #2a5080;border-radius:6px;color:#60b0ff;font-size:13px;font-family:inherit;cursor:pointer"><i class="ti ti-map-pin" style="font-size:16px"></i>ゆかりの地を地図で見る</button>`:''}
     <div class="det-divider"></div>
     <div class="det-desc">${escHtml(p.desc||'')}</div>
     ${locsHtml}
   `;
+  if(hasLocs){
+    document.getElementById('person-map-btn').addEventListener('click',()=>{
+      // 地図タブへ移動し、時代を合わせる
+      closeAllScreens();
+      switchTab('chizu');
+      if(era){
+        document.getElementById('sel-era').value=era.id;
+        setTimeout(()=>updateMapEra(),100);
+      }
+    });
+  }
 
   // legend
   const legend=document.getElementById('person-loc-legend');
@@ -970,9 +1018,9 @@ function doSearch(){
   const ql=q.toLowerCase();
   let html='';
 
-  // persons (fg support)
+  // persons (fg support — furigana は先頭一致のみ)
   const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers].filter(p=>{
-    return p.n.includes(q)||(p.fg&&p.fg.includes(ql))||(p.role&&p.role.includes(q));
+    return p.n.includes(q)||(p.fg&&p.fg.startsWith(ql))||(p.role&&p.role.includes(q));
   });
   if(persons.length){
     html+='<div class="result-type-hdr">人物（'+persons.length+'件）</div>';
@@ -1099,11 +1147,9 @@ function buildTokaidoMap(){
   const w=wrap.clientWidth||390, h=wrap.clientHeight||400;
   const svg=d3.select('#tokaido-svg').attr('viewBox','0 0 '+w+' '+h);
 
-  // project onto Tokaido corridor: lon 135.7-140.0, lat 33.8-36.0
-  const proj=d3.geoMercator()
-    .center([137.85,35.0])
-    .scale(w*5.5)
-    .translate([w/2,h/2]);
+  // 東海道コリドー（日本橋〜三条大橋）をタイトに拡大
+  const tokaidoBounds={type:'FeatureCollection',features:[{type:'Feature',geometry:{type:'MultiPoint',coordinates:[[135.77,35.01],[139.78,35.69],[136.6,34.6],[138.92,35.2]]}}]};
+  const proj=d3.geoMercator().fitExtent([[30,h*0.05],[w-20,h*0.9]],tokaidoBounds);
   const pth=d3.geoPath().projection(proj);
 
   // land
