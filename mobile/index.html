@@ -211,6 +211,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
 /* 旧国ハイライト点滅 */
 @keyframes pref-blink{0%,100%{opacity:1}50%{opacity:.35}}
 .pref-highlighted{animation:pref-blink 1.2s ease-in-out infinite}
+/* 同位置マーカー交互表示 */
+@keyframes alt-a{0%,40%{opacity:1}55%,95%{opacity:0}100%{opacity:1}}
+@keyframes alt-b{0%,40%{opacity:0}55%,95%{opacity:1}100%{opacity:0}}
+.mk-alt-a{animation:alt-a 2s ease-in-out infinite}
+.mk-alt-b{animation:alt-b 2s ease-in-out infinite}
 
 /* scrollbars */
 ::-webkit-scrollbar{width:2px;height:2px}
@@ -359,20 +364,21 @@ input,textarea{-webkit-user-select:text;user-select:text}
       <div style="margin-top:16px;padding:12px;background:#080812;border-radius:8px;border:.5px solid #1a1a2a">
         <div style="font-size:12px;color:#8888aa;margin-bottom:10px">時代ごとの日本の人口（推定）</div>
         <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <colgroup><col><col style="text-align:right"><col style="width:1px"><col></colgroup>
           <tbody>
-            <tr><td style="color:#b0b8d0;padding:3px 0">古墳時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">150<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">飛鳥時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">500<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">奈良時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">600<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">平安時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">700<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">鎌倉時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">800<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">室町時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1,000<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">安土桃山時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1,500<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">江戸時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">3,000<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">明治時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">5,000<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">大正時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">6,000<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">昭和時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1億2,300<span style="color:#888">万</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">平成時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1億2,800<span style="color:#888">万</span><span style="color:#888;font-size:11px">（ピーク）</span></td></tr>
-            <tr><td style="color:#b0b8d0;padding:3px 0">令和時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums">1億2,300<span style="color:#888">万</span></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">古墳時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">150</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">飛鳥時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">500</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">奈良時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">600</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">平安時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">700</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">鎌倉時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">800</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">室町時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">1,000</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">安土桃山時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">1,500</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">江戸時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">3,000</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">明治時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">5,000</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">大正時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">6,000</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">昭和時代</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">1億2,300</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">平　　成</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">1億2,800</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td style="color:#888;font-size:11px;padding:3px 0;white-space:nowrap">（ピーク）</td></tr>
+            <tr><td style="color:#b0b8d0;padding:3px 0">令　　和</td><td style="text-align:right;color:#c0c8e0;padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap">1億2,300</td><td style="color:#888;padding:3px 2px 3px 0;white-space:nowrap">万</td><td></td></tr>
           </tbody>
         </table>
       </div>
@@ -1029,26 +1035,52 @@ function drawPersonLocsOnMap(rgC){
   if(!personMapLocs) return;
   const typeColors={birth:'#40b060',active:'#5090ff',exile:'#ff8030',death:'#909090'};
   const typeLabel={birth:'生',active:'活',exile:'流',death:'没'};
+  // type priority for circle color when multiple locs share same centroid
+  const typePrio={birth:0,active:1,exile:2,death:3};
+
+  // セントロイドを解決してからグループ化
+  const resolved=[];
   personMapLocs.forEach(loc=>{
-    // loc.r は旧国名コード or 地域コード
     let c=null;
     if(PROVPREF[loc.r]){
-      // 旧国名コード → 都道府県の最初のセントロイド
       const pref=PROVPREF[loc.r][0];
       c=prefCentroids[pref];
     } else {
-      // 地域コード → 地域代表セントロイド
       c=rgCentroids_[loc.r];
     }
     if(!c||isNaN(c[0])) return;
-    const clr=typeColors[loc.tp]||'#888';
-    const lbl=typeLabel[loc.tp]||'●';
+    resolved.push({loc, c});
+  });
+
+  // 同じセントロイド（小数1桁で判定）をグループ化
+  const groups=new Map();
+  resolved.forEach(({loc,c})=>{
+    const key=c[0].toFixed(1)+','+c[1].toFixed(1);
+    if(!groups.has(key)) groups.set(key,{c,locs:[]});
+    groups.get(key).locs.push(loc);
+  });
+
+  groups.forEach(({c,locs})=>{
+    // circle colorは最優先タイプの色
+    const primary=locs.reduce((a,b)=>(typePrio[a.tp]??9)<(typePrio[b.tp]??9)?a:b);
+    const clr=typeColors[primary.tp]||'#888';
     const mg=mapG.append('g').attr('class','person-loc-marker')
       .attr('transform','translate('+c[0]+','+c[1]+')');
     mg.append('circle').attr('r',9).attr('fill',clr+'cc').attr('stroke',clr).attr('stroke-width',2);
-    mg.append('text').attr('text-anchor','middle').attr('dy','0.38em')
-      .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
-      .attr('pointer-events','none').text(lbl);
+    if(locs.length===1){
+      mg.append('text').attr('text-anchor','middle').attr('dy','0.38em')
+        .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
+        .attr('pointer-events','none').text(typeLabel[locs[0].tp]||'●');
+    } else {
+      // 複数：交互にフェード表示（最大2種）
+      const altClasses=['mk-alt-a','mk-alt-b'];
+      locs.slice(0,2).forEach((loc,i)=>{
+        mg.append('text').attr('class',altClasses[i])
+          .attr('text-anchor','middle').attr('dy','0.38em')
+          .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
+          .attr('pointer-events','none').text(typeLabel[loc.tp]||'●');
+      });
+    }
   });
 }
 
@@ -1143,7 +1175,7 @@ function buildJinbutsu(){
       row.className='person-row';
       const era=ERAS.find(e=>e.id===p.era)||(p.s?eraForYear(p.s):null);
       row.innerHTML=`<div class="person-dot${sec.sq?' sq':''}" style="background:${sec.color}"></div>
-        <div><div class="person-name">${escHtml(p.n)}</div>
+        <div><div class="person-name">　${escHtml(p.n)}</div>
         <div class="person-sub">${escHtml(p.l||'')}${era?' · '+eraName(era):''}</div></div>
         <i class="ti ti-chevron-right" style="font-size:16px;color:#2a2a3a;margin-left:auto"></i>`;
       row.onclick=()=>showPersonDetail(p, sec.color, sec.sq);
