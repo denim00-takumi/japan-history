@@ -21,7 +21,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #era-indicator{height:20px;display:flex;position:relative;background:#080810;overflow-x:clip;overflow-y:visible}
 .ei-seg{border-right:.5px solid rgba(255,255,255,.2);position:relative;transition:opacity .2s;flex-shrink:0}
 .ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#c8c8e0;white-space:nowrap;pointer-events:none}
-#era-redline{position:absolute;top:-14px;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none;transition:left .4s ease}
+#era-redline{position:absolute;top:-14px;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none}
 #era-chips{display:flex;overflow:hidden;height:50px;align-items:flex-start;padding-top:3px;position:relative;user-select:none}
 .era-chip{
   flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
@@ -576,7 +576,7 @@ function jumpToEra(eraId){
   // if on 年表 tab, scroll to that era section
   if(currentTab==='nenpyo'){
     const hdr = document.getElementById('era-hdr-'+eraId);
-    if(hdr) hdr.scrollIntoView({behavior:'smooth',block:'start'});
+    if(hdr) hdr.scrollIntoView({behavior:'auto',block:'start'});
   }
   // if on 地図, update era select
   if(currentTab==='chizu'){
@@ -622,8 +622,6 @@ function jumpToEra(eraId){
     startX=e.touches[0].clientX;
     moved=false;
     sliding=true;
-    // タッチ開始時点でtransitionを即オフ
-    if(redline) redline.style.transition='none';
   },{passive:true});
   chipsEl.addEventListener('touchmove',e=>{
     if(!sliding||e.touches.length!==1)return;
@@ -640,10 +638,6 @@ function jumpToEra(eraId){
       const era=eraAtX(e.changedTouches[0].clientX);
       jumpToEra(era.id);
     }
-    // jumpToEra完了後のフレームでtransition復元
-    requestAnimationFrame(()=>{
-      if(redline) redline.style.transition='left .4s ease';
-    });
     sliding=false;moved=false;
   });
 })();
