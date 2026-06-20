@@ -1082,15 +1082,18 @@ function drawPersonLocsOnMap(rgC){
     const clr=typeColors[primary.tp]||'#888';
     const mg=mapG.append('g').attr('class','person-loc-marker')
       .attr('transform','translate('+c[0]+','+c[1]+')');
-    mg.append('circle').attr('r',9).attr('fill',clr+'cc').attr('stroke',clr).attr('stroke-width',2);
     if(locs.length===1){
+      mg.append('circle').attr('r',9).attr('fill',clr+'cc').attr('stroke',clr).attr('stroke-width',2);
       mg.append('text').attr('text-anchor','middle').attr('dy','0.38em')
         .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
         .attr('pointer-events','none').text(typeLabel[locs[0].tp]||'●');
     } else {
-      // 複数：交互にフェード表示（最大2種）
+      // 複数：円の色もラベルも同時に交互フェード
       const altClasses=['mk-alt-a','mk-alt-b'];
       locs.slice(0,2).forEach((loc,i)=>{
+        const lc=typeColors[loc.tp]||'#888';
+        mg.append('circle').attr('class',altClasses[i])
+          .attr('r',9).attr('fill',lc+'cc').attr('stroke',lc).attr('stroke-width',2);
         mg.append('text').attr('class',altClasses[i])
           .attr('text-anchor','middle').attr('dy','0.38em')
           .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
