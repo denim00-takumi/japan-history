@@ -5,5 +5,6 @@
 *.gif
 *.svg
 *.json
+!mobile/manifest.json
 .DS_Store
 .claude/
