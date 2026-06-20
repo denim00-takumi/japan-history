@@ -982,32 +982,55 @@ function renderMap(){
     const c=path.centroid(d);
     if(nm&&!isNaN(c[0])) prefCentroids[nm]=c;
   });
-  prefCentroids['沖縄県']=[72,72]; // oki box center (2+140/2)
+  prefCentroids['沖縄県']=[72,72];
+
+  // 地域コード → 代表セントロイド（都道府県の平均）
+  const rgCentroids={};
+  Object.entries(PREFRG).forEach(([pref,rg])=>{
+    const c=prefCentroids[pref];
+    if(!c) return;
+    if(!rgCentroids[rg]) rgCentroids[rg]=[0,0,0];
+    rgCentroids[rg][0]+=c[0]; rgCentroids[rg][1]+=c[1]; rgCentroids[rg][2]++;
+  });
+  Object.keys(rgCentroids).forEach(rg=>{
+    const r=rgCentroids[rg];
+    rgCentroids[rg]=[r[0]/r[2],r[1]/r[2]];
+  });
 
   updateMapEra();
-  if(personMapLocs) drawPersonLocsOnMap();
+  if(personMapLocs) drawPersonLocsOnMap(rgCentroids);
 }
 
-function drawPersonLocsOnMap(){
+// rgCentroidsをモジュールレベルで保持
+let rgCentroids_={};
+
+function drawPersonLocsOnMap(rgC){
+  if(rgC) rgCentroids_=rgC;
   if(!mapRendered||!mapG) return;
   mapG.selectAll('.person-loc-marker').remove();
   if(!personMapLocs) return;
   const typeColors={birth:'#60a0ff',active:'#ff8030',exile:'#ff4060',death:'#909090'};
   const typeLabel={birth:'生',active:'活',exile:'流',death:'没'};
   personMapLocs.forEach(loc=>{
-    const prefs=PROVPREF[loc.r]||[];
-    prefs.forEach(pref=>{
-      const c=prefCentroids[pref];
-      if(!c||isNaN(c[0])) return;
-      const clr=typeColors[loc.tp]||'#888';
-      const lbl=typeLabel[loc.tp]||'●';
-      const mg=mapG.append('g').attr('class','person-loc-marker')
-        .attr('transform','translate('+c[0]+','+c[1]+')');
-      mg.append('circle').attr('r',9).attr('fill',clr+'aa').attr('stroke',clr).attr('stroke-width',1.5);
-      mg.append('text').attr('text-anchor','middle').attr('dy','0.38em')
-        .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
-        .attr('pointer-events','none').text(lbl);
-    });
+    // loc.r は旧国名コード or 地域コード
+    let c=null;
+    if(PROVPREF[loc.r]){
+      // 旧国名コード → 都道府県の最初のセントロイド
+      const pref=PROVPREF[loc.r][0];
+      c=prefCentroids[pref];
+    } else {
+      // 地域コード → 地域代表セントロイド
+      c=rgCentroids_[loc.r];
+    }
+    if(!c||isNaN(c[0])) return;
+    const clr=typeColors[loc.tp]||'#888';
+    const lbl=typeLabel[loc.tp]||'●';
+    const mg=mapG.append('g').attr('class','person-loc-marker')
+      .attr('transform','translate('+c[0]+','+c[1]+')');
+    mg.append('circle').attr('r',9).attr('fill',clr+'cc').attr('stroke',clr).attr('stroke-width',2);
+    mg.append('text').attr('text-anchor','middle').attr('dy','0.38em')
+      .attr('font-size','8').attr('fill','#fff').attr('font-weight','bold')
+      .attr('pointer-events','none').text(lbl);
   });
 }
 
