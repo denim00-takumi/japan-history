@@ -604,12 +604,14 @@ function jumpToEra(eraId){
     return ERAS[ERAS.length-1];
   }
   const redline=document.getElementById('era-redline');
+  const indEl=document.getElementById('era-indicator');
   function showTip(clientX,era){
     const rect=chipsEl.getBoundingClientRect();
+    const indRect=indEl.getBoundingClientRect();
     tip.textContent=eraName(era);
-    // チップ領域上部にオーバーレイ（指より上）
+    // 色の帯（era-indicator）に重ねて表示
     tip.style.left=Math.max(rect.left+34,Math.min(clientX,rect.right-34))+'px';
-    tip.style.top=(rect.top+4)+'px';
+    tip.style.top=(indRect.top+2)+'px';
     tip.classList.add('show');
     // 赤線を指の位置に即追随（transition一時オフ）
     const indRect=document.getElementById('era-indicator').getBoundingClientRect();
