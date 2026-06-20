@@ -18,18 +18,18 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #era-indicator{height:14px;display:flex;position:relative;background:#080810;overflow:hidden}
 .ei-seg{flex-shrink:0;border-right:.5px solid rgba(255,255,255,.07);position:relative;transition:opacity .2s}
 .ei-seg.active{opacity:1}
-.ei-yr{position:absolute;bottom:1px;left:2px;font-size:5px;color:#2a2a40;white-space:nowrap;pointer-events:none}
+.ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#2a2a40;white-space:nowrap;pointer-events:none}
 #era-redline{position:absolute;top:0;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none;transition:left .4s ease}
 #era-chips{display:flex;overflow-x:auto;padding:3px 5px;gap:3px;scrollbar-width:none;height:28px;align-items:center}
 #era-chips::-webkit-scrollbar{display:none}
-.era-chip{flex-shrink:0;height:20px;padding:0 8px;border-radius:10px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:8px;color:#666;display:flex;align-items:center;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s}
+.era-chip{flex-shrink:0;height:20px;padding:0 8px;border-radius:10px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:10px;color:#666;display:flex;align-items:center;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s}
 .era-chip.active{font-weight:500}
 
 /* ── TAB BAR ── */
 #tab-bar{flex-shrink:0;display:flex;background:#0d0d14;border-top:.5px solid rgba(255,255,255,.08);padding:4px 0;padding-bottom:calc(4px + env(safe-area-inset-bottom))}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;color:#444;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#444;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0}
 .tab-btn.active{color:#5090ff}
-.tab-btn i{font-size:20px;line-height:1}
+.tab-btn i{font-size:22px;line-height:1}
 
 /* ── CONTENT ── */
 #content{flex:1;position:relative;overflow:hidden;min-height:0}
@@ -41,36 +41,36 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 
 /* ── NAV ROW (L2) ── */
 .nav-row{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:6px 10px;background:#0f0f18;border-bottom:.5px solid rgba(255,255,255,.07)}
-.back-btn{font-size:13px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:2px;padding:4px 0}
-.nav-title{flex:1;text-align:center;font-size:13px;color:#ccc;font-weight:500}
-.nav-action{font-size:11px;color:#5090ff;background:#1a2040;border-radius:4px;padding:3px 8px;border:.5px solid #2a3a60;cursor:pointer;white-space:nowrap}
+.back-btn{font-size:15px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:2px;padding:4px 0}
+.nav-title{flex:1;text-align:center;font-size:15px;color:#ccc;font-weight:500}
+.nav-action{font-size:13px;color:#5090ff;background:#1a2040;border-radius:4px;padding:3px 8px;border:.5px solid #2a3a60;cursor:pointer;white-space:nowrap}
 .nav-action.muted{color:#555;background:#111118;border-color:#1a1a24}
 
 /* ── 年表 ── */
 #tab-nenpyo{overflow:hidden;display:flex;flex-direction:column}
 #nenpyo-filter{flex-shrink:0;display:flex;overflow-x:auto;padding:4px 8px;gap:4px;background:#0c0c16;border-bottom:.5px solid rgba(255,255,255,.06);scrollbar-width:none}
 #nenpyo-filter::-webkit-scrollbar{display:none}
-.cat-chip{flex-shrink:0;height:22px;padding:0 10px;border-radius:11px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:11px;color:#666;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s}
+.cat-chip{flex-shrink:0;height:22px;padding:0 10px;border-radius:11px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:13px;color:#666;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s}
 .cat-chip.active{background:rgba(80,144,255,.18);border-color:#4080ee;color:#a0c8ff}
 #nenpyo-list{flex:1;overflow-y:auto;padding:4px 0 16px;-webkit-overflow-scrolling:touch}
-.era-section-hdr{padding:6px 12px 3px;font-size:10px;color:#3a3a60;font-weight:500;letter-spacing:.05em;border-left:2px solid;margin-left:10px;margin-bottom:2px}
+.era-section-hdr{padding:6px 12px 3px;font-size:12px;color:#3a3a60;font-weight:500;letter-spacing:.05em;border-left:2px solid;margin-left:10px;margin-bottom:2px}
 .event-card{margin:2px 10px;background:#161624;border-radius:8px;border:.5px solid #1e1e30;padding:8px 10px;display:flex;gap:8px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
 .event-card:active{background:#1e1e30}
 .event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
-.event-title{font-size:13px;color:#ddd}
-.event-year{font-size:10px;color:#555;margin-top:2px}
+.event-title{font-size:15px;color:#ddd}
+.event-year{font-size:12px;color:#555;margin-top:2px}
 
 /* ── 地図 ── */
 #tab-chizu{overflow:hidden;display:flex;flex-direction:column}
 #map-selectors{flex-shrink:0;padding:5px 8px;background:#0f0f18;border-bottom:.5px solid rgba(255,255,255,.07);display:flex;gap:6px}
-#map-selectors select{flex:1;background:#0a0a18;border:.5px solid #222238;border-radius:6px;padding:5px 8px;font-size:12px;color:#80a0d0;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer}
+#map-selectors select{flex:1;background:#0a0a18;border:.5px solid #222238;border-radius:6px;padding:5px 8px;font-size:14px;color:#80a0d0;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer}
 #map-svg-wrap{flex:1;background:#050c14;position:relative;overflow:hidden}
 #map-svg{width:100%;height:100%}
 #map-badge{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(6,12,26,.92);border:.5px solid rgba(64,192,255,.3);border-radius:8px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .3s}
 #map-badge.show{opacity:1}
-#map-badge-title{font-size:12px;color:#60c0ff;font-weight:500;margin-bottom:3px}
-#map-badge-desc{font-size:10px;color:rgba(255,255,255,.6);line-height:1.5}
-#map-tt{position:absolute;display:none;background:rgba(5,15,30,.96);color:rgba(255,255,255,.85);padding:3px 8px;font-size:10px;border-radius:4px;pointer-events:none;border:.5px solid rgba(64,192,255,.3);white-space:nowrap;z-index:10}
+#map-badge-title{font-size:14px;color:#60c0ff;font-weight:500;margin-bottom:3px}
+#map-badge-desc{font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
+#map-tt{position:absolute;display:none;background:rgba(5,15,30,.96);color:rgba(255,255,255,.85);padding:3px 8px;font-size:12px;border-radius:4px;pointer-events:none;border:.5px solid rgba(64,192,255,.3);white-space:nowrap;z-index:10}
 
 /* ── 人物 ── */
 #tab-jinbutsu{overflow:hidden;display:flex;flex-direction:column}
@@ -78,9 +78,9 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .person-acc-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0f0f18;border-top:.5px solid rgba(255,255,255,.05);cursor:pointer;user-select:none}
 .person-acc-left{display:flex;align-items:center;gap:8px}
 .person-acc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.person-acc-title{font-size:12px;color:#999;font-weight:500}
-.person-acc-count{font-size:10px;color:#555;background:#1a1a24;border-radius:8px;padding:1px 7px}
-.person-acc-arrow{font-size:11px;color:#333;transition:transform .2s}
+.person-acc-title{font-size:14px;color:#999;font-weight:500}
+.person-acc-count{font-size:12px;color:#555;background:#1a1a24;border-radius:8px;padding:1px 7px}
+.person-acc-arrow{font-size:13px;color:#333;transition:transform .2s}
 .person-acc-hdr.open .person-acc-arrow{transform:rotate(90deg)}
 .person-acc-body{display:none;background:#080810}
 .person-acc-body.open{display:block}
@@ -88,56 +88,56 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .person-row:active{background:#141420}
 .person-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .person-dot.sq{border-radius:2px}
-.person-name{font-size:13px;color:#ddd;flex:1}
-.person-sub{font-size:10px;color:#555;margin-top:1px}
+.person-name{font-size:15px;color:#ddd;flex:1}
+.person-sub{font-size:12px;color:#555;margin-top:1px}
 
 /* ── 検索 ── */
 #tab-kensaku{overflow:hidden;display:flex;flex-direction:column}
 #search-box-wrap{flex-shrink:0;padding:8px 10px;background:#0c0c16;border-bottom:.5px solid rgba(255,255,255,.06)}
 #search-box{display:flex;align-items:center;gap:8px;background:#0a0a18;border:.5px solid #2a2a40;border-radius:10px;padding:8px 12px}
 #search-box.active{border-color:#3a5080}
-#search-input{flex:1;font-size:14px;color:#e0e8ff;background:none;border:none;outline:none;font-family:inherit}
+#search-input{flex:1;font-size:16px;color:#e0e8ff;background:none;border:none;outline:none;font-family:inherit}
 #search-input::placeholder{color:#2a2a3a}
-#search-clear{color:#444;background:none;border:none;cursor:pointer;font-size:16px;line-height:1;padding:0}
+#search-clear{color:#444;background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0}
 #search-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #search-initial{padding:12px 10px}
 .search-shortcut{background:#141420;border-radius:10px;border:.5px solid #1e1e30;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;transition:background .15s}
 .search-shortcut:active{background:#1e1e2c}
-.search-shortcut i{font-size:20px;color:#5090ff;flex-shrink:0}
-.search-shortcut-t{font-size:13px;color:#ddd;font-weight:500}
-.search-shortcut-s{font-size:10px;color:#555;margin-top:2px}
+.search-shortcut i{font-size:22px;color:#5090ff;flex-shrink:0}
+.search-shortcut-t{font-size:15px;color:#ddd;font-weight:500}
+.search-shortcut-s{font-size:12px;color:#555;margin-top:2px}
 #search-results{display:none;padding:0}
-.result-type-hdr{padding:6px 12px 3px;font-size:10px;color:#3a3a60;font-weight:500;letter-spacing:.05em}
+.result-type-hdr{padding:6px 12px 3px;font-size:12px;color:#3a3a60;font-weight:500;letter-spacing:.05em}
 .result-row{padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
 .result-row:active{background:#141420}
-.result-icon{font-size:16px;color:#444;width:18px;text-align:center;flex-shrink:0}
-.result-main{font-size:13px;color:#ddd;flex:1}
-.result-sub{font-size:10px;color:#555;margin-top:1px}
-.result-badge{font-size:10px;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.result-icon{font-size:18px;color:#444;width:18px;text-align:center;flex-shrink:0}
+.result-main{font-size:15px;color:#ddd;flex:1}
+.result-sub{font-size:12px;color:#555;margin-top:1px}
+.result-badge{font-size:12px;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
 .hl{color:#5090ff;font-weight:500}
-.no-results{padding:30px;text-align:center;font-size:13px;color:#333}
+.no-results{padding:30px;text-align:center;font-size:15px;color:#333}
 
 /* ── L2: イベント詳細 ── */
-.det-tag{display:inline-block;font-size:10px;padding:3px 10px;border-radius:8px;background:#1a2238;color:#7090c0;margin-bottom:8px}
-.det-name{font-size:20px;font-weight:600;color:#e0e0f0;line-height:1.3;margin-bottom:3px}
-.det-sub{font-size:11px;color:#555;margin-bottom:10px}
+.det-tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:8px;background:#1a2238;color:#7090c0;margin-bottom:8px}
+.det-name{font-size:22px;font-weight:600;color:#e0e0f0;line-height:1.3;margin-bottom:3px}
+.det-sub{font-size:13px;color:#555;margin-bottom:10px}
 .det-divider{height:.5px;background:rgba(255,255,255,.07);margin:10px 0}
-.det-desc{font-size:13px;color:#999;line-height:1.8;margin-bottom:12px}
+.det-desc{font-size:15px;color:#999;line-height:1.8;margin-bottom:12px}
 .det-map-stub{height:80px;background:#050c14;border-radius:8px;border:.5px solid #0f1e30;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;cursor:pointer}
-.det-map-label{font-size:10px;color:#0f2030}
-.det-map-goto{position:absolute;right:8px;bottom:6px;font-size:10px;color:#3060a0;background:rgba(5,12,28,.8);padding:2px 6px;border-radius:3px}
-.det-section{font-size:10px;color:#2a2a40;font-weight:500;margin-bottom:6px;margin-top:4px}
+.det-map-label{font-size:12px;color:#0f2030}
+.det-map-goto{position:absolute;right:8px;bottom:6px;font-size:12px;color:#3060a0;background:rgba(5,12,28,.8);padding:2px 6px;border-radius:3px}
+.det-section{font-size:12px;color:#2a2a40;font-weight:500;margin-bottom:6px;margin-top:4px}
 .det-person-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#111120;border-radius:6px;border:.5px solid #1a1a2a;cursor:pointer;margin-right:5px;margin-bottom:5px}
 .det-scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
 
 /* ── L2: 人物詳細 ── */
-.person-furigana{font-size:11px;color:#3a3a55;margin-bottom:4px}
-.person-period{font-size:11px;color:#444;margin-bottom:10px}
+.person-furigana{font-size:13px;color:#3a3a55;margin-bottom:4px}
+.person-period{font-size:13px;color:#444;margin-bottom:10px}
 .person-locs{display:flex;gap:8px;margin-bottom:12px}
 .person-loc-card{flex:1;background:#111120;border-radius:6px;border:.5px solid #1a1a2a;padding:6px 8px}
-.person-loc-type{font-size:9px;color:#444;margin-bottom:2px}
-.person-loc-name{font-size:11px;color:#ccc}
-.loc-legend{padding:8px 12px;font-size:10px;color:#555;border-top:.5px solid rgba(255,255,255,.05);display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0}
+.person-loc-type{font-size:11px;color:#444;margin-bottom:2px}
+.person-loc-name{font-size:13px;color:#ccc}
+.loc-legend{padding:8px 12px;font-size:12px;color:#555;border-top:.5px solid rgba(255,255,255,.05);display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0}
 .loc-item{display:flex;align-items:center;gap:4px}
 .loc-dot-sm{width:7px;height:7px;border-radius:50%}
 
@@ -146,25 +146,25 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #tokaido-svg{width:100%;height:100%}
 #tokaido-station-badge{position:absolute;top:8px;left:8px;right:8px;background:rgba(4,10,24,.92);border:.5px solid rgba(80,144,255,.4);border-radius:8px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .3s}
 #tokaido-station-badge.show{opacity:1}
-#tk-badge-num{font-size:10px;color:#3a5080;margin-bottom:2px}
-#tk-badge-name{font-size:14px;color:#80b0ff;font-weight:500}
-#tk-badge-desc{font-size:10px;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.5}
+#tk-badge-num{font-size:12px;color:#3a5080;margin-bottom:2px}
+#tk-badge-name{font-size:16px;color:#80b0ff;font-weight:500}
+#tk-badge-desc{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.5}
 #tokaido-progress{flex-shrink:0;padding:5px 12px;display:flex;align-items:center;gap:8px;background:#0a0a12;border-top:.5px solid rgba(255,255,255,.06)}
 #tk-prog-bar{flex:1;height:3px;background:#161624;border-radius:2px;overflow:hidden}
 #tk-prog-fill{height:100%;background:linear-gradient(to right,#ff4040,#c08040,#3060b0);width:0%;border-radius:2px;transition:width .4s ease}
-#tk-prog-label{font-size:10px;color:#555;white-space:nowrap}
+#tk-prog-label{font-size:12px;color:#555;white-space:nowrap}
 
 /* ── L2: 東海道 一覧 ── */
 #tokaido-list-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .tk-list-item{padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
 .tk-list-item:active{background:#141420}
 .tk-list-item.active-station{background:#0c1422;border-bottom:.5px solid rgba(80,144,255,.2)}
-.tk-num{width:20px;font-size:10px;color:#555;text-align:right;flex-shrink:0}
+.tk-num{width:20px;font-size:12px;color:#555;text-align:right;flex-shrink:0}
 .tk-num.active-station{color:#5090ff;font-weight:500}
 .tk-dot-row{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.tk-row-name{font-size:13px;color:#ddd}
+.tk-row-name{font-size:15px;color:#ddd}
 .tk-row-name.active-station{color:#90c0ff;font-weight:500}
-.tk-row-sub{font-size:10px;color:#555}
+.tk-row-sub{font-size:12px;color:#555}
 .tk-row-sub.active-station{color:#3a5080}
 
 /* ── L2: 人口グラフ ── */
@@ -172,14 +172,14 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 #pop-canvas{width:100%;flex:1}
 .pop-stat-row{display:flex;gap:8px}
 .pop-stat{flex:1;background:#111120;border-radius:8px;border:.5px solid #1a1a2a;padding:8px 10px}
-.pop-stat-label{font-size:10px;color:#444;margin-bottom:3px}
-.pop-stat-value{font-size:16px;font-weight:500;color:#60c0ff}
-.pop-stat-sub{font-size:9px;color:#333;margin-top:2px}
+.pop-stat-label{font-size:12px;color:#444;margin-bottom:3px}
+.pop-stat-value{font-size:18px;font-weight:500;color:#60c0ff}
+.pop-stat-sub{font-size:11px;color:#333;margin-top:2px}
 
 /* ── LOADING ── */
 #loading{position:fixed;inset:0;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999}
 #loading.done{display:none}
-.loading-text{font-size:14px;color:#333}
+.loading-text{font-size:16px;color:#333}
 .loading-spinner{width:32px;height:32px;border:2px solid #1a1a2a;border-top-color:#604578;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -236,14 +236,14 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
   <div class="screen hidden" id="tab-kensaku">
     <div id="search-box-wrap">
       <div id="search-box">
-        <i class="ti ti-search" style="font-size:18px;color:#444"></i>
+        <i class="ti ti-search" style="font-size:20px;color:#444"></i>
         <input id="search-input" type="search" placeholder="イベント・人物・宿場を検索..." autocomplete="off" autocorrect="off" spellcheck="false">
         <button id="search-clear" style="display:none">✕</button>
       </div>
     </div>
     <div id="search-scroll">
       <div id="search-initial">
-        <div style="font-size:10px;color:#333;font-weight:500;margin-bottom:8px;letter-spacing:.05em">コンテンツ</div>
+        <div style="font-size:12px;color:#333;font-weight:500;margin-bottom:8px;letter-spacing:.05em">コンテンツ</div>
         <div class="search-shortcut" data-goto="tokaido">
           <i class="ti ti-road"></i>
           <div><div class="search-shortcut-t">東海道五十三次</div><div class="search-shortcut-s">江戸〜京都 53宿場を地図で巡る</div></div>
@@ -881,7 +881,7 @@ function buildJinbutsu(){
       row.innerHTML=`<div class="person-dot${sec.sq?' sq':''}" style="background:${sec.color}"></div>
         <div><div class="person-name">${escHtml(p.n)}</div>
         <div class="person-sub">${escHtml(p.l||'')}${era?' · '+eraName(era):''}</div></div>
-        <i class="ti ti-chevron-right" style="font-size:14px;color:#2a2a3a;margin-left:auto"></i>`;
+        <i class="ti ti-chevron-right" style="font-size:16px;color:#2a2a3a;margin-left:auto"></i>`;
       row.onclick=()=>showPersonDetail(p, sec.color, sec.sq);
       body.appendChild(row);
     });
@@ -899,8 +899,8 @@ function showPersonDetail(p, color, sq){
     p.locs.forEach(loc=>{
       locsHtml+=`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;padding:6px 0;border-bottom:.5px solid rgba(255,255,255,.05)">
         <div style="width:10px;height:10px;border-radius:50%;background:${loc.c};flex-shrink:0;margin-top:2px"></div>
-        <div><div style="font-size:10px;color:#555;margin-bottom:2px">${escHtml(typeMap[loc.tp]||loc.tp)}</div>
-        <div style="font-size:12px;color:#ccc">${escHtml(loc.lb||KUNI_LABELS[loc.r]||loc.r)}</div></div>
+        <div><div style="font-size:12px;color:#555;margin-bottom:2px">${escHtml(typeMap[loc.tp]||loc.tp)}</div>
+        <div style="font-size:14px;color:#ccc">${escHtml(loc.lb||KUNI_LABELS[loc.r]||loc.r)}</div></div>
       </div>`;
     });
   }
@@ -1187,7 +1187,7 @@ function buildTokaidoList(){
   const progWrap=document.createElement('div');
   progWrap.style.cssText='padding:6px 12px 4px;display:flex;align-items:center;gap:8px;background:#0a0a12;border-bottom:.5px solid rgba(255,255,255,.06)';
   progWrap.innerHTML='<div style="flex:1;height:3px;background:#161624;border-radius:2px;overflow:hidden"><div style="height:100%;background:linear-gradient(to right,#ff4040,#c08040,#3060b0);border-radius:2px"></div></div>'
-    +'<span style="font-size:10px;color:#555">江戸〜京都 549km</span>';
+    +'<span style="font-size:12px;color:#555">江戸〜京都 549km</span>';
   scroll.appendChild(progWrap);
 
   TOKAIDO.forEach(s=>{
