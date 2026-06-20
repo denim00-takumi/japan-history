@@ -611,17 +611,19 @@ function jumpToEra(eraId){
     tip.textContent=eraName(era);
     // 色の帯（era-indicator）に重ねて表示
     tip.style.left=Math.max(rect.left+34,Math.min(clientX,rect.right-34))+'px';
-    tip.style.top=(indRect.top+2)+'px';
+    tip.style.top=(indRect.top-6)+'px';
     tip.classList.add('show');
-    // 赤線を指の位置に即追随（transition一時オフ）
+    // 赤線を指の位置に即追随
     const pct=Math.max(0,Math.min(1,(clientX-indRect.left)/indRect.width))*100;
-    if(redline){redline.style.transition='none';redline.style.left=pct+'%';}
+    if(redline) redline.style.left=pct+'%';
   }
   chipsEl.addEventListener('touchstart',e=>{
     if(e.touches.length!==1)return;
     startX=e.touches[0].clientX;
     moved=false;
     sliding=true;
+    // タッチ開始時点でtransitionを即オフ
+    if(redline) redline.style.transition='none';
   },{passive:true});
   chipsEl.addEventListener('touchmove',e=>{
     if(!sliding||e.touches.length!==1)return;
@@ -638,8 +640,10 @@ function jumpToEra(eraId){
       const era=eraAtX(e.changedTouches[0].clientX);
       jumpToEra(era.id);
     }
-    // transition復元（jumpToEraがスナップアニメーション）
-    if(redline) setTimeout(()=>{redline.style.transition='left .4s ease';},50);
+    // jumpToEra完了後のフレームでtransition復元
+    requestAnimationFrame(()=>{
+      if(redline) redline.style.transition='left .4s ease';
+    });
     sliding=false;moved=false;
   });
 })();
