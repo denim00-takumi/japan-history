@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0f">
+<title>日本歴史年表</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#0a0a0f;color:#e0e0e8;font-family:-apple-system,'Hiragino Sans',sans-serif}
+body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+
+/* ── ERA HEADER ── */
+#era-header{flex-shrink:0;background:#0d0d16;border-bottom:.5px solid rgba(255,255,255,.08)}
+#era-indicator{height:14px;display:flex;position:relative;background:#080810;overflow:hidden}
+.ei-seg{flex-shrink:0;border-right:.5px solid rgba(255,255,255,.07);position:relative;transition:opacity .2s}
+.ei-seg.active{opacity:1}
+.ei-yr{position:absolute;bottom:1px;left:2px;font-size:5px;color:#2a2a40;white-space:nowrap;pointer-events:none}
+#era-redline{position:absolute;top:0;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none;transition:left .4s ease}
+#era-chips{display:flex;overflow-x:auto;padding:3px 5px;gap:3px;scrollbar-width:none;height:28px;align-items:center}
+#era-chips::-webkit-scrollbar{display:none}
+.era-chip{flex-shrink:0;height:20px;padding:0 8px;border-radius:10px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:8px;color:#666;display:flex;align-items:center;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s}
+.era-chip.active{font-weight:500}
+
+/* ── TAB BAR ── */
+#tab-bar{flex-shrink:0;display:flex;background:#0d0d14;border-top:.5px solid rgba(255,255,255,.08);padding:4px 0;padding-bottom:calc(4px + env(safe-area-inset-bottom))}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;color:#444;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0}
+.tab-btn.active{color:#5090ff}
+.tab-btn i{font-size:20px;line-height:1}
+
+/* ── CONTENT ── */
+#content{flex:1;position:relative;overflow:hidden;min-height:0}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:#080810;transform:translateX(0);transition:transform .25s ease;overflow:hidden}
+.screen.hidden{display:none !important}
+.screen.slide-in{transform:translateX(0)}
+.screen.slide-out{transform:translateX(-100%)}
+.screen.slide-from-right{transform:translateX(100%)}
+
+/* ── NAV ROW (L2) ── */
+.nav-row{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:6px 10px;background:#0f0f18;border-bottom:.5px solid rgba(255,255,255,.07)}
+.back-btn{font-size:13px;color:#5090ff;background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:2px;padding:4px 0}
+.nav-title{flex:1;text-align:center;font-size:13px;color:#ccc;font-weight:500}
+.nav-action{font-size:11px;color:#5090ff;background:#1a2040;border-radius:4px;padding:3px 8px;border:.5px solid #2a3a60;cursor:pointer;white-space:nowrap}
+.nav-action.muted{color:#555;background:#111118;border-color:#1a1a24}
+
+/* ── 年表 ── */
+#tab-nenpyo{overflow:hidden;display:flex;flex-direction:column}
+#nenpyo-filter{flex-shrink:0;display:flex;overflow-x:auto;padding:4px 8px;gap:4px;background:#0c0c16;border-bottom:.5px solid rgba(255,255,255,.06);scrollbar-width:none}
+#nenpyo-filter::-webkit-scrollbar{display:none}
+.cat-chip{flex-shrink:0;height:22px;padding:0 10px;border-radius:11px;border:.5px solid rgba(255,255,255,.1);background:transparent;font-size:11px;color:#666;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s}
+.cat-chip.active{background:rgba(80,144,255,.18);border-color:#4080ee;color:#a0c8ff}
+#nenpyo-list{flex:1;overflow-y:auto;padding:4px 0 16px;-webkit-overflow-scrolling:touch}
+.era-section-hdr{padding:6px 12px 3px;font-size:10px;color:#3a3a60;font-weight:500;letter-spacing:.05em;border-left:2px solid;margin-left:10px;margin-bottom:2px}
+.event-card{margin:2px 10px;background:#161624;border-radius:8px;border:.5px solid #1e1e30;padding:8px 10px;display:flex;gap:8px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.event-card:active{background:#1e1e30}
+.event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.event-title{font-size:13px;color:#ddd}
+.event-year{font-size:10px;color:#555;margin-top:2px}
+
+/* ── 地図 ── */
+#tab-chizu{overflow:hidden;display:flex;flex-direction:column}
+#map-selectors{flex-shrink:0;padding:5px 8px;background:#0f0f18;border-bottom:.5px solid rgba(255,255,255,.07);display:flex;gap:6px}
+#map-selectors select{flex:1;background:#0a0a18;border:.5px solid #222238;border-radius:6px;padding:5px 8px;font-size:12px;color:#80a0d0;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer}
+#map-svg-wrap{flex:1;background:#050c14;position:relative;overflow:hidden}
+#map-svg{width:100%;height:100%}
+#map-badge{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(6,12,26,.92);border:.5px solid rgba(64,192,255,.3);border-radius:8px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .3s}
+#map-badge.show{opacity:1}
+#map-badge-title{font-size:12px;color:#60c0ff;font-weight:500;margin-bottom:3px}
+#map-badge-desc{font-size:10px;color:rgba(255,255,255,.6);line-height:1.5}
+#map-tt{position:absolute;display:none;background:rgba(5,15,30,.96);color:rgba(255,255,255,.85);padding:3px 8px;font-size:10px;border-radius:4px;pointer-events:none;border:.5px solid rgba(64,192,255,.3);white-space:nowrap;z-index:10}
+
+/* ── 人物 ── */
+#tab-jinbutsu{overflow:hidden;display:flex;flex-direction:column}
+#jinbutsu-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.person-acc-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0f0f18;border-top:.5px solid rgba(255,255,255,.05);cursor:pointer;user-select:none}
+.person-acc-left{display:flex;align-items:center;gap:8px}
+.person-acc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.person-acc-title{font-size:12px;color:#999;font-weight:500}
+.person-acc-count{font-size:10px;color:#555;background:#1a1a24;border-radius:8px;padding:1px 7px}
+.person-acc-arrow{font-size:11px;color:#333;transition:transform .2s}
+.person-acc-hdr.open .person-acc-arrow{transform:rotate(90deg)}
+.person-acc-body{display:none;background:#080810}
+.person-acc-body.open{display:block}
+.person-row{padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
+.person-row:active{background:#141420}
+.person-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.person-dot.sq{border-radius:2px}
+.person-name{font-size:13px;color:#ddd;flex:1}
+.person-sub{font-size:10px;color:#555;margin-top:1px}
+
+/* ── 検索 ── */
+#tab-kensaku{overflow:hidden;display:flex;flex-direction:column}
+#search-box-wrap{flex-shrink:0;padding:8px 10px;background:#0c0c16;border-bottom:.5px solid rgba(255,255,255,.06)}
+#search-box{display:flex;align-items:center;gap:8px;background:#0a0a18;border:.5px solid #2a2a40;border-radius:10px;padding:8px 12px}
+#search-box.active{border-color:#3a5080}
+#search-input{flex:1;font-size:14px;color:#e0e8ff;background:none;border:none;outline:none;font-family:inherit}
+#search-input::placeholder{color:#2a2a3a}
+#search-clear{color:#444;background:none;border:none;cursor:pointer;font-size:16px;line-height:1;padding:0}
+#search-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#search-initial{padding:12px 10px}
+.search-shortcut{background:#141420;border-radius:10px;border:.5px solid #1e1e30;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;transition:background .15s}
+.search-shortcut:active{background:#1e1e2c}
+.search-shortcut i{font-size:20px;color:#5090ff;flex-shrink:0}
+.search-shortcut-t{font-size:13px;color:#ddd;font-weight:500}
+.search-shortcut-s{font-size:10px;color:#555;margin-top:2px}
+#search-results{display:none;padding:0}
+.result-type-hdr{padding:6px 12px 3px;font-size:10px;color:#3a3a60;font-weight:500;letter-spacing:.05em}
+.result-row{padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
+.result-row:active{background:#141420}
+.result-icon{font-size:16px;color:#444;width:18px;text-align:center;flex-shrink:0}
+.result-main{font-size:13px;color:#ddd;flex:1}
+.result-sub{font-size:10px;color:#555;margin-top:1px}
+.result-badge{font-size:10px;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.hl{color:#5090ff;font-weight:500}
+.no-results{padding:30px;text-align:center;font-size:13px;color:#333}
+
+/* ── L2: イベント詳細 ── */
+.det-tag{display:inline-block;font-size:10px;padding:3px 10px;border-radius:8px;background:#1a2238;color:#7090c0;margin-bottom:8px}
+.det-name{font-size:20px;font-weight:600;color:#e0e0f0;line-height:1.3;margin-bottom:3px}
+.det-sub{font-size:11px;color:#555;margin-bottom:10px}
+.det-divider{height:.5px;background:rgba(255,255,255,.07);margin:10px 0}
+.det-desc{font-size:13px;color:#999;line-height:1.8;margin-bottom:12px}
+.det-map-stub{height:80px;background:#050c14;border-radius:8px;border:.5px solid #0f1e30;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;cursor:pointer}
+.det-map-label{font-size:10px;color:#0f2030}
+.det-map-goto{position:absolute;right:8px;bottom:6px;font-size:10px;color:#3060a0;background:rgba(5,12,28,.8);padding:2px 6px;border-radius:3px}
+.det-section{font-size:10px;color:#2a2a40;font-weight:500;margin-bottom:6px;margin-top:4px}
+.det-person-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#111120;border-radius:6px;border:.5px solid #1a1a2a;cursor:pointer;margin-right:5px;margin-bottom:5px}
+.det-scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
+
+/* ── L2: 人物詳細 ── */
+.person-furigana{font-size:11px;color:#3a3a55;margin-bottom:4px}
+.person-period{font-size:11px;color:#444;margin-bottom:10px}
+.person-locs{display:flex;gap:8px;margin-bottom:12px}
+.person-loc-card{flex:1;background:#111120;border-radius:6px;border:.5px solid #1a1a2a;padding:6px 8px}
+.person-loc-type{font-size:9px;color:#444;margin-bottom:2px}
+.person-loc-name{font-size:11px;color:#ccc}
+.loc-legend{padding:8px 12px;font-size:10px;color:#555;border-top:.5px solid rgba(255,255,255,.05);display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0}
+.loc-item{display:flex;align-items:center;gap:4px}
+.loc-dot-sm{width:7px;height:7px;border-radius:50%}
+
+/* ── L2: 東海道 地図 ── */
+#tokaido-map-wrap{flex:1;background:#05090f;position:relative;overflow:hidden}
+#tokaido-svg{width:100%;height:100%}
+#tokaido-station-badge{position:absolute;top:8px;left:8px;right:8px;background:rgba(4,10,24,.92);border:.5px solid rgba(80,144,255,.4);border-radius:8px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .3s}
+#tokaido-station-badge.show{opacity:1}
+#tk-badge-num{font-size:10px;color:#3a5080;margin-bottom:2px}
+#tk-badge-name{font-size:14px;color:#80b0ff;font-weight:500}
+#tk-badge-desc{font-size:10px;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.5}
+#tokaido-progress{flex-shrink:0;padding:5px 12px;display:flex;align-items:center;gap:8px;background:#0a0a12;border-top:.5px solid rgba(255,255,255,.06)}
+#tk-prog-bar{flex:1;height:3px;background:#161624;border-radius:2px;overflow:hidden}
+#tk-prog-fill{height:100%;background:linear-gradient(to right,#ff4040,#c08040,#3060b0);width:0%;border-radius:2px;transition:width .4s ease}
+#tk-prog-label{font-size:10px;color:#555;white-space:nowrap}
+
+/* ── L2: 東海道 一覧 ── */
+#tokaido-list-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.tk-list-item{padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
+.tk-list-item:active{background:#141420}
+.tk-list-item.active-station{background:#0c1422;border-bottom:.5px solid rgba(80,144,255,.2)}
+.tk-num{width:20px;font-size:10px;color:#555;text-align:right;flex-shrink:0}
+.tk-num.active-station{color:#5090ff;font-weight:500}
+.tk-dot-row{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tk-row-name{font-size:13px;color:#ddd}
+.tk-row-name.active-station{color:#90c0ff;font-weight:500}
+.tk-row-sub{font-size:10px;color:#555}
+.tk-row-sub.active-station{color:#3a5080}
+
+/* ── L2: 人口グラフ ── */
+#pop-canvas-wrap{flex:1;padding:12px;display:flex;flex-direction:column;gap:8px}
+#pop-canvas{width:100%;flex:1}
+.pop-stat-row{display:flex;gap:8px}
+.pop-stat{flex:1;background:#111120;border-radius:8px;border:.5px solid #1a1a2a;padding:8px 10px}
+.pop-stat-label{font-size:10px;color:#444;margin-bottom:3px}
+.pop-stat-value{font-size:16px;font-weight:500;color:#60c0ff}
+.pop-stat-sub{font-size:9px;color:#333;margin-top:2px}
+
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999}
+#loading.done{display:none}
+.loading-text{font-size:14px;color:#333}
+.loading-spinner{width:32px;height:32px;border:2px solid #1a1a2a;border-top-color:#604578;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* scrollbars */
+::-webkit-scrollbar{width:2px;height:2px}
+::-webkit-scrollbar-thumb{background:#333}
+</style>
+<!-- Tabler Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+</head>
+<body>
+
+<div id="loading"><div class="loading-spinner"></div><div class="loading-text">読み込み中...</div></div>
+
+<!-- ERA HEADER -->
+<div id="era-header">
+  <div id="era-indicator"><!-- JS fills --><div id="era-redline"></div></div>
+  <div id="era-chips"><!-- JS fills --></div>
+</div>
+
+<!-- CONTENT AREA -->
+<div id="content">
+
+  <!-- ① 年表 -->
+  <div class="screen" id="tab-nenpyo">
+    <div id="nenpyo-filter">
+      <button class="cat-chip active" data-cat="all">すべて</button>
+      <button class="cat-chip" data-cat="wars">出来事</button>
+      <button class="cat-chip" data-cat="religion">宗教</button>
+      <button class="cat-chip" data-cat="arts">芸能・文化</button>
+    </div>
+    <div id="nenpyo-list"></div>
+  </div>
+
+  <!-- ② 地図 -->
+  <div class="screen hidden" id="tab-chizu">
+    <div id="map-selectors">
+      <select id="sel-era"><option value="">— 時代を選択 —</option></select>
+      <select id="sel-kuni"><option value="">— 旧国名を選択 —</option></select>
+    </div>
+    <div id="map-svg-wrap">
+      <svg id="map-svg"></svg>
+      <div id="map-tt"></div>
+      <div id="map-badge"><div id="map-badge-title"></div><div id="map-badge-desc"></div></div>
+    </div>
+  </div>
+
+  <!-- ③ 人物 -->
+  <div class="screen hidden" id="tab-jinbutsu">
+    <div id="jinbutsu-list"></div>
+  </div>
+
+  <!-- ④ 検索 -->
+  <div class="screen hidden" id="tab-kensaku">
+    <div id="search-box-wrap">
+      <div id="search-box">
+        <i class="ti ti-search" style="font-size:18px;color:#444"></i>
+        <input id="search-input" type="search" placeholder="イベント・人物・宿場を検索..." autocomplete="off" autocorrect="off" spellcheck="false">
+        <button id="search-clear" style="display:none">✕</button>
+      </div>
+    </div>
+    <div id="search-scroll">
+      <div id="search-initial">
+        <div style="font-size:10px;color:#333;font-weight:500;margin-bottom:8px;letter-spacing:.05em">コンテンツ</div>
+        <div class="search-shortcut" data-goto="tokaido">
+          <i class="ti ti-road"></i>
+          <div><div class="search-shortcut-t">東海道五十三次</div><div class="search-shortcut-s">江戸〜京都 53宿場を地図で巡る</div></div>
+        </div>
+        <div class="search-shortcut" data-goto="population">
+          <i class="ti ti-chart-line" style="color:#60c060"></i>
+          <div><div class="search-shortcut-t">日本人口の変遷</div><div class="search-shortcut-s">縄文〜現代 2000年の人口推移</div></div>
+        </div>
+      </div>
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- L2: イベント詳細 -->
+  <div class="screen hidden" id="screen-event-detail">
+    <div class="nav-row">
+      <button class="back-btn" data-back="nenpyo"><i class="ti ti-chevron-left"></i>年表</button>
+    </div>
+    <div class="det-scroll" id="event-detail-body"></div>
+  </div>
+
+  <!-- L2: 人物詳細 -->
+  <div class="screen hidden" id="screen-person-detail">
+    <div class="nav-row" id="person-detail-nav">
+      <button class="back-btn" data-back="jinbutsu"><i class="ti ti-chevron-left"></i>人物</button>
+    </div>
+    <div class="det-scroll" id="person-detail-body"></div>
+    <div class="loc-legend" id="person-loc-legend"></div>
+  </div>
+
+  <!-- L2: 東海道 地図 -->
+  <div class="screen hidden" id="screen-tokaido-map">
+    <div class="nav-row">
+      <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索</button>
+      <span class="nav-title">東海道五十三次</span>
+      <button class="nav-action muted" id="tk-to-list-btn">一覧</button>
+    </div>
+    <div id="tokaido-map-wrap">
+      <svg id="tokaido-svg"></svg>
+      <div id="tokaido-station-badge">
+        <div id="tk-badge-num"></div>
+        <div id="tk-badge-name"></div>
+        <div id="tk-badge-desc"></div>
+      </div>
+    </div>
+    <div id="tokaido-progress">
+      <div id="tk-prog-bar"><div id="tk-prog-fill"></div></div>
+      <div id="tk-prog-label">0 / 549km</div>
+    </div>
+  </div>
+
+  <!-- L2: 東海道 一覧 -->
+  <div class="screen hidden" id="screen-tokaido-list">
+    <div class="nav-row">
+      <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索</button>
+      <span class="nav-title">東海道五十三次</span>
+      <button class="nav-action" id="tk-to-map-btn">地図</button>
+    </div>
+    <div id="tokaido-list-scroll"></div>
+  </div>
+
+  <!-- L2: 人口グラフ -->
+  <div class="screen hidden" id="screen-population">
+    <div class="nav-row">
+      <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索</button>
+      <span class="nav-title">日本人口の変遷</span>
+    </div>
+    <div id="pop-canvas-wrap">
+      <canvas id="pop-canvas"></canvas>
+      <div class="pop-stat-row">
+        <div class="pop-stat"><div class="pop-stat-label">最大人口</div><div class="pop-stat-value">12,806万人</div><div class="pop-stat-sub">2008年（平成20）</div></div>
+        <div class="pop-stat"><div class="pop-stat-label">現在（令和）</div><div class="pop-stat-value" style="color:#aaa">12,435万人</div><div class="pop-stat-sub" style="color:#ff5050">▼ 減少傾向</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- TAB BAR -->
+<div id="tab-bar">
+  <button class="tab-btn active" data-tab="nenpyo"><i class="ti ti-list"></i>年表</button>
+  <button class="tab-btn" data-tab="chizu"><i class="ti ti-map"></i>地図</button>
+  <button class="tab-btn" data-tab="jinbutsu"><i class="ti ti-users"></i>人物</button>
+  <button class="tab-btn" data-tab="kensaku"><i class="ti ti-search"></i>検索</button>
+</div>
+
+<!-- D3 + TopoJSON -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script>
+// ── ERAS DATA ──────────────────────────────────────────────
+const ERAS = [
+  {id:'kofun',    n:'古墳',    s:250,  e:538,  c:'#7a6040'},
+  {id:'asuka',    n:'飛鳥',    s:538,  e:710,  c:'#607540'},
+  {id:'nara',     n:'奈良',    s:710,  e:794,  c:'#406575'},
+  {id:'heian',    n:'平安',    s:794,  e:1185, c:'#604578'},
+  {id:'kamakura', n:'鎌倉',    s:1185, e:1336, c:'#704040'},
+  {id:'muromachi',n:'室町',    s:1336, e:1573, c:'#706040'},
+  {id:'azuchi',   n:'安土桃山', s:1573, e:1603, c:'#806840'},
+  {id:'edo',      n:'江戸',    s:1603, e:1868, c:'#3a7060'},
+  {id:'meiji',    n:'明治',    s:1868, e:1912, c:'#3a4a75'},
+  {id:'taisho',   n:'大正',    s:1912, e:1926, c:'#506040'},
+  {id:'showa',    n:'昭和',    s:1926, e:1989, c:'#504565'},
+  {id:'heisei',   n:'平成',    s:1989, e:2019, c:'#3a6060'},
+  {id:'reiwa',    n:'令和',    s:2019, e:2030, c:'#506050'},
+];
+const ERA_START = 250, ERA_END = 2025, ERA_SPAN = ERA_END - ERA_START;
+function eraForYear(y){ return ERAS.find(e=>y>=e.s&&y<e.e)||ERAS[ERAS.length-1]; }
+function eraName(e){ return e.n+(['reiwa','heisei'].includes(e.id)?'':'時代'); }
+
+// proportional widths (min 2%)
+const ERA_WIDTHS = (function(){
+  const raw = ERAS.map(e=>Math.max(2,(e.e-e.s)/ERA_SPAN*100));
+  const tot = raw.reduce((a,b)=>a+b,0);
+  return raw.map(w=>w/tot*100);
+})();
+
+// ── TOKAIDO DATA ───────────────────────────────────────────
+const TOKAIDO = [
+  {n:'日本橋',      pref:'東京都',   lon:139.7745,lat:35.6833,num:0, km:0,    label:'起点',special:true,  desc:'東海道の起点。江戸幕府が設置した五街道の基点であり、現在も日本橋が道路元標の場所として知られる。'},
+  {n:'品川宿',      pref:'東京都',   lon:139.7377,lat:35.6086,num:1, km:8,    desc:'東海道最初の宿場。江戸湾に面し、旅籠や茶屋が軒を連ねた。江戸近郊のため日帰り客も多く賑わった。'},
+  {n:'川崎宿',      pref:'神奈川県', lon:139.7030,lat:35.5300,num:2, km:17,   desc:'多摩川渡河の要衝。大師河原の川崎大師への参詣客も集まり、宿場は大いに繁栄した。'},
+  {n:'神奈川宿',    pref:'神奈川県', lon:139.6400,lat:35.4700,num:3, km:26,   desc:'現在の横浜市神奈川区。江戸湾沿いの景勝地で、広重の浮世絵にも描かれた。幕末に開港場として歴史の舞台となった。'},
+  {n:'保土ヶ谷宿',  pref:'神奈川県', lon:139.5900,lat:35.4400,num:4, km:33,   desc:'相模川以東では唯一の宿場として栄えた。峠越えを前に旅人が休息する宿場。'},
+  {n:'戸塚宿',      pref:'神奈川県', lon:139.5353,lat:35.3988,num:5, km:44,   desc:'鎌倉道との分岐に位置する交通の要衝。大規模な宿場町で旅籠の数も多く、東海道屈指の宿泊地。'},
+  {n:'藤沢宿',      pref:'神奈川県', lon:139.4900,lat:35.3400,num:6, km:55,   desc:'遊行寺の門前町。江島（江の島）への参詣ルートの分岐点でもあり、多くの旅人が立ち寄った。'},
+  {n:'平塚宿',      pref:'神奈川県', lon:139.3500,lat:35.3300,num:7, km:68,   desc:'相模川西岸の宿場。規模は大きくないが本陣・脇本陣が整備され旅人を支えた。'},
+  {n:'大磯宿',      pref:'神奈川県', lon:139.3100,lat:35.3100,num:8, km:77,   desc:'「東海道松並木」で知られる景勝の宿場。相模湾を望む眺望が美しく、広重の絵でも知られる。'},
+  {n:'小田原宿',    pref:'神奈川県', lon:139.1687,lat:35.2646,num:9, km:98,   desc:'小田原城の城下町として繁栄した東海道有数の大宿場。箱根越えを前に旅装を整える重要な拠点。'},
+  {n:'箱根宿',      pref:'神奈川県', lon:139.0267,lat:35.1992,num:10,km:114,  desc:'箱根関所を抱える東海道最大の難所の一つ。急峻な山道と厳しい関所が旅人を緊張させた。'},
+  {n:'三島宿',      pref:'静岡県',   lon:138.9167,lat:35.1167,num:11,km:127,  desc:'三嶋大社の門前町として栄えた宿場。函南峠を越えた旅人が安堵して休息する場所だった。'},
+  {n:'沼津宿',      pref:'静岡県',   lon:138.8667,lat:35.0833,num:12,km:137,  desc:'現在の沼津市中心部。愛鷹山麓に位置し、駿河湾の眺望も美しい。本陣が整備された中規模の宿場。'},
+  {n:'原宿',        pref:'静岡県',   lon:138.8303,lat:35.1174,num:13,km:149,  desc:'東海道随一ともいわれる富士山の眺望地。広重の浮世絵にも描かれた絶景で旅人を魅了した。'},
+  {n:'吉原宿',      pref:'静岡県',   lon:138.6839,lat:35.1689,num:14,km:162,  desc:'富士川河口近くの宿場。たびたびの津波・洪水で移転を繰り返した宿場として知られる。'},
+  {n:'蒲原宿',      pref:'静岡県',   lon:138.6167,lat:35.1167,num:15,km:172,  desc:'広重の「蒲原 夜之雪」で有名な宿場。雪の中の夜景を描いた名作として東海道五十三次を代表する。'},
+  {n:'由比宿',      pref:'静岡県',   lon:138.5803,lat:35.1169,num:16,km:181,  desc:'薩埵峠の麓の宿場。峠から望む富士山と駿河湾の絶景は東海道屈指の名所。'},
+  {n:'興津宿',      pref:'静岡県',   lon:138.5100,lat:35.0200,num:17,km:192,  desc:'清見寺が有名な宿場。徳川将軍家も立ち寄った名刹の門前に位置する。'},
+  {n:'江尻宿',      pref:'静岡県',   lon:138.4333,lat:34.9833,num:18,km:201,  desc:'現在の清水市。巴川の渡しが重要で、交通の要衝として栄えた港町の宿場。'},
+  {n:'府中宿',      pref:'静岡県',   lon:138.3831,lat:34.9769,num:19,km:214,  desc:'現在の静岡市中心部。駿府城の城下町で、家康が晩年を過ごした東海道最大級の宿場。'},
+  {n:'丸子宿',      pref:'静岡県',   lon:138.3500,lat:34.9500,num:20,km:221,  desc:'とろろ汁で知られる宿場。松尾芭蕉も詠んだ名物のとろろ汁は現在も名物として続く。'},
+  {n:'岡部宿',      pref:'静岡県',   lon:138.2600,lat:34.9200,num:21,km:234,  desc:'宇津ノ谷峠を越えた先の宿場。峠の難所を抜けた旅人が息をついた休息の場。'},
+  {n:'藤枝宿',      pref:'静岡県',   lon:138.2500,lat:34.8700,num:22,km:242,  desc:'駿河国と遠江国の境近くの宿場。田沼意次ゆかりの地でもある。'},
+  {n:'島田宿',      pref:'静岡県',   lon:138.1765,lat:34.8348,num:23,km:245,  desc:'大井川の東岸。川越制度の拠点で増水時の「川止め」が名高く、長期滞在者も多かった。'},
+  {n:'金谷宿',      pref:'静岡県',   lon:138.1167,lat:34.8167,num:24,km:251,  desc:'大井川の西岸。川越えを終えた旅人が安堵して休息した宿場。茶の産地としても知られる。'},
+  {n:'日坂宿',      pref:'静岡県',   lon:138.0500,lat:34.8100,num:25,km:260,  desc:'小夜の中山越えを控える峠の宿場。難所の前後に位置し旅人に欠かせない休憩地だった。'},
+  {n:'掛川宿',      pref:'静岡県',   lon:137.9981,lat:34.7697,num:26,km:269,  desc:'掛川城の城下町。遠江国の中心都市として栄え、大きな規模を誇った宿場。'},
+  {n:'袋井宿',      pref:'静岡県',   lon:137.9281,lat:34.7508,num:27,km:276,  desc:'東海道のほぼ中間地点。「どまんなか袋井」と呼ばれ旅の節目として親しまれた。', midpoint:true},
+  {n:'見付宿',      pref:'静岡県',   lon:137.8681,lat:34.7211,num:28,km:285,  desc:'遠江国の国府が置かれた歴史ある地。行政・文化の中心として発展した宿場。'},
+  {n:'浜松宿',      pref:'静岡県',   lon:137.7277,lat:34.7108,num:29,km:301,  desc:'浜松城の城下町。徳川家康が若き日を過ごした城でも有名で、東海道有数の大宿場。'},
+  {n:'舞坂宿',      pref:'静岡県',   lon:137.6100,lat:34.6900,num:30,km:318,  desc:'浜名湖の東岸。ここから船で湖上を渡る「今切の渡し」の出発点だった。'},
+  {n:'新居宿',      pref:'静岡県',   lon:137.5562,lat:34.6913,num:31,km:325,  desc:'現存する唯一の関所建物を持つ宿場。箱根と並ぶ厳しい取り締まりで知られた。'},
+  {n:'白須賀宿',    pref:'静岡県',   lon:137.5000,lat:34.7000,num:32,km:334,  desc:'遠州灘を望む台地上の宿場。海岸侵食のため宿場が移転した歴史を持つ。'},
+  {n:'二川宿',      pref:'愛知県',   lon:137.4333,lat:34.7283,num:33,km:340,  desc:'三河国最東端の宿場。本陣・資料館が保存されており往時の雰囲気を今に伝える。'},
+  {n:'吉田宿',      pref:'愛知県',   lon:137.3895,lat:34.7695,num:34,km:350,  desc:'現在の豊橋市。吉田城の城下町で豊川に架かる吉田大橋が交通の要衝だった。'},
+  {n:'御油宿',      pref:'愛知県',   lon:137.2792,lat:34.8204,num:35,km:359,  desc:'美しい松並木と激しい旅籠の客引きで知られる宿場。広重の絵にもその様子が描かれた。'},
+  {n:'赤坂宿',      pref:'愛知県',   lon:137.2575,lat:34.8252,num:36,km:361,  desc:'御油宿とわずか約2kmの距離にある東海道最近接の宿場の一組。小規模ながら整備された。'},
+  {n:'藤川宿',      pref:'愛知県',   lon:137.1879,lat:34.8536,num:37,km:370,  desc:'徳川家康ゆかりの土地。松並木が続く落ち着いた宿場で大名行列の往来も多かった。'},
+  {n:'岡崎宿',      pref:'愛知県',   lon:137.1642,lat:34.9592,num:38,km:380,  desc:'岡崎城の城下町。徳川家康の生誕地として有名で、東海道有数の大宿場として繁栄した。'},
+  {n:'池鯉鮒宿',    pref:'愛知県',   lon:137.0563,lat:35.0044,num:39,km:395,  desc:'現在の知立市。馬市で有名な宿場で東海道有数の馬の取引市場として経済的活気に満ちた。'},
+  {n:'鳴海宿',      pref:'愛知県',   lon:136.9757,lat:35.0553,num:40,km:409,  desc:'桶狭間の近くに位置する宿場。有松絞りの産地に隣接し染め物の名産地でもあった。'},
+  {n:'宮宿',        pref:'愛知県',   lon:136.8990,lat:35.1237,num:41,km:420,  desc:'現在の名古屋市熱田区。熱田神宮の門前町で東海道最大級の宿場。桑名への「七里の渡し」起点。'},
+  {n:'桑名宿',      pref:'三重県',   lon:136.6869,lat:35.0592,num:42,km:450,  desc:'揖斐川・長良川・木曽川の河口。「七里の渡し」の到着地で蛤で名高い。'},
+  {n:'四日市宿',    pref:'三重県',   lon:136.6137,lat:34.9648,num:43,km:460,  desc:'東海道と伊勢参宮街道の交差点。定期市が開かれたことが地名の由来。流通拠点として繁栄。'},
+  {n:'石薬師宿',    pref:'三重県',   lon:136.5817,lat:34.9400,num:44,km:468,  desc:'石薬師寺の門前に発展した小規模な宿場。佐佐木信綱の故郷としても知られる。'},
+  {n:'庄野宿',      pref:'三重県',   lon:136.5424,lat:34.9190,num:45,km:475,  desc:'東海道五十三次の中で最も規模が小さい宿場。広重の「庄野 白雨」は突然の夕立を描いた名作。'},
+  {n:'亀山宿',      pref:'三重県',   lon:136.4527,lat:34.8563,num:46,km:480,  desc:'亀山城の城下町。鈴鹿峠越えを控える拠点として重要な役割を果たした。'},
+  {n:'関宿',        pref:'三重県',   lon:136.3937,lat:34.8735,num:47,km:487,  desc:'古代の鈴鹿関に由来する歴史ある宿場。現在は国の重要伝統的建造物群保存地区として保存状態の良い町並みが残る。'},
+  {n:'坂下宿',      pref:'三重県',   lon:136.3475,lat:34.9092,num:48,km:494,  desc:'鈴鹿峠東の関門の宿場。旅人が峠越えの準備を整えた緊張感漂う場所だった。'},
+  {n:'土山宿',      pref:'滋賀県',   lon:136.2773,lat:34.9400,num:49,km:503,  desc:'鈴鹿峠を越えた近江側最初の宿場。峠越えを終えた旅人が安堵する場所。広重の名作「土山 春之雨」で有名。'},
+  {n:'水口宿',      pref:'滋賀県',   lon:136.1674,lat:34.9594,num:50,km:512,  desc:'水口城の城下町。将軍上洛時の宿泊施設として建てられた水口城が置かれ政治的にも重要だった。'},
+  {n:'石部宿',      pref:'滋賀県',   lon:136.0500,lat:35.0000,num:51,km:521,  desc:'湖南地方の宿場。日本橋から53里（約210km）のほぼ中間に位置することから親しまれた。'},
+  {n:'草津宿',      pref:'滋賀県',   lon:135.9641,lat:35.0155,num:52,km:531,  desc:'東海道と中山道が合流・分岐する五街道屈指の交通拠点。各地からの旅人が集まり大いに繁栄した。'},
+  {n:'大津宿',      pref:'滋賀県',   lon:135.8613,lat:35.0097,num:53,km:541,  desc:'琵琶湖南岸の東海道最後の宿場。京都に最も近く湖上交通の拠点でもあった。名物の大津絵は旅人の人気土産。'},
+  {n:'京都・三条大橋',pref:'京都府', lon:135.7740,lat:35.0095,num:0, km:549,  label:'終点',special:true, desc:'東海道の終点。三条大橋は古くから京の東の玄関口として栄え、江戸から約550kmの旅を終えた旅人を迎えた。'},
+];
+
+// population data (万人)
+const POP_DATA = [
+  {y:250,p:60},{y:500,p:540},{y:700,p:450},{y:900,p:660},{y:1100,p:680},
+  {y:1200,p:760},{y:1300,p:960},{y:1450,p:830},{y:1600,p:1227},{y:1700,p:2800},
+  {y:1721,p:3128},{y:1800,p:3000},{y:1850,p:3229},{y:1868,p:3330},
+  {y:1873,p:3488},{y:1900,p:4385},{y:1920,p:5596},{y:1930,p:6445},
+  {y:1940,p:7193},{y:1950,p:8320},{y:1960,p:9342},{y:1970,p:10467},
+  {y:1980,p:11706},{y:1990,p:12361},{y:2000,p:12693},{y:2008,p:12806},
+  {y:2015,p:12710},{y:2020,p:12615},{y:2024,p:12435},
+];
+
+// ── STATE ──────────────────────────────────────────────────
+let DATA = null, TOPO = null;
+let currentTab = 'nenpyo';
+let currentEraId = null;
+let currentCat = 'all';
+let selectedKuni = '';
+let activeStation = null;
+const screenStack = [];
+
+// ── INIT ───────────────────────────────────────────────────
+Promise.all([
+  fetch('../japan_history_data.json').then(r=>r.json()),
+  fetch('../japan.topojson').then(r=>r.json())
+]).then(([data, topo]) => {
+  DATA = data;
+  TOPO = topo;
+  buildEraHeader();
+  buildNenpyo();
+  buildJinbutsu();
+  buildMap();
+  buildTokaidoList();
+  setEraByYear(new Date().getFullYear());
+  document.getElementById('loading').classList.add('done');
+  registerSW();
+}).catch(err => {
+  document.querySelector('.loading-text').textContent = '読み込みエラー: ' + err.message;
+});
+
+function registerSW(){
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+}
+
+// ── ERA HEADER ─────────────────────────────────────────────
+function buildEraHeader(){
+  const ind = document.getElementById('era-indicator');
+  const chips = document.getElementById('era-chips');
+  ERAS.forEach((era,i)=>{
+    // indicator segment
+    const seg = document.createElement('div');
+    seg.className = 'ei-seg';
+    seg.id = 'ei-'+era.id;
+    seg.style.width = ERA_WIDTHS[i].toFixed(2)+'%';
+    seg.style.background = era.c+'44';
+    seg.style.borderRight = '.5px solid '+era.c+'55';
+    // year label on major eras
+    if([0,3,7,10].includes(i)){
+      const yr = document.createElement('div');
+      yr.className='ei-yr';
+      yr.textContent=era.s;
+      seg.appendChild(yr);
+    }
+    ind.insertBefore(seg, document.getElementById('era-redline'));
+
+    // chip
+    const chip = document.createElement('button');
+    chip.className='era-chip';
+    chip.id='chip-'+era.id;
+    chip.textContent=era.n;
+    chip.style.borderColor=era.c+'80';
+    chip.onclick=()=>jumpToEra(era.id);
+    chips.appendChild(chip);
+  });
+}
+
+function setEraByYear(y){
+  const era = eraForYear(y);
+  if(era && era.id !== currentEraId){
+    currentEraId = era.id;
+    highlightEra(era.id);
+    updateRedline(y);
+  }
+}
+
+function highlightEra(eraId){
+  document.querySelectorAll('.era-chip').forEach(c=>c.classList.remove('active'));
+  const chip = document.getElementById('chip-'+eraId);
+  if(chip){
+    chip.classList.add('active');
+    const era = ERAS.find(e=>e.id===eraId);
+    chip.style.background=era.c+'55';
+    chip.style.color='#fff';
+    chip.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+  }
+  document.querySelectorAll('.era-chip:not(.active)').forEach(c=>{
+    const e=ERAS.find(x=>'chip-'+x.id===c.id);
+    if(e){c.style.background='transparent';c.style.color='#666';}
+  });
+}
+
+function updateRedline(y){
+  const pct = (Math.min(Math.max(y,ERA_START),ERA_END)-ERA_START)/ERA_SPAN*100;
+  document.getElementById('era-redline').style.left=pct.toFixed(2)+'%';
+}
+
+function jumpToEra(eraId){
+  const era = ERAS.find(e=>e.id===eraId);
+  if(!era)return;
+  currentEraId=eraId;
+  highlightEra(eraId);
+  updateRedline((era.s+era.e)/2);
+  // if on 年表 tab, scroll to that era section
+  if(currentTab==='nenpyo'){
+    const hdr = document.getElementById('era-hdr-'+eraId);
+    if(hdr) hdr.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  // if on 地図, update era select
+  if(currentTab==='chizu'){
+    document.getElementById('sel-era').value=eraId;
+    updateMapEra();
+  }
+}
+
+// ── TAB NAVIGATION ─────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const tab=btn.dataset.tab;
+    switchTab(tab);
+  });
+});
+
+function switchTab(tab){
+  if(screenStack.length>0) closeAllScreens();
+  currentTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  const screens=['nenpyo','chizu','jinbutsu','kensaku'];
+  screens.forEach(id=>{
+    const el=document.getElementById('tab-'+id);
+    el.classList.toggle('hidden',id!==tab);
+  });
+  if(tab==='chizu') renderMap();
+}
+
+// ── L2 SCREEN NAVIGATION ───────────────────────────────────
+function showScreen(id){
+  screenStack.push(id);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  const el=document.getElementById(id);
+  el.classList.remove('hidden');
+}
+
+function closeAllScreens(){
+  screenStack.length=0;
+  const tab=currentTab;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+}
+
+document.querySelectorAll('.back-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const back=btn.dataset.back;
+    screenStack.pop();
+    if(screenStack.length>0){
+      document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+      const prev=screenStack[screenStack.length-1];
+      document.getElementById(prev).classList.remove('hidden');
+    } else {
+      closeAllScreens();
+      if(back) switchTab(back);
+    }
+  });
+});
+
+// ── 年表 ──────────────────────────────────────────────────
+function buildNenpyo(){
+  // gather all events from cats
+  const allEvents=[];
+  DATA.cats.forEach(cat=>{
+    cat.items.forEach(item=>{
+      allEvents.push({...item, catId:cat.id, catLabel:cat.lb});
+    });
+  });
+  // sort by start year
+  allEvents.sort((a,b)=>a.s-b.s);
+
+  const list=document.getElementById('nenpyo-list');
+  list.innerHTML='';
+
+  // group by era
+  const byEra={};
+  allEvents.forEach(ev=>{
+    const era=eraForYear(ev.s);
+    if(!byEra[era.id]) byEra[era.id]=[];
+    byEra[era.id].push(ev);
+  });
+
+  ERAS.forEach(era=>{
+    const items=(byEra[era.id]||[]).filter(ev=>currentCat==='all'||ev.catId===currentCat);
+    if(!items.length) return;
+
+    const hdr=document.createElement('div');
+    hdr.className='era-section-hdr';
+    hdr.id='era-hdr-'+era.id;
+    hdr.textContent=eraName(era)+' '+era.s+'–'+era.e;
+    hdr.style.borderColor=era.c;
+    hdr.style.color=era.c+'cc';
+    list.appendChild(hdr);
+
+    items.forEach(ev=>{
+      const card=document.createElement('div');
+      card.className='event-card';
+      const dot=document.createElement('div');
+      dot.className='event-dot';
+      dot.style.background=ev.c||era.c;
+      const info=document.createElement('div');
+      const yr=ev.s===ev.e?ev.s+'年':ev.s+'–'+ev.e+'年';
+      info.innerHTML='<div class="event-title">'+escHtml(ev.n)+'</div>'
+        +'<div class="event-year">'+yr+' · '+escHtml(ev.catLabel)+'</div>';
+      card.appendChild(dot);
+      card.appendChild(info);
+      card.onclick=()=>showEventDetail(ev,era);
+      list.appendChild(card);
+    });
+  });
+
+  // update red line on scroll
+  list.addEventListener('scroll', onNenpyoScroll, {passive:true});
+}
+
+function onNenpyoScroll(){
+  const list=document.getElementById('nenpyo-list');
+  const rect=list.getBoundingClientRect();
+  // find topmost visible era header
+  let topEra=null;
+  document.querySelectorAll('.era-section-hdr').forEach(hdr=>{
+    const r=hdr.getBoundingClientRect();
+    if(r.top<rect.top+40) topEra=hdr.id.replace('era-hdr-','');
+  });
+  if(topEra && topEra!==currentEraId){
+    currentEraId=topEra;
+    highlightEra(topEra);
+    const era=ERAS.find(e=>e.id===topEra);
+    if(era) updateRedline((era.s+era.e)/2);
+  }
+}
+
+// category filter chips
+document.getElementById('nenpyo-filter').addEventListener('click',e=>{
+  const btn=e.target.closest('.cat-chip');
+  if(!btn)return;
+  currentCat=btn.dataset.cat;
+  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  buildNenpyo();
+});
+
+// ── EVENT DETAIL ───────────────────────────────────────────
+function showEventDetail(ev, era){
+  const body=document.getElementById('event-detail-body');
+  const yr=ev.s===ev.e?ev.s+'年':ev.s+'–'+ev.e+'年';
+  body.innerHTML=`
+    <div class="det-tag">${escHtml(ev.catLabel)} · ${escHtml(eraName(era))}</div>
+    <div class="det-name">${escHtml(ev.n)}</div>
+    <div class="det-sub">${escHtml(yr)}</div>
+    <div class="det-divider"></div>
+    <div class="det-desc">${escHtml(ev.desc||'')}</div>
+  `;
+  // set back nav label
+  document.querySelector('#screen-event-detail .back-btn').dataset.back='nenpyo';
+  showScreen('screen-event-detail');
+  setEraByYear(ev.s);
+}
+
+// ── 地図 ──────────────────────────────────────────────────
+let projection, path, mapG;
+const KUNI_LABELS={
+  kanto:'関東（東京・神奈川など）',kinki:'畿内（京都・大阪など）',
+  chubu:'中部（愛知・静岡など）',tohoku:'東北',chugoku:'中国地方',
+  kyushu:'九州',hokkaido:'北海道',shikoku:'四国',
+};
+
+function buildMap(){
+  const eraSelect=document.getElementById('sel-era');
+  ERAS.forEach(era=>{
+    const opt=document.createElement('option');
+    opt.value=era.id;
+    opt.textContent=eraName(era)+'（'+era.s+'–'+era.e+'）';
+    eraSelect.appendChild(opt);
+  });
+  eraSelect.value=currentEraId||'heian';
+
+  const kuniSelect=document.getElementById('sel-kuni');
+  Object.entries(KUNI_LABELS).forEach(([k,v])=>{
+    const opt=document.createElement('option');
+    opt.value=k;opt.textContent=v;kuniSelect.appendChild(opt);
+  });
+
+  eraSelect.addEventListener('change',()=>{
+    currentEraId=eraSelect.value;
+    highlightEra(currentEraId);
+    const era=ERAS.find(e=>e.id===currentEraId);
+    if(era)updateRedline((era.s+era.e)/2);
+    updateMapEra();
+  });
+  kuniSelect.addEventListener('change',()=>{
+    selectedKuni=kuniSelect.value;
+    updateMapEra();
+  });
+}
+
+let mapRendered=false;
+function renderMap(){
+  if(mapRendered||!TOPO)return;
+  mapRendered=true;
+  const wrap=document.getElementById('map-svg-wrap');
+  const w=wrap.clientWidth,h=wrap.clientHeight;
+  const svg=d3.select('#map-svg').attr('viewBox','0 0 '+w+' '+h);
+
+  projection=d3.geoMercator().fitSize([w,h],topojson.feature(TOPO,TOPO.objects.japan));
+  path=d3.geoPath().projection(projection);
+
+  mapG=svg.append('g');
+
+  // prefectures
+  const feat=topojson.feature(TOPO,TOPO.objects.japan);
+  mapG.selectAll('path.pref')
+    .data(feat.features)
+    .join('path')
+    .attr('class','pref')
+    .attr('d',path)
+    .attr('fill','#162030')
+    .attr('stroke','#0a1a28')
+    .attr('stroke-width',0.3)
+    .on('click',function(ev,d){
+      const props=d.properties||{};
+      showMapBadge(props.name||'',props.name_en||'');
+    });
+
+  // add person location markers
+  updateMapEra();
+}
+
+function updateMapEra(){
+  if(!mapRendered||!DATA)return;
+  const eraId=document.getElementById('sel-era').value||currentEraId;
+  const era=ERAS.find(e=>e.id===eraId);
+  if(!era)return;
+
+  // reset prefecture colors
+  d3.selectAll('path.pref').attr('fill','#162030');
+
+  // highlight persons in this era
+  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers]
+    .filter(p=>p.era===eraId||(p.s&&p.s<era.e&&p.e&&p.e>era.s));
+
+  // remove old markers
+  d3.selectAll('.person-marker').remove();
+
+  persons.forEach(p=>{
+    if(!p.locs)return;
+    p.locs.forEach(loc=>{
+      const regionCenter=getRegionCenter(loc.r);
+      if(!regionCenter)return;
+      const [cx,cy]=projection(regionCenter);
+      if(isNaN(cx)||isNaN(cy))return;
+      const g=mapG.append('g').attr('class','person-marker').attr('transform','translate('+cx+','+cy+')');
+      g.append('circle').attr('r',6).attr('fill',loc.c||'#5090ff').attr('opacity',0.8)
+        .attr('stroke','rgba(255,255,255,0.3)').attr('stroke-width',0.5);
+      g.on('click',()=>showMapBadge(p.n, (p.l||'')+(loc.lb?' · '+loc.lb:'')));
+    });
+  });
+
+  // kuni filter highlight
+  if(selectedKuni){
+    d3.selectAll('path.pref').attr('fill',function(d){
+      return (d.properties&&d.properties.region===selectedKuni)?'#1a3a60':'#162030';
+    });
+  }
+}
+
+function getRegionCenter(r){
+  const centers={
+    kanto:[139.69,35.69],kinki:[135.5,34.8],chubu:[137.5,35.0],
+    tohoku:[140.5,39.0],chugoku:[132.5,34.5],kyushu:[130.5,32.5],
+    hokkaido:[143.0,43.5],shikoku:[133.5,33.8],
+  };
+  return centers[r]||null;
+}
+
+function showMapBadge(title, desc){
+  const b=document.getElementById('map-badge');
+  document.getElementById('map-badge-title').textContent=title;
+  document.getElementById('map-badge-desc').textContent=desc;
+  b.classList.add('show');
+  clearTimeout(b._t);
+  b._t=setTimeout(()=>b.classList.remove('show'),4000);
+}
+
+function updateMapEra(){ // redeclare to also handle initial call without sel-era
+  if(!mapRendered||!DATA)return;
+  const eraId=document.getElementById('sel-era').value||currentEraId||'heian';
+  const era=ERAS.find(e=>e.id===eraId);
+  if(!era)return;
+  d3.selectAll('path.pref').attr('fill','#162030');
+  d3.selectAll('.person-marker').remove();
+  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers]
+    .filter(p=>p.era===eraId||(p.s!=null&&p.e!=null&&p.s<era.e&&p.e>era.s));
+  persons.forEach(p=>{
+    if(!p.locs)return;
+    p.locs.forEach(loc=>{
+      const c=getRegionCenter(loc.r);if(!c)return;
+      const [cx,cy]=projection(c);if(isNaN(cx)||isNaN(cy))return;
+      const g=mapG.append('g').attr('class','person-marker').attr('transform','translate('+cx+','+cy+')');
+      g.append('circle').attr('r',6).attr('fill',loc.c||'#5090ff').attr('opacity',0.8)
+        .attr('stroke','rgba(255,255,255,0.3)').attr('stroke-width',0.5);
+      g.on('click',()=>showMapBadge(p.n,(p.l||'')+(loc.lb?' · '+loc.lb:'')));
+    });
+  });
+  if(selectedKuni){
+    d3.selectAll('path.pref').attr('fill',function(d){
+      return(d.properties&&d.properties.region===selectedKuni)?'#1a3a60':'#162030';
+    });
+  }
+}
+
+// ── 人物 ──────────────────────────────────────────────────
+function buildJinbutsu(){
+  const list=document.getElementById('jinbutsu-list');
+  list.innerHTML='';
+
+  const sections=[
+    {label:'天皇・皇族',   color:'#7080d0', sq:true,  items:DATA.emperors},
+    {label:'政治家・武将', color:'#5090ff', sq:false, items:DATA.rulers},
+    {label:'人物',         color:'#80a050', sq:false, items:DATA.persons},
+  ];
+
+  sections.forEach(sec=>{
+    const hdr=document.createElement('div');
+    hdr.className='person-acc-hdr';
+    hdr.innerHTML=`<div class="person-acc-left">
+      <div class="person-acc-dot${sec.sq?' sq':''}" style="background:${sec.color}"></div>
+      <span class="person-acc-title">${sec.label}</span>
+      <span class="person-acc-count">${sec.items.length}</span>
+    </div><span class="person-acc-arrow">▶</span>`;
+    hdr.addEventListener('click',()=>{
+      hdr.classList.toggle('open');
+      body.classList.toggle('open');
+    });
+    list.appendChild(hdr);
+
+    const body=document.createElement('div');
+    body.className='person-acc-body';
+    sec.items.forEach(p=>{
+      const row=document.createElement('div');
+      row.className='person-row';
+      const era=ERAS.find(e=>e.id===p.era)||(p.s?eraForYear(p.s):null);
+      row.innerHTML=`<div class="person-dot${sec.sq?' sq':''}" style="background:${sec.color}"></div>
+        <div><div class="person-name">${escHtml(p.n)}</div>
+        <div class="person-sub">${escHtml(p.l||'')}${era?' · '+eraName(era):''}</div></div>
+        <i class="ti ti-chevron-right" style="font-size:14px;color:#2a2a3a;margin-left:auto"></i>`;
+      row.onclick=()=>showPersonDetail(p, sec.color, sec.sq);
+      body.appendChild(row);
+    });
+    list.appendChild(body);
+  });
+}
+
+function showPersonDetail(p, color, sq){
+  const era=ERAS.find(e=>e.id===p.era)||(p.s?eraForYear(p.s):null);
+  const body=document.getElementById('person-detail-body');
+  let locsHtml='';
+  const typeMap={birth:'出生地',active:'活躍の地',exile:'流刑地',death:'没地'};
+  if(p.locs&&p.locs.length){
+    locsHtml='<div class="det-section" style="margin-top:10px">足跡・ゆかりの地</div>';
+    p.locs.forEach(loc=>{
+      locsHtml+=`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;padding:6px 0;border-bottom:.5px solid rgba(255,255,255,.05)">
+        <div style="width:10px;height:10px;border-radius:50%;background:${loc.c};flex-shrink:0;margin-top:2px"></div>
+        <div><div style="font-size:10px;color:#555;margin-bottom:2px">${escHtml(typeMap[loc.tp]||loc.tp)}</div>
+        <div style="font-size:12px;color:#ccc">${escHtml(loc.lb||KUNI_LABELS[loc.r]||loc.r)}</div></div>
+      </div>`;
+    });
+  }
+
+  body.innerHTML=`
+    <div class="det-tag">${era?eraName(era)+' · ':''}</div>
+    <div class="det-name" style="display:flex;align-items:baseline;gap:8px">
+      <div class="person-dot${sq?' sq':''}" style="background:${color};width:10px;height:10px;flex-shrink:0;margin-top:4px"></div>
+      ${escHtml(p.n)}
+    </div>
+    ${p.fg?`<div class="person-furigana">${escHtml(p.fg)}</div>`:''}
+    <div class="person-period">${escHtml(p.l||'')}${p.role?' | '+escHtml(p.role):''}</div>
+    <div class="det-divider"></div>
+    <div class="det-desc">${escHtml(p.desc||'')}</div>
+    ${locsHtml}
+  `;
+
+  // legend
+  const legend=document.getElementById('person-loc-legend');
+  legend.innerHTML='';
+  if(p.locs&&p.locs.length){
+    const types=[...new Set(p.locs.map(l=>l.tp))];
+    types.forEach(tp=>{
+      const loc=p.locs.find(l=>l.tp===tp);
+      legend.innerHTML+=`<div class="loc-item"><div class="loc-dot-sm" style="background:${loc.c}"></div>${typeMap[tp]||tp}</div>`;
+    });
+  }
+
+  showScreen('screen-person-detail');
+  if(era) setEraByYear(p.s||(era.s+era.e)/2);
+}
+
+// ── 検索 ──────────────────────────────────────────────────
+// shortcuts
+document.querySelectorAll('.search-shortcut').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const goto=btn.dataset.goto;
+    if(goto==='tokaido') openTokaido();
+    else if(goto==='population') openPopulation();
+  });
+});
+
+const searchInput=document.getElementById('search-input');
+const searchClear=document.getElementById('search-clear');
+const searchResults=document.getElementById('search-results');
+const searchInitial=document.getElementById('search-initial');
+
+let searchTimer=null;
+searchInput.addEventListener('input',()=>{
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(doSearch,200);
+  searchClear.style.display=searchInput.value?'block':'none';
+});
+searchClear.addEventListener('click',()=>{
+  searchInput.value='';
+  searchClear.style.display='none';
+  searchResults.style.display='none';
+  searchInitial.style.display='block';
+});
+
+function doSearch(){
+  const q=searchInput.value.trim();
+  if(!q){searchResults.style.display='none';searchInitial.style.display='block';return;}
+  searchInitial.style.display='none';
+  searchResults.style.display='block';
+
+  const ql=q.toLowerCase();
+  let html='';
+
+  // persons (fg support)
+  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers].filter(p=>{
+    return p.n.includes(q)||(p.fg&&p.fg.includes(ql))||(p.role&&p.role.includes(q));
+  });
+  if(persons.length){
+    html+='<div class="result-type-hdr">人物（'+persons.length+'件）</div>';
+    persons.slice(0,8).forEach(p=>{
+      const era=ERAS.find(e=>e.id===p.era)||(p.s?eraForYear(p.s):null);
+      html+=`<div class="result-row" data-type="person" data-id="${escHtml(p.id)}">
+        <i class="ti ti-user result-icon"></i>
+        <div><div class="result-main">${hlText(p.n,q)}</div>
+        <div class="result-sub">${escHtml(p.l||'')} · ${era?eraName(era):''}</div></div>
+        <span class="result-badge" style="background:#1e2840;color:#7090c0">人物</span>
+      </div>`;
+    });
+  }
+
+  // events
+  const events=[];
+  DATA.cats.forEach(cat=>{
+    cat.items.forEach(item=>{
+      if(item.n.includes(q)||(item.desc&&item.desc.includes(q))){
+        events.push({...item,catLabel:cat.lb,catId:cat.id});
+      }
+    });
+  });
+  if(events.length){
+    html+='<div class="result-type-hdr">イベント（'+events.length+'件）</div>';
+    events.slice(0,6).forEach(ev=>{
+      html+=`<div class="result-row" data-type="event" data-id="${escHtml(ev.id)}">
+        <i class="ti ti-calendar result-icon"></i>
+        <div><div class="result-main">${hlText(ev.n,q)}</div>
+        <div class="result-sub">${ev.s}年 · ${escHtml(ev.catLabel)}</div></div>
+        <span class="result-badge" style="background:#1a1e30;color:#6080b0">年表</span>
+      </div>`;
+    });
+  }
+
+  // tokaido stations
+  const stations=TOKAIDO.filter(s=>s.n.includes(q)||(s.pref&&s.pref.includes(q)));
+  if(stations.length){
+    html+='<div class="result-type-hdr">東海道宿場（'+stations.length+'件）</div>';
+    stations.slice(0,5).forEach(s=>{
+      html+=`<div class="result-row" data-type="station" data-num="${s.num}" data-special="${s.special?1:0}">
+        <i class="ti ti-road result-icon"></i>
+        <div><div class="result-main">${hlText(s.n,q)}</div>
+        <div class="result-sub">${escHtml(s.pref)} · ${s.km}km</div></div>
+        <span class="result-badge" style="background:#201810;color:#a07030">東海道</span>
+      </div>`;
+    });
+  }
+
+  if(!html) html='<div class="no-results">「'+escHtml(q)+'」の検索結果はありません</div>';
+  searchResults.innerHTML=html;
+
+  // bind result clicks
+  searchResults.querySelectorAll('.result-row').forEach(row=>{
+    row.addEventListener('click',()=>{
+      const type=row.dataset.type;
+      if(type==='person'){
+        const id=row.dataset.id;
+        const p=[...DATA.persons,...DATA.emperors,...DATA.rulers].find(x=>x.id===id);
+        if(p) showPersonDetail(p,'#5090ff',false);
+      } else if(type==='event'){
+        const id=row.dataset.id;
+        let found=null,cat=null;
+        DATA.cats.forEach(c=>c.items.forEach(it=>{if(it.id===id){found=it;cat=c;}}));
+        if(found){
+          const era=eraForYear(found.s);
+          showEventDetail({...found,catLabel:cat.lb},era);
+        }
+      } else if(type==='station'){
+        const num=parseInt(row.dataset.num);
+        const special=row.dataset.special==='1';
+        const s=TOKAIDO.find(x=>x.num===num&&!!x.special===special);
+        if(s){ activeStation=s; openTokaido(); }
+      }
+    });
+  });
+}
+
+function hlText(text,q){
+  if(!q)return escHtml(text);
+  const idx=text.indexOf(q);
+  if(idx<0)return escHtml(text);
+  return escHtml(text.slice(0,idx))+'<span class="hl">'+escHtml(q)+'</span>'+escHtml(text.slice(idx+q.length));
+}
+
+// ── 東海道 ────────────────────────────────────────────────
+function openTokaido(){
+  buildTokaidoMap();
+  showScreen('screen-tokaido-map');
+  setEraByYear(1750);
+}
+
+document.getElementById('tk-to-list-btn').addEventListener('click',()=>{
+  showScreen('screen-tokaido-list');
+});
+document.getElementById('tk-to-map-btn').addEventListener('click',()=>{
+  const stack=[...screenStack];
+  // pop list, show map
+  screenStack.pop();
+  showScreen('screen-tokaido-map');
+});
+
+// override back on list to go back to map or kensaku
+document.querySelector('#screen-tokaido-list .back-btn').addEventListener('click',()=>{
+  // pop this screen
+  screenStack.pop();
+  if(screenStack.length>0){
+    const prev=screenStack[screenStack.length-1];
+    document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+    document.getElementById(prev).classList.remove('hidden');
+  } else {
+    closeAllScreens();
+    switchTab('kensaku');
+  }
+},true);
+
+let tokaidoMapBuilt=false;
+function buildTokaidoMap(){
+  if(tokaidoMapBuilt)return;
+  tokaidoMapBuilt=true;
+  if(!TOPO)return;
+
+  const wrap=document.getElementById('tokaido-map-wrap');
+  const w=wrap.clientWidth||390, h=wrap.clientHeight||400;
+  const svg=d3.select('#tokaido-svg').attr('viewBox','0 0 '+w+' '+h);
+
+  // project onto Tokaido corridor: lon 135.7-140.0, lat 33.8-36.0
+  const proj=d3.geoMercator()
+    .center([137.85,35.0])
+    .scale(w*5.5)
+    .translate([w/2,h/2]);
+  const pth=d3.geoPath().projection(proj);
+
+  // land
+  const g=svg.append('g');
+  g.selectAll('path')
+    .data(topojson.feature(TOPO,TOPO.objects.japan).features)
+    .join('path')
+    .attr('d',pth)
+    .attr('fill','#162030')
+    .attr('stroke','#0a1a28')
+    .attr('stroke-width',0.4);
+
+  // route line
+  const coords=TOKAIDO.map(s=>[s.lon,s.lat]);
+  const lineGen=d3.line().x(d=>proj(d)[0]).y(d=>proj(d)[1]).curve(d3.curveCatmullRom);
+  g.append('path')
+    .datum(coords)
+    .attr('d',lineGen)
+    .attr('stroke','#c08040')
+    .attr('stroke-width',2)
+    .attr('fill','none')
+    .attr('stroke-linecap','round')
+    .attr('opacity',0.9);
+
+  // station dots
+  TOKAIDO.forEach((s,i)=>{
+    const [cx,cy]=proj([s.lon,s.lat]);
+    if(isNaN(cx)||isNaN(cy))return;
+    const sg=g.append('g').attr('class','tk-station').attr('data-num',s.num||i)
+      .attr('transform','translate('+cx+','+cy+')')
+      .style('cursor','pointer');
+
+    const r=s.special?5:s.midpoint?6:4;
+    const fill=s.special?(s.label==='起点'?'#cc3020':'#3060b0'):s.midpoint?'#1a300a':'#0d0d18';
+    const stroke=s.special?(s.label==='起点'?'#ff5040':'#5090ff'):s.midpoint?'#60c040':'#b07030';
+
+    sg.append('circle').attr('r',r).attr('fill',fill).attr('stroke',stroke).attr('stroke-width',1.2);
+
+    // number label for non-special
+    if(!s.special){
+      const txt=s.midpoint?'中':String(s.num);
+      sg.append('text').attr('text-anchor','middle').attr('dy','0.35em')
+        .attr('font-size','5').attr('fill',s.midpoint?'#80e060':'#c09050')
+        .attr('pointer-events','none').text(txt);
+    }
+
+    sg.on('click',()=>selectStation(s));
+  });
+
+  if(activeStation) selectStation(activeStation);
+}
+
+function selectStation(s){
+  activeStation=s;
+  const badge=document.getElementById('tokaido-station-badge');
+  document.getElementById('tk-badge-num').textContent=
+    s.special?(s.label||''):'第'+s.num+'次 · '+s.pref;
+  document.getElementById('tk-badge-name').textContent=s.n;
+  document.getElementById('tk-badge-desc').textContent=s.desc||'';
+  badge.classList.add('show');
+
+  // progress
+  const pct=s.km/549*100;
+  document.getElementById('tk-prog-fill').style.width=pct+'%';
+  document.getElementById('tk-prog-label').textContent=s.km+' / 549km';
+
+  // highlight in list
+  document.querySelectorAll('.tk-list-item').forEach(el=>{
+    el.classList.toggle('active-station',el.dataset.num==s.num&&el.dataset.special==(s.special?'1':'0'));
+    el.querySelectorAll('.tk-num,.tk-row-name,.tk-row-sub').forEach(x=>{
+      x.classList.toggle('active-station',el.dataset.num==s.num&&el.dataset.special==(s.special?'1':'0'));
+    });
+  });
+}
+
+function buildTokaidoList(){
+  const scroll=document.getElementById('tokaido-list-scroll');
+  scroll.innerHTML='';
+
+  // progress bar at top
+  const progWrap=document.createElement('div');
+  progWrap.style.cssText='padding:6px 12px 4px;display:flex;align-items:center;gap:8px;background:#0a0a12;border-bottom:.5px solid rgba(255,255,255,.06)';
+  progWrap.innerHTML='<div style="flex:1;height:3px;background:#161624;border-radius:2px;overflow:hidden"><div style="height:100%;background:linear-gradient(to right,#ff4040,#c08040,#3060b0);border-radius:2px"></div></div>'
+    +'<span style="font-size:10px;color:#555">江戸〜京都 549km</span>';
+  scroll.appendChild(progWrap);
+
+  TOKAIDO.forEach(s=>{
+    const row=document.createElement('div');
+    row.className='tk-list-item';
+    row.dataset.num=s.num;
+    row.dataset.special=s.special?'1':'0';
+    const numStr=s.special?(s.label||''):(s.midpoint?'中':String(s.num));
+    const dotColor=s.special?(s.label==='起点'?'#ff4040':'#5090ff'):s.midpoint?'#60c040':'#c08040';
+    row.innerHTML=`<div class="tk-num">${escHtml(numStr)}</div>
+      <div class="tk-dot-row" style="background:${dotColor}"></div>
+      <div><div class="tk-row-name">${escHtml(s.n)}</div>
+      <div class="tk-row-sub">${escHtml(s.pref)} · ${s.km}km</div></div>`;
+    row.addEventListener('click',()=>{
+      selectStation(s);
+      // switch to map view
+      screenStack.pop();
+      buildTokaidoMap();
+      showScreen('screen-tokaido-map');
+    });
+    scroll.appendChild(row);
+  });
+}
+
+// ── 人口グラフ ─────────────────────────────────────────────
+function openPopulation(){
+  showScreen('screen-population');
+  drawPopulation();
+  setEraByYear(2024);
+}
+
+let popDrawn=false;
+function drawPopulation(){
+  if(popDrawn)return;
+  popDrawn=true;
+  const canvas=document.getElementById('pop-canvas');
+  const wrap=document.getElementById('pop-canvas-wrap');
+  const dpr=window.devicePixelRatio||1;
+  const w=wrap.clientWidth||370;
+  const h=canvas.parentElement.clientHeight-120||220;
+  canvas.width=w*dpr;
+  canvas.height=h*dpr;
+  canvas.style.width=w+'px';
+  canvas.style.height=h+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const pad={t:15,r:10,b:30,l:48};
+  const iw=w-pad.l-pad.r, ih=h-pad.t-pad.b;
+  const maxP=Math.max(...POP_DATA.map(d=>d.p));
+  const minY=POP_DATA[0].y, maxY=POP_DATA[POP_DATA.length-1].y;
+  const xScale=y=>(y-minY)/(maxY-minY)*iw+pad.l;
+  const yScale=p=>(1-p/maxP)*ih+pad.t;
+
+  // era backgrounds
+  ERAS.forEach(era=>{
+    const x1=xScale(Math.max(era.s,minY));
+    const x2=xScale(Math.min(era.e,maxY));
+    if(x2<pad.l||x1>w-pad.r)return;
+    ctx.fillStyle=era.c+'18';
+    ctx.fillRect(x1,pad.t,x2-x1,ih);
+  });
+
+  // grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.05)';
+  ctx.lineWidth=1;
+  [2000,5000,8000,12000].forEach(p=>{
+    const y=yScale(p);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+    ctx.fillStyle='#333';ctx.font='9px -apple-system,sans-serif';
+    ctx.textAlign='right';ctx.fillText((p/1).toLocaleString(),pad.l-4,y+3);
+  });
+
+  // year labels
+  ctx.fillStyle='#2a2a40';ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';
+  [500,1000,1600,1868,2000].forEach(y=>{
+    if(y>=minY&&y<=maxY){
+      ctx.fillText(y,xScale(y),h-pad.b+12);
+    }
+  });
+
+  // area fill
+  const grad=ctx.createLinearGradient(0,pad.t,0,h-pad.b);
+  grad.addColorStop(0,'rgba(58,136,184,0.35)');
+  grad.addColorStop(1,'rgba(58,136,184,0.02)');
+  ctx.beginPath();
+  POP_DATA.forEach((d,i)=>{
+    const x=xScale(d.y),y=yScale(d.p);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.lineTo(xScale(POP_DATA[POP_DATA.length-1].y),h-pad.b);
+  ctx.lineTo(xScale(POP_DATA[0].y),h-pad.b);
+  ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+
+  // line
+  ctx.beginPath();ctx.strokeStyle='#3a88b8';ctx.lineWidth=1.5;
+  POP_DATA.forEach((d,i)=>{
+    const x=xScale(d.y),y=yScale(d.p);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // peak marker
+  const peak=POP_DATA.find(d=>d.p===maxP);
+  const px=xScale(peak.y),py=yScale(peak.p);
+  ctx.beginPath();ctx.arc(px,py,3,0,Math.PI*2);ctx.fillStyle='#ff4040';ctx.fill();
+  ctx.fillStyle='#ff6060';ctx.font='8px -apple-system,sans-serif';ctx.textAlign='center';
+  ctx.fillText(peak.y,px,py-7);
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function escHtml(s){
+  if(!s)return'';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
