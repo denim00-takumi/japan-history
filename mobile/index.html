@@ -324,14 +324,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
     <div id="tokaido-nav" style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:4px 10px;background:#0a0a12;border-top:.5px solid rgba(255,255,255,.06)">
-      <button id="tk-prev-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;opacity:0.3;pointer-events:none">
-        <span style="font-size:13px;color:#5090ff">三条大橋 ▶</span>
-        <span style="font-size:10px;color:#c03030;border-left:2px solid #c03030;padding-left:4px">◀ 前の宿場</span>
-      </button>
-      <button id="tk-next-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-        <span style="font-size:13px;color:#c03030">◀ 日本橋</span>
-        <span style="font-size:10px;color:#5090ff;border-right:2px solid #5090ff;padding-right:4px">次の宿場 ▶</span>
-      </button>
+      <button id="tk-prev-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;font-size:13px;color:#5090ff;opacity:0.3;pointer-events:none">三条大橋 ▶</button>
+      <button id="tk-next-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;font-size:13px;color:#c03030">◀ 日本橋</button>
 
     </div>
     <div id="tokaido-progress">
@@ -1341,7 +1335,7 @@ function hlText(text,q){
 
 // ── 東海道 ────────────────────────────────────────────────
 function openTokaido(){
-  if(!activeStation) activeStation=TOKAIDO.find(s=>s.special&&s.label==='起点')||null;
+  activeStation=TOKAIDO.find(s=>s.special&&s.label==='起点')||null;
   buildTokaidoMap();
   showScreen('screen-tokaido-map');
   setEraByYear(1750);
