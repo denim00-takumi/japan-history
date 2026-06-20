@@ -19,10 +19,10 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .cent-seg{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:flex-start;padding-left:2px;border-right:.5px solid rgba(255,255,255,.08)}
 .cent-label{font-size:7px;color:#4a4a68;white-space:nowrap;pointer-events:none}
 #era-indicator{height:20px;display:flex;position:relative;background:#080810;overflow:hidden}
-.ei-seg{border-right:.5px solid rgba(255,255,255,.12);position:relative;transition:opacity .2s;flex-shrink:0}
-.ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#8a8aaa;white-space:nowrap;pointer-events:none}
+.ei-seg{border-right:.5px solid rgba(255,255,255,.2);position:relative;transition:opacity .2s;flex-shrink:0}
+.ei-yr{position:absolute;bottom:1px;left:2px;font-size:7px;color:#c8c8e0;white-space:nowrap;pointer-events:none}
 #era-redline{position:absolute;top:0;bottom:0;width:1px;background:#ff3030;z-index:5;pointer-events:none;transition:left .4s ease}
-#era-chips{display:flex;overflow:hidden;height:50px;align-items:flex-start;padding-top:3px}
+#era-chips{display:flex;overflow:hidden;height:50px;align-items:flex-start;padding-top:3px;position:relative;user-select:none}
 .era-chip{
   flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   border:none;border-right:.5px solid rgba(255,255,255,.06);background:transparent;
@@ -32,6 +32,9 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
   transition:all .15s
 }
 .era-chip.active{font-weight:600;color:#fff}
+/* スライド吹き出し */
+#era-slide-tooltip{position:absolute;bottom:calc(100% + 4px);left:0;background:#101828;border:.5px solid rgba(255,255,255,.25);border-radius:6px;padding:3px 8px;font-size:11px;color:#e0e8ff;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s;z-index:20;transform:translateX(-50%)}
+#era-slide-tooltip.show{opacity:1}
 
 /* ── TAB BAR ── */
 #tab-bar{flex-shrink:0;display:flex;background:#0d0d14;border-top:.5px solid rgba(255,255,255,.08);padding:4px 0;padding-bottom:calc(4px + env(safe-area-inset-bottom))}
@@ -40,7 +43,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .tab-btn i{font-size:23px;line-height:1}
 
 /* ── CONTENT ── */
-#content{flex:1;position:relative;overflow:hidden;min-height:0}
+#content{flex:1;position:relative;overflow:hidden;min-height:0;padding:0 5px}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;background:#080810;transform:translateX(0);transition:transform .25s ease;overflow:hidden}
 .screen.hidden{display:none !important}
 .screen.slide-in{transform:translateX(0)}
@@ -90,6 +93,7 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 .person-acc-count{font-size:12px;color:#aaa;background:#222230;border-radius:8px;padding:1px 7px}
 .person-acc-arrow{font-size:13px;color:#888;transition:transform .2s}
 .person-acc-hdr.open .person-acc-arrow{transform:rotate(90deg)}
+.person-acc-hdr.open{background:#141428}
 .person-acc-body{display:none;background:#080810}
 .person-acc-body.open{display:block}
 .person-row{padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
@@ -210,7 +214,9 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
 <div id="era-header">
   <div id="century-bar"><!-- JS fills --></div>
   <div id="era-indicator"><!-- JS fills --><div id="era-redline"></div></div>
-  <div id="era-chips"><!-- JS fills --></div>
+  <div id="era-chips" style="position:relative"><!-- JS fills -->
+    <div id="era-slide-tooltip"></div>
+  </div>
 </div>
 
 <!-- CONTENT AREA -->
@@ -283,7 +289,6 @@ body{display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);pad
       <button class="back-btn" data-back="jinbutsu"><i class="ti ti-chevron-left"></i>人物</button>
     </div>
     <div class="det-scroll" id="person-detail-body"></div>
-    <div class="loc-legend" id="person-loc-legend"></div>
   </div>
 
   <!-- L2: 東海道 地図 -->
@@ -504,8 +509,8 @@ function buildEraHeader(){
     seg.className = 'ei-seg';
     seg.id = 'ei-'+era.id;
     seg.style.width = ERA_WIDTHS[i].toFixed(2)+'%';
-    seg.style.background = era.c+'99';
-    seg.style.borderRight = '.5px solid '+era.c+'80';
+    seg.style.background = era.c;
+    seg.style.borderRight = '.5px solid rgba(0,0,0,0.3)';
     // year label on major eras
     if([0,3,7,10].includes(i)){
       const yr = document.createElement('div');
@@ -575,6 +580,55 @@ function jumpToEra(eraId){
 }
 
 // ── TAB NAVIGATION ─────────────────────────────────────────
+// ERA chips スライド吹き出し
+(function(){
+  const chipsEl=document.getElementById('era-chips');
+  const tip=document.getElementById('era-slide-tooltip');
+  let sliding=false,startX=0,moved=false;
+
+  function eraAtX(clientX){
+    const rect=chipsEl.getBoundingClientRect();
+    const x=clientX-rect.left;
+    let acc=0;
+    for(let i=0;i<ERAS.length;i++){
+      const w=ERA_WIDTHS[i]/100*rect.width;
+      acc+=w;
+      if(x<=acc)return ERAS[i];
+    }
+    return ERAS[ERAS.length-1];
+  }
+  function showTip(clientX,era){
+    const rect=chipsEl.getBoundingClientRect();
+    const x=clientX-rect.left;
+    tip.textContent=eraName(era);
+    tip.style.left=Math.max(30,Math.min(x,rect.width-30))+'px';
+    tip.classList.add('show');
+  }
+  chipsEl.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1)return;
+    startX=e.touches[0].clientX;
+    moved=false;
+    sliding=true;
+  },{passive:true});
+  chipsEl.addEventListener('touchmove',e=>{
+    if(!sliding||e.touches.length!==1)return;
+    if(Math.abs(e.touches[0].clientX-startX)>6)moved=true;
+    if(!moved)return;
+    e.preventDefault();
+    const era=eraAtX(e.touches[0].clientX);
+    showTip(e.touches[0].clientX,era);
+    highlightEra(era.id);
+  },{passive:false});
+  chipsEl.addEventListener('touchend',e=>{
+    tip.classList.remove('show');
+    if(moved&&e.changedTouches.length){
+      const era=eraAtX(e.changedTouches[0].clientX);
+      jumpToEra(era.id);
+    }
+    sliding=false;moved=false;
+  });
+})();
+
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const tab=btn.dataset.tab;
@@ -889,9 +943,9 @@ function buildJinbutsu(){
   list.innerHTML='';
 
   const sections=[
-    {label:'天皇・皇族',   color:'#7080d0', sq:true,  items:DATA.emperors},
-    {label:'政治家・武将', color:'#5090ff', sq:false, items:DATA.rulers},
-    {label:'人物',         color:'#80a050', sq:false, items:DATA.persons},
+    {label:'天皇',   color:'#c8a84b', sq:true,  items:DATA.emperors},
+    {label:'為政者', color:'#5090ff', sq:false, items:DATA.rulers},
+    {label:'人物',   color:'#80a050', sq:false, items:DATA.persons},
   ];
 
   sections.forEach(sec=>{
@@ -931,11 +985,10 @@ function showPersonDetail(p, color, sq){
   let locsHtml='';
   const typeMap={birth:'出生地',active:'活躍の地',exile:'流刑地',death:'没地'};
   if(p.locs&&p.locs.length){
-    locsHtml='<div class="det-section" style="margin-top:10px">足跡・ゆかりの地</div>';
     p.locs.forEach(loc=>{
       locsHtml+=`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;padding:6px 0;border-bottom:.5px solid rgba(255,255,255,.05)">
         <div style="width:10px;height:10px;border-radius:50%;background:${loc.c};flex-shrink:0;margin-top:2px"></div>
-        <div><div style="font-size:12px;color:#555;margin-bottom:2px">${escHtml(typeMap[loc.tp]||loc.tp)}</div>
+        <div><div style="font-size:12px;color:#888;margin-bottom:2px">${escHtml(typeMap[loc.tp]||loc.tp)}</div>
         <div style="font-size:14px;color:#ccc">${escHtml(loc.lb||KUNI_LABELS[loc.r]||loc.r)}</div></div>
       </div>`;
     });
@@ -973,17 +1026,6 @@ function showPersonDetail(p, color, sq){
         document.getElementById('sel-era').value=era.id;
         setTimeout(()=>updateMapEra(),100);
       }
-    });
-  }
-
-  // legend
-  const legend=document.getElementById('person-loc-legend');
-  legend.innerHTML='';
-  if(p.locs&&p.locs.length){
-    const types=[...new Set(p.locs.map(l=>l.tp))];
-    types.forEach(tp=>{
-      const loc=p.locs.find(l=>l.tp===tp);
-      legend.innerHTML+=`<div class="loc-item"><div class="loc-dot-sm" style="background:${loc.c}"></div>${typeMap[tp]||tp}</div>`;
     });
   }
 
@@ -1045,11 +1087,13 @@ function doSearch(){
     });
   }
 
-  // events
+  // events — 1文字の場合は先頭一致のみ、複数文字はincludes
   const events=[];
   DATA.cats.forEach(cat=>{
     cat.items.forEach(item=>{
-      if(item.n.includes(q)||(item.desc&&item.desc.includes(q))){
+      const nameMatch=q.length===1?item.n.startsWith(q):item.n.includes(q);
+      const descMatch=q.length>=2&&item.desc&&item.desc.includes(q);
+      if(nameMatch||descMatch){
         events.push({...item,catLabel:cat.lb,catId:cat.id});
       }
     });
@@ -1147,10 +1191,11 @@ document.querySelector('#screen-tokaido-list .back-btn').addEventListener('click
   }
 },true);
 
-let tokaidoMapBuilt=false;
+let tokaidoListenersAdded=false;
 function buildTokaidoMap(){
-  if(tokaidoMapBuilt)return;
-  tokaidoMapBuilt=true;
+  // 毎回SVGをクリアして再描画（ズームリセット）
+  const svgElPrev=document.getElementById('tokaido-svg');
+  svgElPrev.innerHTML='';
   if(!TOPO)return;
 
   const wrap=document.getElementById('tokaido-map-wrap');
@@ -1162,21 +1207,21 @@ function buildTokaidoMap(){
   const proj=d3.geoMercator().fitExtent([[30,h*0.05],[w-20,h*0.9]],tokaidoBounds);
   const pth=d3.geoPath().projection(proj);
 
-  // land
+  // land — 明るい配色・県境強調
   const g=svg.append('g');
   g.selectAll('path')
     .data(topojson.feature(TOPO,TOPO.objects.japan).features)
     .join('path')
     .attr('d',pth)
-    .attr('fill','#162030')
-    .attr('stroke','#0a1a28')
-    .attr('stroke-width',0.4);
+    .attr('fill','#243850')
+    .attr('stroke','#5080a0')
+    .attr('stroke-width',0.6);
 
   // route line
-  const coords=TOKAIDO.map(s=>[s.lon,s.lat]);
+  const coords=TOKAIDO.filter(s=>!s.midpoint||true).map(s=>[s.lon,s.lat]);
   const lineGen=d3.line().x(d=>proj(d)[0]).y(d=>proj(d)[1]).curve(d3.curveCatmullRom);
   g.append('path')
-    .datum(coords)
+    .datum(TOKAIDO.map(s=>[s.lon,s.lat]))
     .attr('d',lineGen)
     .attr('stroke','#c08040')
     .attr('stroke-width',2)
@@ -1184,9 +1229,9 @@ function buildTokaidoMap(){
     .attr('stroke-linecap','round')
     .attr('opacity',0.9);
 
-  // station dots — 非フォーカスは小さいドットのみ
+  // station dots — 始点・終点以外は統一小ドット、中間点は非表示
   TOKAIDO.forEach((s,i)=>{
-    if(s.midpoint)return; // 中間点は非表示
+    if(s.midpoint)return;
     const [cx,cy]=proj([s.lon,s.lat]);
     if(isNaN(cx)||isNaN(cy))return;
     const sg=g.append('g').attr('class','tk-station').attr('data-num',s.num||i)
@@ -1195,37 +1240,68 @@ function buildTokaidoMap(){
       .style('cursor','pointer');
 
     const r=s.special?5:3;
-    const fill=s.special?(s.label==='起点'?'#cc3020':'#3060b0'):'#0d0d18';
-    const stroke=s.special?(s.label==='起点'?'#ff5040':'#5090ff'):'#b07030';
-    sg.append('circle').attr('r',r).attr('fill',fill).attr('stroke',stroke).attr('stroke-width',1.2).attr('class','tk-dot');
-
+    const fill=s.special?(s.label==='起点'?'#cc3020':'#3060b0'):'#4a6a40';
+    const stroke=s.special?(s.label==='起点'?'#ff5040':'#5090ff'):'#90c070';
+    sg.append('circle').attr('r',r).attr('fill',fill).attr('stroke',stroke).attr('stroke-width',1).attr('class','tk-dot');
     sg.on('click',()=>selectStation(s));
   });
 
-  // ピンチズーム（地図SVG内のみ）
-  let tkScale=1,tkTx=0,tkTy=0;
-  let pinchStartDist=null,pinchStartScale=1,pinchMidX=0,pinchMidY=0;
-  const svgEl=document.getElementById('tokaido-svg');
-  svgEl.addEventListener('touchstart',e=>{
-    if(e.touches.length===2){
-      e.preventDefault();
-      const t=e.touches;
-      pinchStartDist=Math.hypot(t[1].clientX-t[0].clientX,t[1].clientY-t[0].clientY);
-      pinchStartScale=tkScale;
-      pinchMidX=(t[0].clientX+t[1].clientX)/2;
-      pinchMidY=(t[0].clientY+t[1].clientY)/2;
+  // ピンチズーム＋パン（地図SVG内のみ）
+  if(!tokaidoListenersAdded){
+    tokaidoListenersAdded=true;
+    let tkScale=1,tkTx=0,tkTy=0;
+    let pinchStartDist=null,pinchStartScale=1,pinchStartTx=0,pinchStartTy=0,pinchMidX=0,pinchMidY=0;
+    let panStartX=0,panStartY=0,panStartTx=0,panStartTy=0,panning=false;
+    const svgEl=document.getElementById('tokaido-svg');
+
+    function applyTransform(){
+      // gはこのスコープではアクセスできないのでSVG内のgを再取得
+      const gEl=svgEl.querySelector('g');
+      if(gEl)gEl.setAttribute('transform','translate('+tkTx+','+tkTy+') scale('+tkScale+')');
     }
-  },{passive:false});
-  svgEl.addEventListener('touchmove',e=>{
-    if(e.touches.length===2&&pinchStartDist){
-      e.preventDefault();
-      const t=e.touches;
-      const dist=Math.hypot(t[1].clientX-t[0].clientX,t[1].clientY-t[0].clientY);
-      tkScale=Math.max(1,Math.min(6,pinchStartScale*dist/pinchStartDist));
-      g.attr('transform','translate('+tkTx+','+tkTy+') scale('+tkScale+')');
-    }
-  },{passive:false});
-  svgEl.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStartDist=null;});
+
+    svgEl.addEventListener('touchstart',e=>{
+      if(e.touches.length===2){
+        e.preventDefault();
+        const t=e.touches;
+        pinchStartDist=Math.hypot(t[1].clientX-t[0].clientX,t[1].clientY-t[0].clientY);
+        pinchStartScale=tkScale;pinchStartTx=tkTx;pinchStartTy=tkTy;
+        pinchMidX=(t[0].clientX+t[1].clientX)/2;
+        pinchMidY=(t[0].clientY+t[1].clientY)/2;
+        panning=false;
+      } else if(e.touches.length===1&&tkScale>1){
+        panning=true;
+        panStartX=e.touches[0].clientX;panStartY=e.touches[0].clientY;
+        panStartTx=tkTx;panStartTy=tkTy;
+      }
+    },{passive:false});
+
+    svgEl.addEventListener('touchmove',e=>{
+      if(e.touches.length===2&&pinchStartDist){
+        e.preventDefault();
+        const t=e.touches;
+        const dist=Math.hypot(t[1].clientX-t[0].clientX,t[1].clientY-t[0].clientY);
+        const newScale=Math.max(1,Math.min(8,pinchStartScale*dist/pinchStartDist));
+        const factor=newScale/pinchStartScale;
+        const rect=svgEl.getBoundingClientRect();
+        const ox=pinchMidX-rect.left,oy=pinchMidY-rect.top;
+        tkTx=ox-factor*(ox-pinchStartTx);
+        tkTy=oy-factor*(oy-pinchStartTy);
+        tkScale=newScale;
+        applyTransform();
+      } else if(e.touches.length===1&&panning){
+        e.preventDefault();
+        tkTx=panStartTx+(e.touches[0].clientX-panStartX);
+        tkTy=panStartTy+(e.touches[0].clientY-panStartY);
+        applyTransform();
+      }
+    },{passive:false});
+
+    svgEl.addEventListener('touchend',e=>{
+      if(e.touches.length<2)pinchStartDist=null;
+      if(e.touches.length===0)panning=false;
+    });
+  }
 
   if(activeStation) selectStation(activeStation);
 }
@@ -1241,13 +1317,19 @@ function selectStation(s){
     return special?5:3;
   });
   if(!s.special&&s.num){
-    const sg=d3.select('.tk-station[data-num="'+s.num+'"][data-special="0"]');
-    if(!sg.empty()){
-      sg.select('.tk-dot').attr('r',8).attr('fill','#c08040').attr('stroke','#ffd080').attr('stroke-width',1.5);
-      sg.append('text').attr('class','tk-focus-label')
-        .attr('text-anchor','middle').attr('dy','0.38em')
-        .attr('font-size','9').attr('font-weight','bold').attr('fill','#fff')
-        .attr('pointer-events','none').text(String(s.num));
+    const svgEl=document.getElementById('tokaido-svg');
+    const gEl=svgEl.querySelector('g');
+    if(gEl){
+      // フォーカスノードを最前面に移動（他ドットに隠れない）
+      const sg=d3.select(gEl).select('.tk-station[data-num="'+s.num+'"][data-special="0"]');
+      if(!sg.empty()){
+        sg.raise(); // SVG内で最後に描画 = 最前面
+        sg.select('.tk-dot').attr('r',11).attr('fill','#c08040').attr('stroke','#ffd080').attr('stroke-width',2);
+        sg.append('text').attr('class','tk-focus-label')
+          .attr('text-anchor','middle').attr('dy','0.38em')
+          .attr('font-size','10').attr('font-weight','bold').attr('fill','#fff')
+          .attr('pointer-events','none').text(String(s.num));
+      }
     }
   }
 
@@ -1328,7 +1410,7 @@ function drawPopulation(){
   const ctx=canvas.getContext('2d');
   ctx.scale(dpr,dpr);
 
-  const pad={t:15,r:10,b:30,l:48};
+  const pad={t:15,r:52,b:30,l:48};
   const iw=w-pad.l-pad.r, ih=h-pad.t-pad.b;
   const maxP=Math.max(...POP_DATA.map(d=>d.p));
   const minY=POP_DATA[0].y, maxY=POP_DATA[POP_DATA.length-1].y;
@@ -1351,7 +1433,7 @@ function drawPopulation(){
     const y=yScale(p);
     ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
     ctx.fillStyle='#888';ctx.font='9px -apple-system,sans-serif';
-    ctx.textAlign='right';ctx.fillText((p/1).toLocaleString(),pad.l-4,y+3);
+    ctx.textAlign='left';ctx.fillText((p/1).toLocaleString()+'万',w-pad.r+4,y+3);
   });
 
   // year labels
