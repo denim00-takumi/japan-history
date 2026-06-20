@@ -614,7 +614,6 @@ function jumpToEra(eraId){
     tip.style.top=(indRect.top+2)+'px';
     tip.classList.add('show');
     // 赤線を指の位置に即追随（transition一時オフ）
-    const indRect=document.getElementById('era-indicator').getBoundingClientRect();
     const pct=Math.max(0,Math.min(1,(clientX-indRect.left)/indRect.width))*100;
     if(redline){redline.style.transition='none';redline.style.left=pct+'%';}
   }
