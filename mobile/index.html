@@ -8,6 +8,9 @@
 <meta name="theme-color" content="#0a0a0f">
 <title>日本歴史年表</title>
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="nenpyo_icon.png">
+<link rel="icon" type="image/png" href="nenpyo_icon.png">
+<meta name="apple-mobile-web-app-title" content="歴史年表">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#0a0a0f;color:#e0e0e8;font-family:-apple-system,'Hiragino Sans',sans-serif}
@@ -1028,6 +1031,15 @@ function renderMap(){
 // rgCentroidsをモジュールレベルで保持
 let rgCentroids_={};
 
+// 旧国名コードの精密緯度経度（prefecture centroidでは精度不足な場合）
+const KUNI_LNGLAT={
+  sado:[138.45,38.05],   // 佐渡島
+  tsushima:[129.31,34.4], // 対馬
+  iki:[129.72,33.74],     // 壱岐
+  oki:[133.22,36.25],     // 隠岐
+  awaji:[134.85,34.38],   // 淡路
+};
+
 function drawPersonLocsOnMap(rgC){
   if(rgC) rgCentroids_=rgC;
   if(!mapRendered||!mapG) return;
@@ -1042,7 +1054,11 @@ function drawPersonLocsOnMap(rgC){
   const resolved=[];
   personMapLocs.forEach(loc=>{
     let c=null;
-    if(PROVPREF[loc.r]){
+    // 精密緯度経度がある旧国名は最優先（離島など）
+    if(KUNI_LNGLAT[loc.r] && projection){
+      const pt=projection(KUNI_LNGLAT[loc.r]);
+      if(pt) c=pt;
+    } else if(PROVPREF[loc.r]){
       const pref=PROVPREF[loc.r][0];
       c=prefCentroids[pref];
     } else {

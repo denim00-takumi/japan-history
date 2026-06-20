@@ -1,8 +1,9 @@
 // バージョンを上げるたびに古いキャッシュが自動削除される
-const CACHE = 'jhm-v7';
+const CACHE = 'jhm-v8';
 const ASSETS = [
   '/japan-history/mobile/',
   '/japan-history/mobile/index.html',
+  '/japan-history/mobile/nenpyo_icon.png',
   '/japan-history/japan_history_data.json',
   '/japan-history/japan.topojson'
 ];

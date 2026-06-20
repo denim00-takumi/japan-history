@@ -6,5 +6,6 @@
 *.svg
 *.json
 !mobile/manifest.json
+!mobile/nenpyo_icon.png
 .DS_Store
 .claude/
