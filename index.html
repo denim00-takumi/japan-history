@@ -560,7 +560,7 @@ var MAP_R=14, MAP_FS=11; // アイコン基本サイズ（80%化済: 18*0.8≈14
 var _birthYear=null;
 // データバージョン（japan_history_data.json の version で上書きされる）
 // JSON 側が localStorage より新しい場合に JSON を優先するための基準値。
-var DATA_VERSION_FALLBACK=14;  // JSON 取得失敗時に用いる既定バージョン
+var DATA_VERSION_FALLBACK=15;  // JSON 取得失敗時に用いる既定バージョン
 var REMOTE_VERSION=DATA_VERSION_FALLBACK; // 実際に採用したデータのバージョン
 var DATA_URL='japan_history_data.json';   // 同一リポジトリ内のデータファイル
 var _jsonLoaded=false; // JSON取得に成功したか（localStorage破棄判定のガード）
@@ -751,13 +751,13 @@ var PERSONS=[
 
 // ★ 最小デフォルトseed。本番の全データは japan_history_data.json が正。
 var EMPERORS=[
-  {id:'ojin',    n:'応神天皇', l:'270〜310年頃', s:270,  e:310,  role:'第15代天皇',
+  {id:'ojin',    n:'応神天皇', fg:'おうじんてんのう', l:'270〜310年頃', s:270,  e:310,  role:'第15代天皇',
    desc:'百済から王仁博士を招き漢字・儒学を導入。秦氏ら渡来人を組織化し技術・文化を発展させた。',
    locs:[{r:'kinki',tp:'active',c:'#f0c050',lb:'河内国（大阪）が本拠'}]},
-  {id:'kammu',   n:'桓武天皇', l:'781〜806年',   s:781,  e:806,  role:'第50代天皇',
+  {id:'kammu',   n:'桓武天皇', fg:'かんむてんのう', l:'781〜806年',   s:781,  e:806,  role:'第50代天皇',
    desc:'784年長岡京、794年平安京へ遷都。坂上田村麻呂を征夷大将軍に任じ東北を制圧した。',
    locs:[{r:'kinki',tp:'active',c:'#f0c050',lb:'平安京（山城国・京都）'}]},
-  {id:'meiji_e', n:'明治天皇', l:'1867〜1912年', s:1868, e:1912, role:'第122代天皇',
+  {id:'meiji_e', n:'明治天皇', fg:'めいじてんのう', l:'1867〜1912年', s:1868, e:1912, role:'第122代天皇',
    desc:'江戸から東京へ遷都。文明開化・富国強兵・殖産興業を推進。大日本帝国憲法発布（1889）。',
    locs:[{r:'kinki',tp:'birth',c:'#50cc50',lb:'京都御所'},{r:'kanto',tp:'active',c:'#6088ff',lb:'明治宮殿（東京）'}]},
   {id:'reiwa_e', n:'今上天皇（徳仁）',l:'1960〜',s:2019, e:2030, role:'第126代天皇',
@@ -767,13 +767,13 @@ var EMPERORS=[
 
 // ★ 最小デフォルトseed。本番の全データは japan_history_data.json が正。
 var RULERS=[
-  {id:'himiko',      n:'卑弥呼',    l:'?〜248年頃',  s:175,  e:248,  role:'邪馬台国女王',
+  {id:'himiko',      n:'卑弥呼',    fg:'ひみこ', l:'?〜248年頃',  s:175,  e:248,  role:'邪馬台国女王',
    desc:'邪馬台国を治めた女王。239年に魏に使節を送り「親魏倭王」の金印を授かった。所在地は畿内説・北九州説が対立。',
    locs:[{r:'kinki',tp:'active',c:'#c090ff',lb:'邪馬台国（畿内説）'},{r:'kyushu',tp:'active',c:'#90b0ff',lb:'邪馬台国（北九州説）'}]},
-  {id:'nobunaga',    n:'織田信長',  l:'1534〜1582年',s:1534, e:1582, role:'天下人',
+  {id:'nobunaga',    n:'織田信長',  fg:'おだのぶなが', l:'1534〜1582年',s:1534, e:1582, role:'天下人',
    desc:'応仁の乱後の戦国時代を統一へ導いた革命的武将。長篠の戦いで鉄砲を活用。本能寺の変で討たれた。',
    locs:[{r:'chubu',tp:'birth',c:'#50cc50',lb:'尾張国（愛知）'},{r:'kinki',tp:'active',c:'#6088ff',lb:'安土城（近江国・滋賀）'}]},
-  {id:'ieyasu',      n:'徳川家康',  l:'1543〜1616年',s:1543, e:1616, role:'江戸幕府初代将軍',
+  {id:'ieyasu',      n:'徳川家康',  fg:'とくがわいえやす', l:'1543〜1616年',s:1543, e:1616, role:'江戸幕府初代将軍',
    desc:'関ヶ原の戦いで西軍を破り天下統一。江戸に幕府を開き265年の泰平の世を実現。',
    locs:[{r:'chubu',tp:'birth',c:'#50cc50',lb:'三河国（愛知）'},{r:'kanto',tp:'active',c:'#6088ff',lb:'江戸城（武蔵国・東京）'}]},
   {id:'saigo',       n:'西郷隆盛', fg:'さいごうたかもり', l:'1828〜1877年',s:1828, e:1877, role:'政治家・軍人・維新三傑',
