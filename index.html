@@ -128,7 +128,30 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 #map-tt{position:absolute;display:none;background:rgba(5,15,30,0.96);color:rgba(255,255,255,0.85);padding:3px 8px;font-size:10px;border-radius:4px;pointer-events:none;border:0.5px solid rgba(64,192,255,0.3);white-space:nowrap;z-index:10}
 #mload{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(255,255,255,0.3);font-size:11px;text-align:center;line-height:1.8}
 /* ── 右ペイン（詳細）── 3列目 */
-#rp{background:#222228;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+#rp{background:#222228;display:flex;flex-direction:column;overflow:hidden;min-height:0;position:relative}
+/* 日本の人口ドロワー（右カラム上に右からスライドイン） */
+#pop-drawer{position:absolute;inset:0;background:#13131a;display:flex;flex-direction:column;transform:translateX(105%);transition:transform 0.28s cubic-bezier(0.32,0.72,0.35,1);z-index:50;overflow:hidden;border-left:0.5px solid #2a2a40}
+#pop-drawer.open{transform:translateX(0)}
+#pop-drawer-hd{padding:11px 14px;border-bottom:0.5px solid #2a2a40;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0c0c14}
+#pop-drawer-hd .pop-title{font-size:13px;font-weight:600;color:#cfd5f0;display:flex;align-items:center;gap:6px}
+#pop-drawer-hd button{background:none;border:none;color:#888;cursor:pointer;font-size:17px;line-height:1;padding:0 4px}
+#pop-drawer-hd button:hover{color:#cfd5f0}
+#pop-drawer-bd{flex:1;overflow-y:auto;padding:14px 14px 18px;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.pop-stat-row{display:flex;gap:10px;margin-bottom:14px}
+.pop-stat{flex:1;background:#0a0a14;border:0.5px solid #1e1e2e;border-radius:8px;padding:10px 12px}
+.pop-stat-label{font-size:10px;color:#7080a0;letter-spacing:0.03em}
+.pop-stat-value{font-size:18px;font-weight:600;color:#e0e8ff;margin-top:3px;font-variant-numeric:tabular-nums}
+.pop-stat-sub{font-size:10px;color:#6a7090;margin-top:2px}
+.pop-era-wrap{padding:12px;background:#080812;border-radius:8px;border:0.5px solid #1a1a2a}
+.pop-era-hd{font-size:11px;color:#8888aa;margin-bottom:8px;letter-spacing:0.03em}
+.pop-era-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.pop-era-tbl td{padding:4px 0;border-bottom:0.5px solid #14141e}
+.pop-era-tbl tr:last-child td{border-bottom:none}
+.pop-era-tbl td.era{color:#b0b8d0}
+.pop-era-tbl td.num{text-align:right;color:#c0c8e0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pop-era-tbl td.unit{color:#888;padding:4px 2px 4px 4px;white-space:nowrap}
+.pop-era-tbl td.note{color:#888;font-size:10.5px;white-space:nowrap}
+.pop-era-tbl tr.peak td.era,.pop-era-tbl tr.peak td.num{color:#e0e6ff;font-weight:500}
 #rp-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent;min-height:0}
 .emp{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:300px;color:#666;text-align:center;padding:20px;gap:8px;font-size:11px}
 .det{padding:14px;position:relative}
@@ -316,6 +339,47 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
       </div>
       <div id="dcon" style="display:none"></div>
     </div>
+    <!-- 日本の人口ドロワー（人口タブと連動して右からスライドイン） -->
+    <div id="pop-drawer">
+      <div id="pop-drawer-hd">
+        <span class="pop-title">📊 日本の人口</span>
+        <button onclick="switchBtmTab('pop')" title="閉じる">✕</button>
+      </div>
+      <div id="pop-drawer-bd">
+        <div class="pop-stat-row">
+          <div class="pop-stat">
+            <div class="pop-stat-label">最大人口</div>
+            <div class="pop-stat-value">12,806万人</div>
+            <div class="pop-stat-sub">2008年（平成20）</div>
+          </div>
+          <div class="pop-stat">
+            <div class="pop-stat-label">現在（令和）</div>
+            <div class="pop-stat-value">12,435万人</div>
+            <div class="pop-stat-sub" style="color:#ff5050">▼ 減少傾向</div>
+          </div>
+        </div>
+        <div class="pop-era-wrap">
+          <div class="pop-era-hd">時代ごとの日本の人口（推定）</div>
+          <table class="pop-era-tbl">
+            <tbody>
+              <tr><td class="era">古墳時代</td><td class="num">150</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">飛鳥時代</td><td class="num">500</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">奈良時代</td><td class="num">600</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">平安時代</td><td class="num">700</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">鎌倉時代</td><td class="num">800</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">室町時代</td><td class="num">1,000</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">安土桃山時代</td><td class="num">1,500</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">江戸時代</td><td class="num">3,000</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">明治時代</td><td class="num">5,000</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">大正時代</td><td class="num">6,000</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr><td class="era">昭和時代</td><td class="num">1億2,300</td><td class="unit">万</td><td class="note"></td></tr>
+              <tr class="peak"><td class="era">平　　成</td><td class="num">1億2,800</td><td class="unit">万</td><td class="note">（ピーク）</td></tr>
+              <tr><td class="era">令　　和</td><td class="num">1億2,300</td><td class="unit">万</td><td class="note"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -486,7 +550,7 @@ var MAP_R=14, MAP_FS=11; // アイコン基本サイズ（80%化済: 18*0.8≈14
 var _birthYear=null;
 // データバージョン（japan_history_data.json の version で上書きされる）
 // JSON 側が localStorage より新しい場合に JSON を優先するための基準値。
-var DATA_VERSION_FALLBACK=4;   // JSON 取得失敗時に用いる既定バージョン
+var DATA_VERSION_FALLBACK=5;   // JSON 取得失敗時に用いる既定バージョン
 var REMOTE_VERSION=DATA_VERSION_FALLBACK; // 実際に採用したデータのバージョン
 var DATA_URL='japan_history_data.json';   // 同一リポジトリ内のデータファイル
 var _jsonLoaded=false; // JSON取得に成功したか（localStorage破棄判定のガード）
@@ -699,10 +763,8 @@ var RULERS=[
    locs:[{r:'chubu',tp:'birth',c:'#50cc50',lb:'尾張国（愛知）'},{r:'kinki',tp:'active',c:'#6088ff',lb:'安土城（近江国・滋賀）'}]},
   {id:'ieyasu',      n:'徳川家康',  l:'1543〜1616年',s:1543, e:1616, role:'江戸幕府初代将軍',
    desc:'関ヶ原の戦いで西軍を破り天下統一。江戸に幕府を開き265年の泰平の世を実現。',
-   locs:[{r:'chubu',tp:'birth',c:'#50cc50',lb:'三河国（愛知）'},{r:'kanto',tp:'active',c:'#6088ff',lb:'江戸城（武蔵国・東京）'}]},
-  {id:'itohirobumi', n:'伊藤博文',  l:'1841〜1909年',s:1841, e:1909, role:'初代内閣総理大臣',
-   desc:'長州藩出身の明治の元勲。大日本帝国憲法を起草（1889）。初代内閣総理大臣（4回就任）。1909年にハルビンで暗殺。',
-   locs:[{r:'chugoku',tp:'birth',c:'#50cc50',lb:'長州（周防国・山口）'},{r:'kanto',tp:'active',c:'#6088ff',lb:'東京で政治活動'}]}
+   locs:[{r:'chubu',tp:'birth',c:'#50cc50',lb:'三河国（愛知）'},{r:'kanto',tp:'active',c:'#6088ff',lb:'江戸城（武蔵国・東京）'}]}
+  // 伊藤博文は PMS（総理大臣）に移管。為政者カテゴリからは削除（2重登録回避）。
 ];
 
 // ★ 総理大臣 最小デフォルトseed。本番の全データ（66名）は japan_history_data.json が正。
@@ -2305,12 +2367,14 @@ function switchBtmTab(name){
   var tkPanel  = document.getElementById('tokaido-panel');
   var popTab   = document.getElementById('btm-pop-tab');
   var tkTab    = document.getElementById('btm-tk-tab');
+  var popDrawer = document.getElementById('pop-drawer');
   if(_btmTab === name){
     // 同じタブ → 折り畳み
     _btmTab = null;
     btm.classList.add('collapsed');
     popTab.classList.remove('active'); tkTab.classList.remove('active');
     clearTokaidoRoute();
+    if(popDrawer) popDrawer.classList.remove('open'); // 人口ドロワーも閉じる
   } else {
     _btmTab = name;
     btm.classList.remove('collapsed');
@@ -2320,11 +2384,13 @@ function switchBtmTab(name){
       popTab.classList.add('active'); tkTab.classList.remove('active');
       clearTokaidoRoute();
       setTimeout(buildPopChart, 250);
+      if(popDrawer) popDrawer.classList.add('open'); // 右カラムにドロワー展開
     } else {
       popPanel.style.display = 'none';
       tkPanel.style.display  = 'flex';
       tkTab.classList.add('active'); popTab.classList.remove('active');
       buildTokaidoPanel();
+      if(popDrawer) popDrawer.classList.remove('open'); // 東海道タブ時はドロワー閉じる
     }
   }
 }
