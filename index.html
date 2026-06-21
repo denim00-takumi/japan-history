@@ -83,7 +83,7 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 #rp{order:3}
 /* ── 下段：人口グラフ ── */
 #btm{height:156px;background:#1a1a22;border-top:0.5px solid #2a2a35;flex-shrink:0;display:flex;overflow:hidden}
-#btm.collapsed{height:28px!important}
+#btm.collapsed{height:32px!important}
 /* ── 左ペイン（人物）── 2列目 */
 #lp{background:#222228;border-right:0.5px solid #333340;border-left:0.5px solid #333340;display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .lph{padding:7px 10px;border-bottom:0.5px solid #333;font-size:10px;color:#888;flex-shrink:0}
@@ -249,8 +249,8 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 #tlw.cats-collapsed #tl-fold-btn .fold-arrow{transform:rotate(0deg)}
 /* ── 人口グラフ＋東海道 折り畳み（ブラウザタブ風） ── */
 #btm{transition:height 0.23s ease;flex-direction:column}
-#btm-tabbar{height:26px;flex-shrink:0;display:flex;align-items:flex-end;padding:0 8px;background:#141418;border-top:0.5px solid #2a2a35;gap:4px}
-.btm-tab{display:inline-flex;align-items:center;gap:5px;padding:0 12px;height:22px;background:#111116;border:0.5px solid #2a2a35;border-bottom:none;border-radius:4px 4px 0 0;font-size:10px;color:#666;cursor:pointer;font-family:inherit;transition:all 0.15s;position:relative;bottom:-1px}
+#btm-tabbar{height:30px;flex-shrink:0;display:flex;align-items:flex-end;padding:0 8px;background:#141418;border-top:0.5px solid #2a2a35;gap:4px}
+.btm-tab{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:#111116;border:0.5px solid #2a2a35;border-bottom:none;border-radius:4px 4px 0 0;font-size:11px;color:#666;cursor:pointer;font-family:inherit;transition:all 0.15s;position:relative;bottom:-1px}
 .btm-tab:hover{background:#1a1a22;color:#bbb;border-color:#3a3a50}
 .btm-tab.active{background:#1a1a22;color:#ccc;border-color:#3a3a55}
 .btm-tab .tab-arrow{font-size:8px;color:#555;transition:transform 0.2s}
@@ -1126,6 +1126,16 @@ function buildTimeline(){
     var yl=document.createElement('div');yl.className='yl';yl.style.left=yx+'px';yl.textContent=yr;
     tlc.appendChild(yl);
   }
+  // 200年刻みで隠れる主要年を補完（非ズーム時のみ）
+  if(!ZM_ERA && step===200){
+    [1900].forEach(function(extraYr){
+      if(extraYr<=s0||extraYr>=s1)return;
+      var ex=(extraYr-BY)*PY;
+      if(ex<12||ex>W-18)return;
+      var yl=document.createElement('div');yl.className='yl';yl.style.left=ex+'px';yl.textContent=extraYr;
+      tlc.appendChild(yl);
+    });
+  }
   ERAS.forEach(function(era){
     if(ZM_ERA&&era.id!==ZM_ERA.id)return;
     var ex=ZM_ERA?0:fy(era.s), ew=ZM_ERA?W:(era.e-era.s)*PY-2;
@@ -1311,13 +1321,15 @@ function selHistFig(id,arr,type){
   p.locs.forEach(function(loc,i){
     var rpn=resolvePrefName(loc.lb);
     if(rpn)hiPref(rpn,false); else hiRg(loc.r,false);
-    addMarker(loc.r,loc.c,loc.tp==='birth'?'生':loc.tp==='active'?'活':'流',i*0.1,loc.lb);
+    var mc=LOCTPCOLOR[loc.tp]||loc.c; // 種別→色を統一（活躍は常に青）
+    addMarker(loc.r,mc,loc.tp==='birth'?'生':loc.tp==='active'?'活':'流',i*0.1,loc.lb);
   });
   centerMapOnMarkers();
   var tag=type==='emperor'?'天皇':(type==='ruler'?'為政者':'総理大臣');
   var locH=p.locs.map(function(l){
     var tpLb=l.tp==='birth'?'出生地':l.tp==='active'?'活躍の地':'流刑地';
-    return'<div class="lr"><div class="ld" style="background:'+l.c+'"></div><div><div class="ltp">'+tpLb+'</div><div class="llb">'+l.lb+'</div></div></div>';
+    var dc=LOCTPCOLOR[l.tp]||l.c; // 詳細画面のドットも統一
+    return'<div class="lr"><div class="ld" style="background:'+dc+'"></div><div><div class="ltp">'+tpLb+'</div><div class="llb">'+l.lb+'</div></div></div>';
   }).join('');
   var eraEl=eraForYear(p.s);
   showDet('<div class="det-acts">'
@@ -1928,12 +1940,14 @@ function selPerson(id){
   p.locs.forEach(function(loc,i){
     var rpn=resolvePrefName(loc.lb);
     if(rpn)hiPref(rpn,false); else hiRg(loc.r,false);
-    addMarker(loc.r,loc.c,loc.tp==='birth'?'生':loc.tp==='active'?'活':'流',i*0.1,loc.lb);
+    var mc=LOCTPCOLOR[loc.tp]||loc.c; // 種別→色を統一（活躍は常に青）
+    addMarker(loc.r,mc,loc.tp==='birth'?'生':loc.tp==='active'?'活':'流',i*0.1,loc.lb);
   });
   centerMapOnMarkers();
   var lh=p.locs.map(function(l){
     var tpLb=l.tp==='birth'?'出生地':l.tp==='active'?'活躍の地':'流刑地';
-    return'<div class="lr"><div class="ld" style="background:'+l.c+'"></div><div><div class="ltp">'+tpLb+'</div><div class="llb">'+l.lb+'</div></div></div>';
+    var dc=LOCTPCOLOR[l.tp]||l.c; // 詳細画面のドットも統一
+    return'<div class="lr"><div class="ld" style="background:'+dc+'"></div><div><div class="ltp">'+tpLb+'</div><div class="llb">'+l.lb+'</div></div></div>';
   }).join('');
   showDet('<div class="det-acts">'
     +'<button class="det-ab" onclick="openDr(\''+p.id+'\')">✎ 編集</button>'
@@ -2394,6 +2408,20 @@ function switchBtmTab(name){
     }
   }
 }
+
+// 人口ドロワー外クリックで自動的に閉じる（上年表・左カラム・中央カラム等）
+// ドロワー内 / 人口タブボタン / 下段の人口グラフパネル のクリックは無視
+document.addEventListener('click', function(e){
+  var drawer = document.getElementById('pop-drawer');
+  if(!drawer || !drawer.classList.contains('open')) return;
+  if(drawer.contains(e.target)) return;
+  var popTab = document.getElementById('btm-pop-tab');
+  if(popTab && popTab.contains(e.target)) return;
+  var popPanel = document.getElementById('pop-panel');
+  if(popPanel && popPanel.contains(e.target)) return;
+  // ドロワー＋人口タブを同時に閉じる
+  switchBtmTab('pop');
+}, true);
 
 function buildTokaidoPanel(){
   var route = document.querySelector('.tk-route');
