@@ -112,7 +112,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .person-acc-hdr.open{background:#141428}
 .person-acc-body{display:none;background:#080810}
 .person-acc-body.open{display:block}
-.person-row{padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
+.person-row{padding:8px 12px 8px 22px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
 .person-row:active{background:#141420}
 .person-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .person-dot.sq{border-radius:2px}
@@ -1194,7 +1194,7 @@ function buildJinbutsu(){
       row.className='person-row';
       const era=ERAS.find(e=>e.id===p.era)||(p.s?eraForYear(p.s):null);
       row.innerHTML=`<div class="person-dot${sec.sq?' sq':''}" style="background:${sec.color}"></div>
-        <div><div class="person-name">　${escHtml(p.n)}</div>
+        <div><div class="person-name">${escHtml(p.n)}</div>
         <div class="person-sub">${escHtml(p.l||'')}${era?' · '+eraName(era):''}</div></div>
         <i class="ti ti-chevron-right" style="font-size:16px;color:#2a2a3a;margin-left:auto"></i>`;
       row.onclick=()=>showPersonDetail(p, sec.color, sec.sq);
