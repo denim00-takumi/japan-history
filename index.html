@@ -56,6 +56,9 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 #srch-input-wrap:focus-within{border-color:#5070a0}
 #srch-input{flex:1;background:none;border:none;outline:none;color:#e0e0e8;font-size:13px;font-family:inherit;min-width:0}
 #srch-input::placeholder{color:#555}
+/* ブラウザ標準の検索クリア(✕)を非表示。自前の #srch-clear のみ表示 */
+#srch-input::-webkit-search-cancel-button,
+#srch-input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
 #srch-clear{background:none;border:none;color:#888;cursor:pointer;font-size:14px;line-height:1;padding:0 3px;display:none}
 #srch-clear:hover{color:#ccc}
 #srch-cls{background:none;border:none;color:#666;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
@@ -550,7 +553,7 @@ var MAP_R=14, MAP_FS=11; // アイコン基本サイズ（80%化済: 18*0.8≈14
 var _birthYear=null;
 // データバージョン（japan_history_data.json の version で上書きされる）
 // JSON 側が localStorage より新しい場合に JSON を優先するための基準値。
-var DATA_VERSION_FALLBACK=6;   // JSON 取得失敗時に用いる既定バージョン
+var DATA_VERSION_FALLBACK=7;   // JSON 取得失敗時に用いる既定バージョン
 var REMOTE_VERSION=DATA_VERSION_FALLBACK; // 実際に採用したデータのバージョン
 var DATA_URL='japan_history_data.json';   // 同一リポジトリ内のデータファイル
 var _jsonLoaded=false; // JSON取得に成功したか（localStorage破棄判定のガード）
@@ -1121,22 +1124,13 @@ function buildTimeline(){
       dm.appendChild(ml);tlc.appendChild(dm);
     }
   }
-  var step=ZM_ERA?10:(span>500?200:span>200?100:span>80?50:20);
+  // 非ズーム時は100年刻みで年号表示（300〜2000を全て）。ズーム時は10年刻み。
+  var step=ZM_ERA?10:(span>200?100:span>80?50:20);
   for(var yr=Math.ceil(s0/step)*step;yr<=s1;yr+=step){
     var yx=ZM_ERA?(yr-ZM_ERA.s)*PY:(yr-BY)*PY;
     if(yx<12||yx>W-18)continue;
     var yl=document.createElement('div');yl.className='yl';yl.style.left=yx+'px';yl.textContent=yr;
     tlc.appendChild(yl);
-  }
-  // 200年刻みで隠れる主要年を補完（非ズーム時のみ）
-  if(!ZM_ERA && step===200){
-    [1900].forEach(function(extraYr){
-      if(extraYr<=s0||extraYr>=s1)return;
-      var ex=(extraYr-BY)*PY;
-      if(ex<12||ex>W-18)return;
-      var yl=document.createElement('div');yl.className='yl';yl.style.left=ex+'px';yl.textContent=extraYr;
-      tlc.appendChild(yl);
-    });
   }
   ERAS.forEach(function(era){
     if(ZM_ERA&&era.id!==ZM_ERA.id)return;
