@@ -289,6 +289,7 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
     <div id="lp-foot">
       <button class="hist-btn" id="em-btn" onclick="toggleHistFloat('emperor')" style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="3.5" r="2.8" fill="#c8a84b"/><path d="M0.5 12.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="#c8a84b" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>天皇</span><span style="font-size:9px;color:#555">▶</span></button>
       <button class="hist-btn" id="rl-btn" onclick="toggleHistFloat('ruler')" style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="3.5" r="2.8" fill="#5a8ab8"/><path d="M0.5 12.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="#5a8ab8" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>為政者</span><span style="font-size:9px;color:#555">▶</span></button>
+      <button class="hist-btn" id="pm-btn" onclick="toggleHistFloat('pm')" style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="3.5" r="2.8" fill="#c08560"/><path d="M0.5 12.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="#c08560" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>総理大臣</span><span style="font-size:9px;color:#555">▶</span></button>
     </div>
   </div>
 
@@ -360,6 +361,14 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
     <button class="hfloat-cls" onclick="closeHistFloat('ruler')">✕</button>
   </div>
   <div class="hfloat-bd" id="rl-fbd"></div>
+</div>
+<!-- 総理大臣フローティングパネル -->
+<div class="hfloat" id="pm-float">
+  <div class="hfloat-hd">
+    <span>🏛 総理大臣</span>
+    <button class="hfloat-cls" onclick="closeHistFloat('pm')">✕</button>
+  </div>
+  <div class="hfloat-bd" id="pm-fbd"></div>
 </div>
 
 <!-- ドロワー -->
@@ -468,7 +477,7 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 // ════════════════════════════════════════════════════
 var BY=250, END=2030, PY=0.405;
 var ZM=null, ZM_ERA=null, ZM_TW=0;
-var st={person:null, emperor:null, ruler:null, prov:null, curEra:null};
+var st={person:null, emperor:null, ruler:null, pm:null, prov:null, curEra:null};
 // 地図ズーム状態
 var _mapScale=1, _mapVX=0, _mapVY=0, _mapW=0, _mapH=0;
 var _mapDrag=false, _mapDragX=0, _mapDragY=0;
@@ -477,7 +486,7 @@ var MAP_R=14, MAP_FS=11; // アイコン基本サイズ（80%化済: 18*0.8≈14
 var _birthYear=null;
 // データバージョン（japan_history_data.json の version で上書きされる）
 // JSON 側が localStorage より新しい場合に JSON を優先するための基準値。
-var DATA_VERSION_FALLBACK=3;   // JSON 取得失敗時に用いる既定バージョン
+var DATA_VERSION_FALLBACK=4;   // JSON 取得失敗時に用いる既定バージョン
 var REMOTE_VERSION=DATA_VERSION_FALLBACK; // 実際に採用したデータのバージョン
 var DATA_URL='japan_history_data.json';   // 同一リポジトリ内のデータファイル
 var _jsonLoaded=false; // JSON取得に成功したか（localStorage破棄判定のガード）
@@ -515,6 +524,7 @@ function loadJsonData(){
       if(d.persons)  PERSONS=d.persons;
       if(d.emperors) EMPERORS=d.emperors;
       if(d.rulers)   RULERS=d.rulers;
+      if(d.pms)      PMS=d.pms;
       if(d.cats)     mergeCats(d.cats);
       REMOTE_VERSION = (typeof d.version==='number') ? d.version : DATA_VERSION_FALLBACK;
       _jsonLoaded = true; // 取得成功
@@ -532,7 +542,8 @@ function saveData(){
       persons:PERSONS,
       cats:CATS,
       emperors:EMPERORS,
-      rulers:RULERS
+      rulers:RULERS,
+      pms:PMS
     }));
   }catch(e){}
 }
@@ -553,6 +564,7 @@ function loadData(){
     if(saved.persons)PERSONS=saved.persons;
     if(saved.emperors)EMPERORS=saved.emperors;
     if(saved.rulers)RULERS=saved.rulers;
+    if(saved.pms)PMS=saved.pms;
     mergeCats(saved.cats);
   }catch(e){}
 }
@@ -691,6 +703,16 @@ var RULERS=[
   {id:'itohirobumi', n:'伊藤博文',  l:'1841〜1909年',s:1841, e:1909, role:'初代内閣総理大臣',
    desc:'長州藩出身の明治の元勲。大日本帝国憲法を起草（1889）。初代内閣総理大臣（4回就任）。1909年にハルビンで暗殺。',
    locs:[{r:'chugoku',tp:'birth',c:'#50cc50',lb:'長州（周防国・山口）'},{r:'kanto',tp:'active',c:'#6088ff',lb:'東京で政治活動'}]}
+];
+
+// ★ 総理大臣 最小デフォルトseed。本番の全データ（66名）は japan_history_data.json が正。
+var PMS=[
+  {id:'pm01', n:'伊藤博文',  fg:'いとう ひろぶみ',  l:'1841〜1909年', s:1841, e:1909, role:'第1代内閣総理大臣',
+   desc:'初代内閣総理大臣。長州藩出身で明治維新に参加し、大日本帝国憲法の起草を主導した。',
+   locs:[{r:'chugoku',tp:'birth',c:'#50cc50',lb:'山口県（出生）'},{r:'kanto',tp:'active',c:'#6088ff',lb:'東京都（主に住んだ地・地盤）'}]},
+  {id:'pm66', n:'高市早苗',  fg:'たかいち さなえ',  l:'1961〜',       s:1961, e:2026, role:'第66代内閣総理大臣',
+   desc:'奈良出身。憲政史上初の女性首相で、2025年10月に就任した。',
+   locs:[{r:'kinki',  tp:'birth',c:'#50cc50',lb:'奈良県（出生・地盤）'}]}
 ];
 
 // 天皇・為政者ふりがな辞書（fg フィールドが未定義の場合に参照）
@@ -1141,31 +1163,36 @@ function appendPersonCard(container,p,dimmed){
 // ════════════════════════════════════════════════════
 // 天皇・為政者 フローティングメニュー
 // ════════════════════════════════════════════════════
+// 天皇 / 為政者 / 総理大臣 フローティングパネルの id マップ
+var HFLOATS={
+  emperor:{f:'em-float',b:'em-btn',body:'em-fbd',arr:'EMPERORS'},
+  ruler:  {f:'rl-float',b:'rl-btn',body:'rl-fbd',arr:'RULERS'},
+  pm:     {f:'pm-float',b:'pm-btn',body:'pm-fbd',arr:'PMS'}
+};
 function buildHistFloats(){
   buildHistList('em-fbd',EMPERORS,'emperor');
   buildHistList('rl-fbd',RULERS,'ruler');
+  buildHistList('pm-fbd',PMS,'pm');
 }
 
 function toggleHistFloat(type){
-  var floatId=type==='emperor'?'em-float':'rl-float';
-  var btnId=type==='emperor'?'em-btn':'rl-btn';
-  var otherFloatId=type==='emperor'?'rl-float':'em-float';
-  var otherBtnId=type==='emperor'?'rl-btn':'em-btn';
-  var fl=document.getElementById(floatId);
-  var btn=document.getElementById(btnId);
+  var cur=HFLOATS[type];if(!cur)return;
+  var fl=document.getElementById(cur.f);
+  var btn=document.getElementById(cur.b);
   var isOpen=fl.classList.contains('open');
-  // close other
-  document.getElementById(otherFloatId).classList.remove('open');
-  document.getElementById(otherBtnId).classList.remove('act');
+  // 他のパネルを閉じる
+  Object.keys(HFLOATS).forEach(function(k){
+    if(k===type)return;
+    document.getElementById(HFLOATS[k].f).classList.remove('open');
+    document.getElementById(HFLOATS[k].b).classList.remove('act');
+  });
   if(isOpen){
     fl.classList.remove('open');btn.classList.remove('act');
   } else {
     fl.classList.add('open');btn.classList.add('act');
-    // position: right of left pane, near button
     var btnRect=btn.getBoundingClientRect();
     fl.style.left=(btnRect.right+6)+'px';
     fl.style.top=Math.max(60,btnRect.top-20)+'px';
-    // ensure it fits on screen
     var fh=Math.min(window.innerHeight*0.58,600);
     fl.style.maxHeight=fh+'px';
     if(parseFloat(fl.style.top)+fh>window.innerHeight-20){
@@ -1175,19 +1202,17 @@ function toggleHistFloat(type){
 }
 
 function closeHistFloat(type){
-  var floatId=type==='emperor'?'em-float':'rl-float';
-  var btnId=type==='emperor'?'em-btn':'rl-btn';
-  document.getElementById(floatId).classList.remove('open');
-  document.getElementById(btnId).classList.remove('act');
+  var cur=HFLOATS[type];if(!cur)return;
+  document.getElementById(cur.f).classList.remove('open');
+  document.getElementById(cur.b).classList.remove('act');
 }
 
-// 外クリックで閉じる
+// 外クリックで閉じる（3パネル対応）
 document.addEventListener('click',function(e){
-  ['emperor','ruler'].forEach(function(type){
-    var floatId=type==='emperor'?'em-float':'rl-float';
-    var btnId=type==='emperor'?'em-btn':'rl-btn';
-    var fl=document.getElementById(floatId);
-    var btn=document.getElementById(btnId);
+  Object.keys(HFLOATS).forEach(function(type){
+    var cur=HFLOATS[type];
+    var fl=document.getElementById(cur.f);
+    var btn=document.getElementById(cur.b);
     if(fl&&fl.classList.contains('open')){
       if(!fl.contains(e.target)&&e.target!==btn&&!btn.contains(e.target)){
         fl.classList.remove('open');btn.classList.remove('act');
@@ -1213,7 +1238,9 @@ function selHistFig(id,arr,type){
   st.person=null;st.prov=null;
   document.querySelectorAll('.pc').forEach(function(c){c.classList.remove('sel');});
   document.getElementById('psel').value='';
-  if(type==='emperor'){st.emperor=id;st.ruler=null;}else{st.ruler=id;st.emperor=null;}
+  if(type==='emperor'){st.emperor=id;st.ruler=null;st.pm=null;}
+  else if(type==='ruler'){st.ruler=id;st.emperor=null;st.pm=null;}
+  else if(type==='pm'){st.pm=id;st.emperor=null;st.ruler=null;}
   document.querySelectorAll('.hc').forEach(function(c){c.classList.toggle('sel',c.dataset.id===id&&c.dataset.type===type);});
   clearMap();
   var p=arr.find(function(x){return x.id===id;});if(!p)return;
@@ -1225,7 +1252,7 @@ function selHistFig(id,arr,type){
     addMarker(loc.r,loc.c,loc.tp==='birth'?'生':loc.tp==='active'?'活':'流',i*0.1,loc.lb);
   });
   centerMapOnMarkers();
-  var tag=type==='emperor'?'天皇':'為政者';
+  var tag=type==='emperor'?'天皇':(type==='ruler'?'為政者':'総理大臣');
   var locH=p.locs.map(function(l){
     var tpLb=l.tp==='birth'?'出生地':l.tp==='active'?'活躍の地':'流刑地';
     return'<div class="lr"><div class="ld" style="background:'+l.c+'"></div><div><div class="ltp">'+tpLb+'</div><div class="llb">'+l.lb+'</div></div></div>';
@@ -1468,9 +1495,9 @@ function saveDr(){
   var existId=document.getElementById('dr-id').value;
   var drType=document.getElementById('dr-type').value; // 'emperor'|'ruler'|''
   var savedId;
-  if(drType==='emperor'||drType==='ruler'){
-    // RULERS / EMPERORS を更新（追加はしない）
-    var harr=drType==='emperor'?EMPERORS:RULERS;
+  if(drType==='emperor'||drType==='ruler'||drType==='pm'){
+    // EMPERORS / RULERS / PMS を更新（追加はしない）
+    var harr=drType==='emperor'?EMPERORS:(drType==='ruler'?RULERS:PMS);
     var hp=harr.find(function(x){return x.id===existId;});
     if(hp){
       hp.n=n;hp.fg=fg;hp.l=l;hp.role=r;hp.desc=d;hp.locs=locsSnap;
@@ -1520,9 +1547,10 @@ function deletePDirect(id){
 }
 function openHistDr(id,type){
   initDrEraSelect();
-  var arr=type==='emperor'?EMPERORS:RULERS;
+  var arr=type==='emperor'?EMPERORS:(type==='ruler'?RULERS:PMS);
   var p=arr.find(function(x){return x.id===id;});if(!p)return;
-  document.getElementById('dr-title').textContent=(type==='emperor'?'天皇':'為政者')+'を編集';
+  var tagLb=type==='emperor'?'天皇':(type==='ruler'?'為政者':'総理大臣');
+  document.getElementById('dr-title').textContent=tagLb+'を編集';
   document.getElementById('dr-del-btn').style.display='none'; // プリセットは削除不可
   document.getElementById('dr-id').value=id;
   document.getElementById('dr-type').value=type;
@@ -1579,6 +1607,7 @@ function reapplyMapSelection(){
   if(st.person)      selPerson(st.person);
   else if(st.emperor)selHistFig(st.emperor, EMPERORS, 'emperor');
   else if(st.ruler)  selHistFig(st.ruler,   RULERS,   'ruler');
+  else if(st.pm)     selHistFig(st.pm,      PMS,      'pm');
   else if(st.prov)   selProv(st.prov);
 }
 function buildMap(){
@@ -1998,7 +2027,7 @@ function buildPopChart(){
 function exportData(){
   // version をインクリメントして書き出す。リポジトリにこのJSONを差し替えてコミットすると、
   // 既存ユーザーの古い localStorage より新しくなり、更新が確実に反映される（JSON優先）。
-  var data={version:REMOTE_VERSION+1,persons:PERSONS,cats:CATS,emperors:EMPERORS,rulers:RULERS};
+  var data={version:REMOTE_VERSION+1,persons:PERSONS,cats:CATS,emperors:EMPERORS,rulers:RULERS,pms:PMS};
   var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');a.href=url;a.download='japan_history_data.json';a.click();
@@ -2013,6 +2042,7 @@ function importData(input){
       if(d.persons)PERSONS=d.persons;
       if(d.emperors)EMPERORS=d.emperors;
       if(d.rulers)RULERS=d.rulers;
+      if(d.pms)PMS=d.pms;
       mergeCats(d.cats);
       if(typeof d.version==='number') REMOTE_VERSION=d.version; // バージョンを引き継ぐ
       saveData();buildTimeline();renderPersonList();buildHistFloats();
@@ -2077,13 +2107,14 @@ function doSrch(){
   var pHits=PERSONS.filter(matchPerson).map(function(p){return{p:p,type:'person'};});
   var eHits=EMPERORS.filter(matchPerson).map(function(p){return{p:p,type:'emperor'};});
   var rHits=RULERS.filter(matchPerson).map(function(p){return{p:p,type:'ruler'};});
-  var ppl=pHits.concat(eHits).concat(rHits);
+  var mHits=PMS.filter(matchPerson).map(function(p){return{p:p,type:'pm'};});
+  var ppl=pHits.concat(eHits).concat(rHits).concat(mHits);
   if(ppl.length){
     html+='<div class="srch-hdr">人物 ('+ppl.length+'件)</div>';
     ppl.slice(0,12).forEach(function(o){
       var p=o.p, t=o.type;
-      var tagLb=t==='emperor'?'天皇':(t==='ruler'?'為政者':'人物');
-      var bg=t==='emperor'?'#3a2848':(t==='ruler'?'#283848':'#283248');
+      var tagLb=t==='emperor'?'天皇':(t==='ruler'?'為政者':(t==='pm'?'総理大臣':'人物'));
+      var bg=t==='emperor'?'#3a2848':(t==='ruler'?'#283848':(t==='pm'?'#3a2818':'#283248'));
       var fg=p.fg||HIST_FG[p.n]||'';
       html+='<div class="srch-row" data-type="'+t+'" data-id="'+srchEsc(p.id)+'">'
         +'<div class="srch-ico">人</div>'
@@ -2157,6 +2188,7 @@ function doSrch(){
       if(t==='person'){selPerson(row.dataset.id);}
       else if(t==='emperor'){selHistFig(row.dataset.id,EMPERORS,'emperor');}
       else if(t==='ruler'){selHistFig(row.dataset.id,RULERS,'ruler');}
+      else if(t==='pm'){selHistFig(row.dataset.id,PMS,'pm');}
       else if(t==='event'){
         var cat=CATS.find(function(c){return c.id===row.dataset.cat;});
         var it=cat&&cat.items.find(function(i){return i.id===row.dataset.id;});
