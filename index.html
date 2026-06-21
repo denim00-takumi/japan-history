@@ -34,11 +34,47 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 .ci:hover,.ci.sel{background:#1a1a22;border-color:#444}
 .ci-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .cil{font-size:11px;color:#bbb;pointer-events:none}
-#tlftr{padding:4px 8px;border-top:0.5px solid #2a2a35;display:flex;gap:6px;align-items:center;flex-shrink:0}
+#tlftr{padding:4px 8px;border-top:0.5px solid #2a2a35;display:flex;gap:7px;align-items:center;flex-shrink:0}
 .addb{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border:0.5px dashed #444;border-radius:4px;font-size:10px;color:#888;cursor:pointer;background:none;font-family:inherit}
 .addb:hover{border-color:#777;color:#bbb}
 #zbtn{display:none;align-items:center;gap:4px;padding:3px 10px;border:0.5px solid #444;border-radius:4px;font-size:10px;color:#aaa;cursor:pointer;background:none;font-family:inherit;margin-left:auto}
 #zbtn:hover{background:#1a1a22}
+/* #tlftr 内のボタンを約110%拡大（font-size 10→11px, padding 3/10→4/12px） */
+#tlftr .addb,#tlftr #zbtn,#tlftr #tl-fold-btn{font-size:11px;padding:4px 12px}
+/* 検索（虫眼鏡ボタン） */
+.srchb{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border:0.5px solid #5070a0;border-radius:4px;font-size:11px;color:#9bb3d8;cursor:pointer;background:rgba(48,72,128,0.18);font-family:inherit}
+.srchb:hover{background:rgba(70,100,170,0.32);color:#cfdfff;border-color:#7090c8}
+/* 検索モーダル */
+#srch-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200}
+#srch-bg.open{display:block}
+#srch-modal{display:none;position:fixed;top:9vh;left:50%;transform:translateX(-50%);width:580px;max-width:92vw;max-height:78vh;background:#1e1e28;border:0.5px solid #3a3a50;border-radius:8px;z-index:201;flex-direction:column;box-shadow:0 14px 44px rgba(0,0,0,0.65)}
+#srch-modal.open{display:flex}
+@keyframes srchIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}}
+#srch-modal.open{animation:srchIn 0.16s ease-out}
+#srch-hd{padding:10px 12px;border-bottom:0.5px solid #333;display:flex;align-items:center;gap:8px;flex-shrink:0}
+#srch-input-wrap{flex:1;display:flex;align-items:center;gap:8px;background:#16161e;border:0.5px solid #333;border-radius:6px;padding:6px 10px;transition:border-color 0.15s}
+#srch-input-wrap:focus-within{border-color:#5070a0}
+#srch-input{flex:1;background:none;border:none;outline:none;color:#e0e0e8;font-size:13px;font-family:inherit;min-width:0}
+#srch-input::placeholder{color:#555}
+#srch-clear{background:none;border:none;color:#888;cursor:pointer;font-size:14px;line-height:1;padding:0 3px;display:none}
+#srch-clear:hover{color:#ccc}
+#srch-cls{background:none;border:none;color:#666;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+#srch-cls:hover{color:#aaa}
+#srch-body{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent;min-height:80px}
+#srch-body::-webkit-scrollbar{width:6px}#srch-body::-webkit-scrollbar-thumb{background:#333}
+.srch-hint{padding:22px 16px;color:#666;font-size:11px;line-height:1.8;text-align:center}
+.srch-hint b{color:#9bb3d8;font-weight:500}
+.srch-hdr{padding:7px 14px 5px;font-size:10px;color:#aaa;letter-spacing:0.04em;background:#16161e;border-top:0.5px solid #2a2a35;border-bottom:0.5px solid #2a2a35;position:sticky;top:0;z-index:1}
+.srch-row{padding:8px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:0.5px solid #25252e;transition:background 0.12s}
+.srch-row:hover{background:#28282f}
+.srch-ico{width:26px;height:26px;border-radius:50%;background:#2a2a40;color:#7090c0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.srch-main{flex:1;min-width:0}
+.srch-mn{font-size:13px;color:#e0e0e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srch-mn .hl{background:#5070b0;color:#fff;padding:0 2px;border-radius:2px}
+.srch-mn .srch-fg{color:#888;font-size:10px;margin-left:4px}
+.srch-ms{font-size:10px;color:#888;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srch-bdg{font-size:9px;padding:2px 7px;border-radius:3px;flex-shrink:0;letter-spacing:0.04em}
+.srch-none{padding:24px 14px;color:#666;font-size:12px;text-align:center}
 /* ── メインレイアウト ── */
 #main{flex:1;display:grid;grid-template-columns:2fr 1fr 2fr;overflow:hidden;min-height:0}
 /* ペイン表示順: 地図 | 人物 | 詳細 */
@@ -239,6 +275,7 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
     <button class="addb" onclick="addCat()">＋ カテゴリを追加</button>
     <button class="addb" onclick="exportData()" title="登録データをJSONファイルに保存">💾 データ書出</button>
     <label class="addb" title="JSONファイルからデータを復元" style="cursor:pointer">📂 データ読込<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+    <button class="srchb" onclick="openSrch()" title="人物・イベント・宿場を横断検索（Ctrl/⌘+F）">🔍 検　索</button>
     <button id="zbtn" onclick="resetZoom()">↩ <span id="zbtntxt"></span> ズーム解除</button>
   </div>
 </div>
@@ -363,6 +400,27 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
     <button class="dr-btn del" id="dr-del-btn" onclick="deletePFromDr()">削除</button>
     <button class="dr-btn cancel" onclick="closeDr()">キャンセル</button>
     <button class="dr-btn save" onclick="saveDr()">保存</button>
+  </div>
+</div>
+
+<!-- 横断検索モーダル -->
+<div id="srch-bg" onclick="closeSrch()"></div>
+<div id="srch-modal">
+  <div id="srch-hd">
+    <div id="srch-input-wrap">
+      <span style="color:#7090c0;font-size:14px">🔍</span>
+      <input id="srch-input" type="search" placeholder="人物・イベント・旧国名・宿場を検索…（ふりがな先頭一致も可）" autocomplete="off" autocorrect="off" spellcheck="false" oninput="onSrchInput()">
+      <button id="srch-clear" onclick="clearSrch()" title="クリア">✕</button>
+    </div>
+    <button id="srch-cls" onclick="closeSrch()" title="閉じる (Esc)">✕</button>
+  </div>
+  <div id="srch-body">
+    <div class="srch-hint" id="srch-hint">
+      <b>横断検索</b><br>
+      人物・天皇・為政者・宗教/芸能/出来事のイベント・旧国名・東海道五十三次の宿場を一括検索できます。<br>
+      <span style="color:#555">漢字 / ひらがな（ふりがな先頭一致） / 役職・説明文 にマッチ</span>
+    </div>
+    <div id="srch-results"></div>
   </div>
 </div>
 
@@ -1964,6 +2022,168 @@ function importData(input){
   };
   reader.readAsText(input.files[0]);
 }
+
+// ════════════════════════════════════════════════════
+// 横断インクリメンタル検索
+// ════════════════════════════════════════════════════
+function srchEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function srchHl(text,q){
+  if(!q)return srchEsc(text);
+  var idx=String(text).indexOf(q);
+  if(idx<0)return srchEsc(text);
+  return srchEsc(text.slice(0,idx))+'<span class="hl">'+srchEsc(q)+'</span>'+srchEsc(text.slice(idx+q.length));
+}
+function openSrch(){
+  document.getElementById('srch-bg').classList.add('open');
+  document.getElementById('srch-modal').classList.add('open');
+  setTimeout(function(){var i=document.getElementById('srch-input');i.focus();i.select();},30);
+}
+function closeSrch(){
+  document.getElementById('srch-bg').classList.remove('open');
+  document.getElementById('srch-modal').classList.remove('open');
+}
+function clearSrch(){
+  var inp=document.getElementById('srch-input');
+  inp.value='';
+  document.getElementById('srch-clear').style.display='none';
+  document.getElementById('srch-results').innerHTML='';
+  document.getElementById('srch-hint').style.display='block';
+  inp.focus();
+}
+var _srchTimer=null;
+function onSrchInput(){
+  clearTimeout(_srchTimer);
+  _srchTimer=setTimeout(doSrch,180);
+  var q=document.getElementById('srch-input').value;
+  document.getElementById('srch-clear').style.display=q?'inline-block':'none';
+}
+function doSrch(){
+  var q=document.getElementById('srch-input').value.trim();
+  var results=document.getElementById('srch-results');
+  var hint=document.getElementById('srch-hint');
+  if(!q){results.innerHTML='';hint.style.display='block';return;}
+  hint.style.display='none';
+  var ql=q.toLowerCase();
+  var html='';
+  // 人物 / 天皇 / 為政者
+  function matchPerson(p){
+    if(p.n&&p.n.indexOf(q)>=0)return true;
+    var fg=p.fg||HIST_FG[p.n]||'';
+    if(fg&&fg.toLowerCase().indexOf(ql)===0)return true;
+    if(p.role&&p.role.indexOf(q)>=0)return true;
+    if(p.desc&&q.length>=2&&p.desc.indexOf(q)>=0)return true;
+    return false;
+  }
+  var pHits=PERSONS.filter(matchPerson).map(function(p){return{p:p,type:'person'};});
+  var eHits=EMPERORS.filter(matchPerson).map(function(p){return{p:p,type:'emperor'};});
+  var rHits=RULERS.filter(matchPerson).map(function(p){return{p:p,type:'ruler'};});
+  var ppl=pHits.concat(eHits).concat(rHits);
+  if(ppl.length){
+    html+='<div class="srch-hdr">人物 ('+ppl.length+'件)</div>';
+    ppl.slice(0,12).forEach(function(o){
+      var p=o.p, t=o.type;
+      var tagLb=t==='emperor'?'天皇':(t==='ruler'?'為政者':'人物');
+      var bg=t==='emperor'?'#3a2848':(t==='ruler'?'#283848':'#283248');
+      var fg=p.fg||HIST_FG[p.n]||'';
+      html+='<div class="srch-row" data-type="'+t+'" data-id="'+srchEsc(p.id)+'">'
+        +'<div class="srch-ico">人</div>'
+        +'<div class="srch-main"><div class="srch-mn">'+srchHl(p.n,q)
+        +(fg?'<span class="srch-fg">('+srchEsc(fg)+')</span>':'')+'</div>'
+        +'<div class="srch-ms">'+srchEsc(p.l||'')+(p.role?' ｜ '+srchEsc(p.role):'')+'</div></div>'
+        +'<span class="srch-bdg" style="background:'+bg+';color:#cfd5ee">'+tagLb+'</span></div>';
+    });
+  }
+  // カテゴリ項目（宗教・芸能・出来事）
+  var evs=[];
+  CATS.forEach(function(cat){
+    cat.items.forEach(function(it){
+      var nameMatch=q.length===1?it.n.indexOf(q)===0:it.n.indexOf(q)>=0;
+      var fgMatch=it.fg&&it.fg.toLowerCase().indexOf(ql)===0;
+      var descMatch=q.length>=2&&it.desc&&it.desc.indexOf(q)>=0;
+      if(nameMatch||fgMatch||descMatch)evs.push({item:it,cat:cat});
+    });
+  });
+  if(evs.length){
+    html+='<div class="srch-hdr">イベント・項目 ('+evs.length+'件)</div>';
+    evs.slice(0,12).forEach(function(o){
+      html+='<div class="srch-row" data-type="event" data-cat="'+srchEsc(o.cat.id)+'" data-id="'+srchEsc(o.item.id)+'">'
+        +'<div class="srch-ico" style="background:#2a2a18;color:#a89048">事</div>'
+        +'<div class="srch-main"><div class="srch-mn">'+srchHl(o.item.n,q)
+        +(o.item.fg?'<span class="srch-fg">('+srchEsc(o.item.fg)+')</span>':'')+'</div>'
+        +'<div class="srch-ms">'+o.item.s+'年'+(o.item.e&&o.item.e<2030?'〜'+o.item.e+'年':'〜現在')+' ｜ '+srchEsc(o.cat.lb)+'</div></div>'
+        +'<span class="srch-bdg" style="background:#322a18;color:#d8c890">'+srchEsc(o.cat.lb)+'</span></div>';
+    });
+  }
+  // 旧国名
+  var prvs=PROVS.filter(function(p){
+    return (p.lb&&p.lb.indexOf(q)>=0)||(p.fg&&p.fg.toLowerCase().indexOf(ql)>=0);
+  });
+  if(prvs.length){
+    html+='<div class="srch-hdr">旧国名 ('+prvs.length+'件)</div>';
+    prvs.slice(0,10).forEach(function(p){
+      html+='<div class="srch-row" data-type="prov" data-id="'+srchEsc(p.v)+'">'
+        +'<div class="srch-ico" style="background:#1e2830;color:#7090b0">国</div>'
+        +'<div class="srch-main"><div class="srch-mn">'+srchHl(p.lb,q)+'<span class="srch-fg">('+srchEsc(p.fg)+')</span></div>'
+        +'<div class="srch-ms">'+srchEsc(p.rd||'')+'</div></div>'
+        +'<span class="srch-bdg" style="background:#1e2840;color:#7090c0">旧国名</span></div>';
+    });
+  }
+  // 東海道宿場
+  var sts=TOKAIDO.filter(function(s){return (s.n&&s.n.indexOf(q)>=0)||(s.pref&&s.pref.indexOf(q)>=0);});
+  if(sts.length){
+    html+='<div class="srch-hdr">東海道宿場 ('+sts.length+'件)</div>';
+    sts.slice(0,10).forEach(function(s){
+      var idx=TOKAIDO.indexOf(s);
+      var lbl=s.num!=null?('第'+s.num+'次'):(s.label||'');
+      html+='<div class="srch-row" data-type="station" data-idx="'+idx+'">'
+        +'<div class="srch-ico" style="background:#2a2018;color:#c08040">宿</div>'
+        +'<div class="srch-main"><div class="srch-mn">'+srchHl(s.n,q)+'</div>'
+        +'<div class="srch-ms">'+srchEsc(s.pref)+(s.km!=null?' ｜ 日本橋より'+s.km+'km':'')+'</div></div>'
+        +'<span class="srch-bdg" style="background:#201810;color:#a07030">'+lbl+'</span></div>';
+    });
+  }
+  if(!html)html='<div class="srch-none">「'+srchEsc(q)+'」に一致する項目はありません</div>';
+  results.innerHTML=html;
+  // クリック動作のバインド
+  results.querySelectorAll('.srch-row').forEach(function(row){
+    row.addEventListener('click',function(){
+      var t=row.dataset.type;
+      closeSrch();
+      if(t==='person'){selPerson(row.dataset.id);}
+      else if(t==='emperor'){selHistFig(row.dataset.id,EMPERORS,'emperor');}
+      else if(t==='ruler'){selHistFig(row.dataset.id,RULERS,'ruler');}
+      else if(t==='event'){
+        var cat=CATS.find(function(c){return c.id===row.dataset.cat;});
+        var it=cat&&cat.items.find(function(i){return i.id===row.dataset.id;});
+        if(cat&&it){
+          // 該当時代へズームして項目を選択（タイムライン視認性向上）
+          var era=eraForYear(it.s);
+          if(era&&!ZM_ERA){clearMap();setEra(era.id);}
+          setTimeout(function(){selCatItem(cat,it);
+            var el=document.getElementById('ci-'+it.id);
+            if(el)el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+          },30);
+        }
+      } else if(t==='prov'){
+        var sel=document.getElementById('psel');if(sel)sel.value=row.dataset.id;
+        selProv(row.dataset.id);
+      } else if(t==='station'){
+        var idx=parseInt(row.dataset.idx);
+        if(_btmTab!=='tokaido'){switchBtmTab('tokaido');}
+        setTimeout(function(){selTokaidoStation(idx);},260);
+      }
+    });
+  });
+}
+// Esc で閉じる / Ctrl+F・⌘+F で開く（既存ブラウザ検索を上書き）
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    if(document.getElementById('srch-modal').classList.contains('open')){closeSrch();}
+  } else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='f'){
+    e.preventDefault();
+    openSrch();
+  }
+});
 
 // ════════════════════════════════════════════════════
 // 東海道五十三次データ
