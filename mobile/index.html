@@ -144,34 +144,35 @@ input,textarea{-webkit-user-select:text;user-select:text}
 #search-results{display:none;padding:0}
 /* ── 能の分類と解説 ── */
 .noh-act-section{margin:0 0 4px}
-.noh-act-hdr{padding:10px 14px 6px;font-size:11px;letter-spacing:.05em;color:#bbb;border-bottom:.5px solid rgba(255,255,255,.08);background:#0c0c16;display:flex;align-items:center;gap:6px}
+.noh-act-hdr{padding:10px 14px 6px;font-size:13px;letter-spacing:.05em;color:#bbb;border-bottom:.5px solid rgba(255,255,255,.08);background:#0c0c16;display:flex;align-items:center;gap:6px}
 .noh-act-hdr .noh-act-color{width:8px;height:18px;border-radius:2px;flex-shrink:0}
-.noh-act-hdr-desc{font-size:10px;color:#888;margin-left:auto}
+.noh-act-hdr-desc{font-size:12px;color:#888;margin-left:auto}
 .noh-card{background:#141420;border-bottom:.5px solid #1e1e30;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .noh-card:active{background:#1e1e30}
 .noh-card-dot{width:6px;height:34px;border-radius:3px;flex-shrink:0}
 .noh-card-main{flex:1;min-width:0}
-.noh-card-n{font-size:16px;font-weight:600;letter-spacing:.02em}
-.noh-card-fg{font-size:11px;color:#888;margin-top:1px}
+.noh-card-name-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.noh-card-n{font-size:18px;font-weight:600;letter-spacing:.02em}
+.noh-card-fg{font-size:13px;color:#888}
 .noh-card-cls{font-size:10px;color:#888;margin-top:2px}
 .noh-card-check{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1.5px solid #2a2a3a;display:flex;align-items:center;justify-content:center;color:#5090ff;font-size:14px;background:#0a0a14}
 .noh-card-check.done{background:#1e3050;border-color:#5090ff;color:#fff}
 /* 詳細画面 */
 .noh-detail-title{font-size:24px;font-weight:700;letter-spacing:.04em;margin-bottom:4px}
-.noh-detail-fg{font-size:13px;color:#888;margin-bottom:10px}
-.noh-detail-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:11px;font-size:11px;margin-bottom:14px}
+.noh-detail-fg{font-size:15px;color:#888;margin-bottom:10px}
+.noh-detail-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:11px;font-size:13px;margin-bottom:14px}
 .noh-detail-field{margin-bottom:12px}
-.noh-detail-field-label{font-size:11px;color:#888;letter-spacing:.04em;margin-bottom:3px}
-.noh-detail-field-value{font-size:14px;color:#ddd;line-height:1.7}
-.noh-detail-notes{font-size:13px;color:#aaa;line-height:1.85;padding:10px 12px;background:#0c0c14;border-radius:8px;border:.5px solid #1e1e30}
+.noh-detail-field-label{font-size:13px;color:#888;letter-spacing:.04em;margin-bottom:3px}
+.noh-detail-field-value{font-size:16px;color:#ddd;line-height:1.7}
+.noh-detail-notes{font-size:15px;color:#aaa;line-height:1.85;padding:10px 12px;background:#0c0c14;border-radius:8px;border:.5px solid #1e1e30}
 .noh-record-box{margin-top:18px;padding:14px;border-radius:10px;background:#0c0c14;border:.5px solid #1e1e30}
-.noh-record-hdr{font-size:11px;color:#7090c0;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.noh-record-hdr{font-size:13px;color:#7090c0;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:5px}
 .noh-record-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.noh-record-row label{font-size:13px;color:#ccc;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.noh-record-row label{font-size:15px;color:#ccc;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
 .noh-record-row input[type=checkbox]{width:18px;height:18px;accent-color:#5090ff;cursor:pointer}
-.noh-record-row input[type=text],.noh-record-row input[type=date]{flex:1;background:#141420;border:.5px solid #2a2a3a;border-radius:6px;color:#ddd;font-size:14px;padding:7px 9px;font-family:inherit;outline:none}
+.noh-record-row input[type=text],.noh-record-row input[type=date]{flex:1;background:#141420;border:.5px solid #2a2a3a;border-radius:6px;color:#ddd;font-size:16px;padding:7px 9px;font-family:inherit;outline:none}
 .noh-record-row input[type=text]:focus,.noh-record-row input[type=date]:focus{border-color:#5090ff}
-.noh-record-row .noh-record-label{flex-shrink:0;width:78px;font-size:11px;color:#888}
+.noh-record-row .noh-record-label{flex-shrink:0;width:78px;font-size:13px;color:#888}
 .result-type-hdr{padding:6px 12px 3px;font-size:12px;color:#7070b0;font-weight:500;letter-spacing:.05em}
 .result-row{padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
 .result-row:active{background:#141420}
@@ -1663,8 +1664,10 @@ function buildNohList(){
       card.innerHTML=`
         <div class="noh-card-dot" style="background:${a.color}"></div>
         <div class="noh-card-main">
-          <div class="noh-card-n" style="color:${a.color}">${escHtml(p.n)}</div>
-          <div class="noh-card-fg">${escHtml(p.fg)}</div>
+          <div class="noh-card-name-row">
+            <span class="noh-card-n" style="color:${a.color}">${escHtml(p.n)}</span>
+            <span class="noh-card-fg">${escHtml(p.fg)}</span>
+          </div>
           <div class="noh-card-cls">${escHtml(p.cls)} ｜ ${escHtml(p.alt)}</div>
         </div>
         <div class="noh-card-check${done?' done':''}" title="鑑賞${done?'済':''}">
