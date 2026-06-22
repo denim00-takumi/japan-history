@@ -142,6 +142,36 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .search-shortcut-t{font-size:15px;color:#ddd;font-weight:500}
 .search-shortcut-s{font-size:12px;color:#aaa;margin-top:2px}
 #search-results{display:none;padding:0}
+/* ── 能の分類と解説 ── */
+.noh-act-section{margin:0 0 4px}
+.noh-act-hdr{padding:10px 14px 6px;font-size:11px;letter-spacing:.05em;color:#bbb;border-bottom:.5px solid rgba(255,255,255,.08);background:#0c0c16;display:flex;align-items:center;gap:6px}
+.noh-act-hdr .noh-act-color{width:8px;height:18px;border-radius:2px;flex-shrink:0}
+.noh-act-hdr-desc{font-size:10px;color:#888;margin-left:auto}
+.noh-card{background:#141420;border-bottom:.5px solid #1e1e30;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.noh-card:active{background:#1e1e30}
+.noh-card-dot{width:6px;height:34px;border-radius:3px;flex-shrink:0}
+.noh-card-main{flex:1;min-width:0}
+.noh-card-n{font-size:16px;font-weight:600;letter-spacing:.02em}
+.noh-card-fg{font-size:11px;color:#888;margin-top:1px}
+.noh-card-cls{font-size:10px;color:#888;margin-top:2px}
+.noh-card-check{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1.5px solid #2a2a3a;display:flex;align-items:center;justify-content:center;color:#5090ff;font-size:14px;background:#0a0a14}
+.noh-card-check.done{background:#1e3050;border-color:#5090ff;color:#fff}
+/* 詳細画面 */
+.noh-detail-title{font-size:24px;font-weight:700;letter-spacing:.04em;margin-bottom:4px}
+.noh-detail-fg{font-size:13px;color:#888;margin-bottom:10px}
+.noh-detail-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:11px;font-size:11px;margin-bottom:14px}
+.noh-detail-field{margin-bottom:12px}
+.noh-detail-field-label{font-size:11px;color:#888;letter-spacing:.04em;margin-bottom:3px}
+.noh-detail-field-value{font-size:14px;color:#ddd;line-height:1.7}
+.noh-detail-notes{font-size:13px;color:#aaa;line-height:1.85;padding:10px 12px;background:#0c0c14;border-radius:8px;border:.5px solid #1e1e30}
+.noh-record-box{margin-top:18px;padding:14px;border-radius:10px;background:#0c0c14;border:.5px solid #1e1e30}
+.noh-record-hdr{font-size:11px;color:#7090c0;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.noh-record-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.noh-record-row label{font-size:13px;color:#ccc;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.noh-record-row input[type=checkbox]{width:18px;height:18px;accent-color:#5090ff;cursor:pointer}
+.noh-record-row input[type=text],.noh-record-row input[type=date]{flex:1;background:#141420;border:.5px solid #2a2a3a;border-radius:6px;color:#ddd;font-size:14px;padding:7px 9px;font-family:inherit;outline:none}
+.noh-record-row input[type=text]:focus,.noh-record-row input[type=date]:focus{border-color:#5090ff}
+.noh-record-row .noh-record-label{flex-shrink:0;width:78px;font-size:11px;color:#888}
 .result-type-hdr{padding:6px 12px 3px;font-size:12px;color:#7070b0;font-weight:500;letter-spacing:.05em}
 .result-row{padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
 .result-row:active{background:#141420}
@@ -298,6 +328,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
     <div id="search-scroll">
       <div id="search-initial">
         <div style="font-size:12px;color:#333;font-weight:500;margin-bottom:8px;letter-spacing:.05em">コンテンツ</div>
+        <div class="search-shortcut" data-goto="noh">
+          <i class="ti ti-masks-theater" style="color:#c8a04a"></i>
+          <div><div class="search-shortcut-t">能の分類と解説</div><div class="search-shortcut-s">五番立 全34曲 — 神能・修羅・鬘・雑・切</div></div>
+        </div>
         <div class="search-shortcut" data-goto="tokaido">
           <i class="ti ti-road"></i>
           <div><div class="search-shortcut-t">東海道五十三次</div><div class="search-shortcut-s">江戸〜京都 53宿場を地図で巡る</div></div>
@@ -399,6 +433,24 @@ input,textarea{-webkit-user-select:text;user-select:text}
     </div>
   </div>
 
+  <!-- L2: 能リスト -->
+  <div class="screen hidden" id="screen-noh-list">
+    <div class="nav-row">
+      <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索TOP</button>
+      <span class="nav-title">能の分類と解説</span>
+    </div>
+    <div id="noh-list-scroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#0a0a14"></div>
+  </div>
+
+  <!-- L2: 能の曲 詳細 -->
+  <div class="screen hidden" id="screen-noh-detail">
+    <div class="nav-row">
+      <button class="back-btn" data-back="noh-list"><i class="ti ti-chevron-left"></i>分類一覧</button>
+      <span class="nav-title" id="noh-detail-nav-title">曲詳細</span>
+    </div>
+    <div id="noh-detail-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 30px"></div>
+  </div>
+
 </div><!-- /content -->
 
 <!-- TAB BAR -->
@@ -498,6 +550,60 @@ const TOKAIDO = [
   {n:'大津宿',      fg:'おおつじゅく',pref:'滋賀県',   lon:135.8613,lat:35.0097,num:53,km:541,  desc:'琵琶湖南岸の東海道最後の宿場。京都に最も近く湖上交通の拠点でもあった。名物の大津絵は旅人の人気土産。'},
   {n:'京都・三条大橋',fg:'きょうと・さんじょうおおはし',pref:'京都府', lon:135.7740,lat:35.0095,num:0, km:549,  label:'終点',special:true, desc:'東海道の終点。三条大橋は古くから京の東の玄関口として栄え、江戸から約550kmの旅を終えた旅人を迎えた。'},
 ];
+
+// ── 能の分類（五番立）データ ──────────────────────────────
+const NOH_ACTS={
+  1:{name:'神能',     color:'#c8a04a',label:'一番目',desc:'神事的・祝言的な曲'},
+  2:{name:'修羅能',   color:'#b04848',label:'二番目',desc:'武将の亡霊が修羅道の苦しみを語る'},
+  3:{name:'鬘能',     color:'#c074b0',label:'三番目',desc:'女性の霊や精が登場する優美な曲'},
+  4:{name:'雑能',     color:'#5c8c5c',label:'四番目',desc:'狂女物・現在物・人情物など'},
+  5:{name:'切能',     color:'#7a48a0',label:'五番目',desc:'鬼や怪異が登場する激しい曲'}
+};
+const NOH_DATA=[
+  // 一番目 神能（6）
+  {id:'okina',act:1,n:'翁',fg:'おきな',cls:'神能',alt:'脇能',shite_type:'神',shite:'翁（老人神）',waki:'なし（儀式的構成）',source:'神道祝詞・呪言「とうとうたらり」',era:'猿楽以前の神事芸能に由来',author:'不詳（世阿弥以前）',religion:'神道・修験道・密教（呪術的起源）',notes:'舞台：特定の舞台地なし。天下泰平・五穀豊穣を祈る祝言曲。能以前の神事芸能の要素を色濃く残し、「能にして能にあらず」と称される特別な演目。'},
+  {id:'takasago',act:1,n:'高砂',fg:'たかさご',cls:'神能',alt:'脇能',shite_type:'神',shite:'住吉明神（老翁）の化身',waki:'旅の神職',source:'古今集仮名序・住吉大社縁起',era:'室町前期（14世紀後半）',author:'世阿弥（改作・大成）',religion:'神道・春日信仰・天台本覚思想',notes:'舞台：播磨国高砂（現在の兵庫県高砂市）。高砂と住吉の松を夫婦和合になぞらえ、長寿と平和を寿ぐ代表的な祝言能。'},
+  {id:'miwa',act:1,n:'三輪',fg:'みわ',cls:'神能',alt:'脇能',shite_type:'神',shite:'三輪明神（女神）',waki:'旅の僧・玄賓',source:'古事記・大神神社縁起',era:'室町前期（15世紀前半）',author:'世阿弥',religion:'神道（三輪山信仰）・仏教習合',notes:'舞台：大和国三輪（現在の奈良県桜井市）。三輪山信仰を背景に三輪明神が姿を現す。神と人との結びつきを語る神婚伝説で知られ、神仏習合の世界観を色濃く残す。'},
+  {id:'youro',act:1,n:'養老',fg:'ようろう',cls:'神能',alt:'脇能',shite_type:'神',shite:'養老の滝の神',waki:'勅使',source:'日本書紀・養老の滝縁起',era:'室町前期',author:'世阿弥',religion:'神道・孝道（儒教的要素も）',notes:'舞台：美濃国養老（現在の岐阜県養老町）。孝行息子の徳を称え、霊泉の恵みと君臣和楽を祝う祝賀的な神能。'},
+  {id:'chikubushima',act:1,n:'竹生島',fg:'ちくぶしま',cls:'神能',alt:'脇能',shite_type:'神',shite:'弁財天・竜神',waki:'旅人',source:'竹生島縁起・法華経',era:'室町前期',author:'世阿弥（または金春禅竹）',religion:'天台宗・弁財天信仰・法華経',notes:'舞台：近江国竹生島（現在の滋賀県長浜市）。弁財天と竜神の霊験を描き、湖上の神秘と国家安泰を寿ぐ。'},
+  {id:'shirahige',act:1,n:'白髭',fg:'しらひげ',cls:'神能',alt:'脇能',shite_type:'神',shite:'白髭明神',waki:'旅僧',source:'近江・白髭神社縁起',era:'室町中期',author:'不詳',religion:'神道（近江神道）',notes:'舞台：近江国白髭（現在の滋賀県高島市）。長寿の神を讃える祝祭色の強い神能。'},
+  // 二番目 修羅能（6）
+  {id:'atsumori',act:2,n:'敦盛',fg:'あつもり',cls:'修羅能',alt:'男性的',shite_type:'武将の亡霊',shite:'平敦盛の霊',waki:'蓮生法師（熊谷直実）',source:'平家物語',era:'室町前期（14世紀末〜15世紀初）',author:'世阿弥',religion:'浄土宗・法華経・念仏信仰',notes:'舞台：摂津国一ノ谷（現在の神戸市須磨区）。熊谷直実と敦盛の因縁を描く修羅能の代表作。'},
+  {id:'tadanori',act:2,n:'忠度',fg:'ただのり',cls:'修羅能',alt:'男性的',shite_type:'武将の亡霊',shite:'平忠度の霊',waki:'旅の僧',source:'平家物語・千載集',era:'室町前期',author:'世阿弥',religion:'浄土宗・和歌信仰',notes:'舞台：摂津国須磨（現在の神戸市須磨区）。武将であり歌人でもあった平忠度の霊が現れる。戦乱の中で詠んだ和歌が『千載集』に採られた逸話で有名。'},
+  {id:'sanemori',act:2,n:'実盛',fg:'さねもり',cls:'修羅能',alt:'男性的',shite_type:'武将の亡霊',shite:'斎藤実盛の霊',waki:'旅僧',source:'平家物語',era:'室町前期',author:'世阿弥',religion:'浄土宗・法華経',notes:'舞台：加賀国篠原（現在の石川県加賀市）。老武者・斎藤実盛が白髪を黒く染めて出陣した最期を語る。老いてなお武名を守ろうとした武士の誇りを描く。'},
+  {id:'yorimasa',act:2,n:'頼政',fg:'よりまさ',cls:'修羅能',alt:'男性的',shite_type:'武将の亡霊',shite:'源頼政の霊',waki:'旅僧',source:'平家物語・平等院',era:'室町前期',author:'世阿弥',religion:'浄土宗・阿弥陀信仰',notes:'舞台：山城国宇治（現在の京都府宇治市）。鵺退治で名高い源頼政の霊が現れ、自害した無念を語る。'},
+  {id:'kiyotsune',act:2,n:'清経',fg:'きよつね',cls:'修羅能',alt:'男性的',shite_type:'武将の亡霊',shite:'平清経の霊',waki:'清経の妻（回想）・家臣',source:'平家物語',era:'室町前期',author:'世阿弥',religion:'浄土宗・浄土信仰',notes:'舞台：豊前国柳ヶ浦（現在の大分県宇佐市付近）。入水した平清経と妻との悲しい再会を描く。'},
+  {id:'kagekiyo',act:2,n:'景清',fg:'かげきよ',cls:'修羅能',alt:'男性的',shite_type:'武将の亡霊',shite:'平景清の霊（盲目の老武者）',waki:'旅人・景清の娘',source:'平家物語',era:'室町前期（15世紀前半）',author:'世阿弥',religion:'浄土宗・法華経',notes:'舞台：日向国宮崎（現在の宮崎市周辺）。壇ノ浦敗戦後に流浪し盲目となった平景清の晩年を描く。敗者の誇りと孤高の生き方が見どころ。'},
+  // 三番目 鬘能（9）
+  {id:'izutsu',act:3,n:'井筒',fg:'いづつ',cls:'鬘能',alt:'女性的',shite_type:'女性の霊・精',shite:'在原業平の妻の霊',waki:'旅僧',source:'伊勢物語（筒井筒）',era:'室町前期（15世紀前半）',author:'世阿弥',religion:'神道（業平塚）・法華経',notes:'舞台：大和国筒井（現在の奈良県安堵町付近）。在原業平を慕う妻の情愛を描く夢幻能の名作。'},
+  {id:'matsukaze',act:3,n:'松風',fg:'まつかぜ',cls:'鬘能',alt:'女性的',shite_type:'女性の霊・精',shite:'松風・村雨の霊',waki:'旅僧',source:'古今集・業平伝説',era:'室町前期',author:'世阿弥',religion:'浄土信仰・歌道',notes:'舞台：摂津国須磨（現在の神戸市須磨区）。在原業平への恋に執着する姉妹の霊を描く優美な鬘能。'},
+  {id:'nonomiya',act:3,n:'野宮',fg:'ののみや',cls:'鬘能',alt:'女性的',shite_type:'女性の霊',shite:'六条御息所の霊',waki:'旅僧',source:'源氏物語（賢木巻）',era:'室町前期（15世紀前半）',author:'世阿弥',religion:'神道（野宮神社）・仏教的無常観',notes:'舞台：山城国野宮（現在の京都市右京区嵯峨）。六条御息所の執念と哀しみを描く源氏物語ゆかりの名曲。'},
+  {id:'kakitsubata',act:3,n:'杜若',fg:'かきつばた',cls:'鬘能',alt:'女性的',shite_type:'女性の霊・精',shite:'在原業平の愛した杜若の精',waki:'旅僧',source:'伊勢物語（八橋）',era:'室町前期',author:'世阿弥',religion:'神道・歌道',notes:'舞台：三河国八橋（現在の愛知県知立市）。在原業平の東下りで知られる『伊勢物語』を背景とし、和歌と草木成仏を語る。'},
+  {id:'toru',act:3,n:'融',fg:'とおる',cls:'鬘能',alt:'女性的',shite_type:'貴族の霊',shite:'源融（光源氏のモデル）の霊',waki:'旅僧',source:'伊勢物語・源氏物語',era:'室町前期',author:'世阿弥',religion:'浄土信仰・歌道',notes:'舞台：山城国六条河原院（現在の京都市下京区付近）。源融の霊が往時の貴族文化を偲び舞を舞う。光源氏のモデルの一人とされる人物としても有名。'},
+  {id:'yuya',act:3,n:'熊野',fg:'ゆや',cls:'鬘能',alt:'女性的',shite_type:'女性・現在物',shite:'宗盛の愛妾・熊野',waki:'平宗盛',source:'平家物語・熊野詣',era:'室町前期',author:'世阿弥',religion:'熊野信仰・法華経',notes:'舞台：京都・清水寺周辺。病母を思う熊野の孝心を描く現在能の名作。'},
+  {id:'eguchi',act:3,n:'江口',fg:'えぐち',cls:'鬘能',alt:'女性的',shite_type:'女性の霊・精',shite:'遊女の霊（普賢菩薩の化身）',waki:'旅僧',source:'西行法師の和歌・発心集',era:'室町前期',author:'世阿弥',religion:'法華経・浄土教・普賢菩薩信仰',notes:'舞台：摂津国江口（現在の大阪市東淀川区付近）。西行法師と遊女江口の君の伝説をもとにした能。遊女の霊が普賢菩薩の化身として現れ救済を説く。'},
+  {id:'sotobakomachi',act:3,n:'卒都婆小町',fg:'そとばこまち',cls:'鬘能',alt:'女性的',shite_type:'老女',shite:'老いた小野小町の霊',waki:'旅僧',source:'古今集・小野小町伝説',era:'室町前期（14世紀末〜15世紀初）',author:'観阿弥（世阿弥が改作）',religion:'仏教（卒都婆）・法華経',notes:'舞台：山城国深草（現在の京都市伏見区付近）。老いた小野小町が無常を語る。百夜通い伝説でも知られる。'},
+  {id:'hagoromo',act:3,n:'羽衣',fg:'はごろも',cls:'鬘能',alt:'女性的',shite_type:'天女',shite:'天女の霊',waki:'漁夫・白竜',source:'羽衣伝説（三保松原）',era:'室町前期〜中期',author:'観阿弥原作・世阿弥改作？',religion:'神道・天人思想',notes:'舞台：駿河国三保（現在の静岡市清水区三保松原）。羽衣を返してもらった天女が天上の舞を舞う祝祭的名曲。'},
+  // 四番目 雑能（8）
+  {id:'hachinoki',act:4,n:'鉢木',fg:'はちのき',cls:'人情物・現在物',alt:'雑能',shite_type:'現在物・説教者',shite:'御家人',waki:'旅する高僧風（北条時頼）',source:'仏教説話集 沙石集',era:'室町前期（14世紀末〜15世紀前半頃）',author:'不詳',religion:'禅宗系色彩が強い',notes:'舞台：下野国佐野（現在の栃木県佐野市）。没落御家人の忠義を描く現在能。「いざ鎌倉」の故事で有名。'},
+  {id:'jinenkoji',act:4,n:'自然居士',fg:'じねんこじ',cls:'狂女物・現在物',alt:'雑能',shite_type:'現在物・説教者',shite:'自然居士（念仏聖）',waki:'人買い・子ども',source:'説話（自然居士説話）',era:'南北朝〜室町前期（14世紀後半）',author:'観阿弥（代表作）',religion:'浄土宗・念仏信仰',notes:'舞台：京都周辺。少女を救うため自ら身を売る念仏聖・自然居士の慈悲を描く。説教芸能的色彩が強い。'},
+  {id:'hanagatami',act:4,n:'花筐',fg:'はながたみ',cls:'狂女物・現在物',alt:'雑能',shite_type:'狂女',shite:'継体天皇に捨てられた女・照日の前',waki:'勅使',source:'継体天皇伝説・太平記（花筐の章）',era:'室町前期',author:'観阿弥（世阿弥が改作）',religion:'神道（継体天皇）',notes:'舞台：越前国味真野（現在の福井県越前市）。継体天皇を慕う照日の前の狂乱と再会を描く。'},
+  {id:'sumidagawa',act:4,n:'隅田川',fg:'すみだがわ',cls:'狂女物・現在物',alt:'雑能',shite_type:'狂女',shite:'我が子を求める狂女',waki:'旅の船頭・旅人',source:'実話（梅若伝説）',era:'室町中期（15世紀後半）',author:'観世元雅（世阿弥の子）',religion:'浄土宗・念仏・梅若堂',notes:'舞台：武蔵国隅田川（現在の東京都墨田区周辺）。子を失った母の悲嘆を描く能屈指の悲劇。'},
+  {id:'ataka',act:4,n:'安宅',fg:'あたか',cls:'狂女物・現在物',alt:'雑能',shite_type:'現在物',shite:'弁慶・義経一行',waki:'富樫左衛門',source:'義経記・弁慶伝説',era:'室町中期〜後期',author:'不詳',religion:'修験道（山伏の呪力）',notes:'舞台：加賀国安宅（現在の石川県小松市）。義経一行を弁慶の機転が救う。歌舞伎『勧進帳』の原典。'},
+  {id:'hanjo',act:4,n:'班女',fg:'はんじょ',cls:'狂女物・現在物',alt:'雑能',shite_type:'狂女',shite:'扇を待ち続ける狂女',waki:'旅人・花子を探す吉田少将',source:'源氏物語・班倢伃故事',era:'室町前期',author:'世阿弥',religion:'道教・漢籍',notes:'舞台：京都。恋人を待ち続ける花子の狂おしい恋情を描く。中国の班女故事を原典とする。'},
+  {id:'kuramatengu',act:4,n:'鞍馬天狗',fg:'くらまてんぐ',cls:'狂女物・現在物',alt:'雑能',shite_type:'天狗・現在物',shite:'大天狗',waki:'幼少期の牛若丸（義経）',source:'義経記・鞍馬寺縁起',era:'室町中期',author:'不詳',religion:'修験道・天狗信仰・鞍馬寺（天台宗）',notes:'舞台：山城国鞍馬山（現在の京都市左京区）。大天狗が幼い牛若丸に兵法を授ける。義経伝説の代表作。'},
+  {id:'aoinoue',act:4,n:'葵上',fg:'あおいのうえ',cls:'狂女物・現在物',alt:'雑能',shite_type:'生霊・死霊',shite:'六条御息所の生霊・死霊',waki:'照日の巫女・横川の小聖',source:'源氏物語（葵巻）',era:'室町前期',author:'世阿弥（改作）',religion:'密教（護摩祈祷）・修験道・陰陽道',notes:'舞台：京都。『源氏物語』を原典とする。六条御息所の生霊が葵上に取り憑く執念の物語。'},
+  // 五番目 切能（5）
+  {id:'kurozuka',act:5,n:'黒塚',fg:'くろづか',cls:'切能',alt:'鬼・怪異',shite_type:'鬼女',shite:'鬼女（安達原の鬼婆）',waki:'山伏・旅僧',source:'奥州・安達原伝説',era:'室町前期〜中期',author:'不詳',religion:'修験道・天台宗・陰陽道',notes:'舞台：陸奥国安達ヶ原（現在の福島県二本松市付近）。鬼婆伝説を題材とする代表的な鬼能。喜多流では「安達原」と呼ぶ。'},
+  {id:'dojoji',act:5,n:'道成寺',fg:'どうじょうじ',cls:'切能',alt:'鬼・怪異',shite_type:'怨霊・蛇体',shite:'執念の白拍子（蛇体に変化）',waki:'能力（道成寺の僧）',source:'大和物語・道成寺縁起',era:'室町中期',author:'不詳（世阿弥周辺か）',religion:'真言宗（道成寺）・法華経・女人禁制',notes:'舞台：紀伊国道成寺（現在の和歌山県日高川町）。安珍への執着から蛇体となった女性の情念を描く。「鐘入り」で有名な大曲。'},
+  {id:'tsuchigumo',act:5,n:'土蜘蛛',fg:'つちぐも',cls:'切能',alt:'鬼・怪異',shite_type:'鬼・異形',shite:'土蜘蛛の精',waki:'源頼光・頼光の家臣',source:'源平盛衰記・土蜘蛛伝説',era:'室町中期',author:'不詳',religion:'神道（国津神的存在）・陰陽道',notes:'舞台：京都。病床の源頼光を襲う土蜘蛛の精との戦いを描く。大量の蜘蛛の糸を放つ演出で有名。'},
+  {id:'nue',act:5,n:'鵺',fg:'ぬえ',cls:'切能',alt:'鬼・怪異',shite_type:'怨霊・異形',shite:'鵺（怪物）の霊',waki:'旅の僧',source:'平家物語（鵺退治）',era:'室町前期',author:'世阿弥（諸説あり）',religion:'陰陽道・法華経（成仏できない存在）',notes:'舞台：摂津国芦屋浜（現在の兵庫県芦屋市付近）。討伐された怪物・鵺の霊が現れ苦悩を語る。平家物語でも知られる妖怪。'},
+  {id:'momijigari',act:5,n:'紅葉狩',fg:'もみじがり',cls:'切能',alt:'鬼・怪異',shite_type:'鬼神',shite:'女に化けた鬼神',waki:'平惟茂・八幡神の使い',source:'今昔物語・更科日記',era:'室町中期〜後期',author:'不詳',religion:'神道（八幡信仰）・修験道',notes:'舞台：信濃国戸隠山（現在の長野県長野市）。美女に化けた鬼神と平維茂の戦いを描く。華麗な紅葉と鬼退治が見どころ。'}
+];
+// 鑑賞記録（localStorage 永続化）
+const NOH_REC_KEY='noh_records_v1';
+function getNohRecord(id){try{const all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');return all[id]||{};}catch(e){return {};}}
+function saveNohRecord(id,rec){try{const all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');all[id]=rec;localStorage.setItem(NOH_REC_KEY,JSON.stringify(all));}catch(e){}}
 
 // population data (万人)
 const POP_DATA = [
@@ -1403,6 +1509,7 @@ document.querySelectorAll('.search-shortcut').forEach(btn=>{
     const goto=btn.dataset.goto;
     if(goto==='tokaido') openTokaido();
     else if(goto==='population') openPopulation();
+    else if(goto==='noh') openNoh();
   });
 });
 
@@ -1530,6 +1637,100 @@ function hlText(text,q){
   const idx=text.indexOf(q);
   if(idx<0)return escHtml(text);
   return escHtml(text.slice(0,idx))+'<span class="hl">'+escHtml(q)+'</span>'+escHtml(text.slice(idx+q.length));
+}
+
+// ── 能の分類と解説 ─────────────────────────────────────────
+function openNoh(){
+  buildNohList();
+  showScreen('screen-noh-list');
+}
+function buildNohList(){
+  const scroll=document.getElementById('noh-list-scroll');
+  scroll.innerHTML='';
+  // 五段ごとにグループ化
+  [1,2,3,4,5].forEach(actNum=>{
+    const a=NOH_ACTS[actNum];
+    const sec=document.createElement('div');sec.className='noh-act-section';
+    sec.innerHTML=`<div class="noh-act-hdr">
+      <span class="noh-act-color" style="background:${a.color}"></span>
+      <span style="color:${a.color};font-weight:600">${a.label} ${a.name}</span>
+      <span class="noh-act-hdr-desc">${escHtml(a.desc)}</span>
+    </div>`;
+    NOH_DATA.filter(p=>p.act===actNum).forEach(p=>{
+      const rec=getNohRecord(p.id);
+      const done=rec.watched;
+      const card=document.createElement('div');card.className='noh-card';
+      card.innerHTML=`
+        <div class="noh-card-dot" style="background:${a.color}"></div>
+        <div class="noh-card-main">
+          <div class="noh-card-n" style="color:${a.color}">${escHtml(p.n)}</div>
+          <div class="noh-card-fg">${escHtml(p.fg)}</div>
+          <div class="noh-card-cls">${escHtml(p.cls)} ｜ ${escHtml(p.alt)}</div>
+        </div>
+        <div class="noh-card-check${done?' done':''}" title="鑑賞${done?'済':''}">
+          <i class="ti ti-${done?'check':'eye'}"></i>
+        </div>`;
+      card.addEventListener('click',()=>showNohDetail(p.id));
+      sec.appendChild(card);
+    });
+    scroll.appendChild(sec);
+  });
+}
+function showNohDetail(id){
+  const p=NOH_DATA.find(x=>x.id===id);if(!p)return;
+  const a=NOH_ACTS[p.act];
+  document.getElementById('noh-detail-nav-title').textContent=p.n;
+  const rec=getNohRecord(p.id);
+  const body=document.getElementById('noh-detail-body');
+  body.innerHTML=`
+    <div class="noh-detail-title" style="color:${a.color}">${escHtml(p.n)}</div>
+    <div class="noh-detail-fg">${escHtml(p.fg)}</div>
+    <div class="noh-detail-tag" style="background:${a.color}33;color:${a.color};border:.5px solid ${a.color}">${a.label} ${a.name}（${escHtml(p.cls)}）</div>
+
+    <div class="noh-detail-field"><div class="noh-detail-field-label">主なシテ</div><div class="noh-detail-field-value">${escHtml(p.shite_type)}</div></div>
+    <div class="noh-detail-field"><div class="noh-detail-field-label">登場人物（シテ）</div><div class="noh-detail-field-value">${escHtml(p.shite)}</div></div>
+    <div class="noh-detail-field"><div class="noh-detail-field-label">登場人物（ワキ）</div><div class="noh-detail-field-value">${escHtml(p.waki)}</div></div>
+    <div class="noh-detail-field"><div class="noh-detail-field-label">引用・典拠</div><div class="noh-detail-field-value">${escHtml(p.source)}</div></div>
+    <div class="noh-detail-field"><div class="noh-detail-field-label">成立年代</div><div class="noh-detail-field-value">${escHtml(p.era)}</div></div>
+    <div class="noh-detail-field"><div class="noh-detail-field-label">作者</div><div class="noh-detail-field-value">${escHtml(p.author)}</div></div>
+    <div class="noh-detail-field"><div class="noh-detail-field-label">関連宗教・宗派</div><div class="noh-detail-field-value">${escHtml(p.religion)}</div></div>
+    <div class="noh-detail-field"><div class="noh-detail-field-label">注釈</div><div class="noh-detail-notes">${escHtml(p.notes)}</div></div>
+
+    <div class="noh-record-box">
+      <div class="noh-record-hdr"><i class="ti ti-bookmark"></i> 鑑賞記録</div>
+      <div class="noh-record-row">
+        <label><input type="checkbox" id="noh-rec-watched"${rec.watched?' checked':''}>鑑賞済み</label>
+      </div>
+      <div class="noh-record-row">
+        <span class="noh-record-label">鑑賞場所</span>
+        <input type="text" id="noh-rec-place" placeholder="例：能楽堂・神社・ホール名" value="${escHtml(rec.place||'')}">
+      </div>
+      <div class="noh-record-row">
+        <span class="noh-record-label">鑑賞年月日</span>
+        <input type="date" id="noh-rec-date" value="${escHtml(rec.date||'')}">
+      </div>
+      <div class="noh-record-row" style="flex-direction:column;align-items:stretch;gap:4px">
+        <span class="noh-record-label" style="width:auto">メモ</span>
+        <input type="text" id="noh-rec-memo" placeholder="感想・配役・流派など" value="${escHtml(rec.memo||'')}">
+      </div>
+    </div>
+  `;
+  // 入力時に自動保存
+  const save=()=>{
+    saveNohRecord(p.id,{
+      watched:document.getElementById('noh-rec-watched').checked,
+      place:document.getElementById('noh-rec-place').value.trim(),
+      date:document.getElementById('noh-rec-date').value.trim(),
+      memo:document.getElementById('noh-rec-memo').value.trim(),
+    });
+  };
+  ['noh-rec-watched','noh-rec-place','noh-rec-date','noh-rec-memo'].forEach(eid=>{
+    const el=document.getElementById(eid);
+    if(el){
+      el.addEventListener(el.type==='checkbox'?'change':'input',save);
+    }
+  });
+  showScreen('screen-noh-detail');
 }
 
 // ── 東海道 ────────────────────────────────────────────────
