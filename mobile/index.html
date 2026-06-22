@@ -165,14 +165,15 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .noh-detail-field-label{font-size:13px;color:#888;letter-spacing:.04em;margin-bottom:3px}
 .noh-detail-field-value{font-size:16px;color:#ddd;line-height:1.7}
 .noh-detail-notes{font-size:15px;color:#aaa;line-height:1.85;padding:10px 12px;background:#0c0c14;border-radius:8px;border:.5px solid #1e1e30}
-.noh-record-box{margin-top:18px;padding:14px;border-radius:10px;background:#0c0c14;border:.5px solid #1e1e30}
-.noh-record-hdr{font-size:13px;color:#7090c0;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+/* 鑑賞記録：他セクションと区別する「ごく薄い緑」配色 */
+.noh-record-box{margin-top:18px;padding:14px;border-radius:10px;background:#0a1410;border:.5px solid #1e2c22}
+.noh-record-hdr{font-size:13px;color:#a8d8b8;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:5px}
 .noh-record-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.noh-record-row label{font-size:15px;color:#ccc;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
-.noh-record-row input[type=checkbox]{width:18px;height:18px;accent-color:#5090ff;cursor:pointer}
-.noh-record-row input[type=text],.noh-record-row input[type=date]{flex:1;background:#141420;border:.5px solid #2a2a3a;border-radius:6px;color:#ddd;font-size:16px;padding:7px 9px;font-family:inherit;outline:none}
-.noh-record-row input[type=text]:focus,.noh-record-row input[type=date]:focus{border-color:#5090ff}
-.noh-record-row .noh-record-label{flex-shrink:0;width:78px;font-size:13px;color:#888}
+.noh-record-row label{font-size:15px;color:#c0e0c8;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.noh-record-row input[type=checkbox]{width:18px;height:18px;accent-color:#6ab48b;cursor:pointer}
+.noh-record-row input[type=text],.noh-record-row input[type=date]{flex:1;background:#101c14;border:.5px solid #2a3a30;border-radius:6px;color:#c0e0c8;font-size:16px;padding:7px 9px;font-family:inherit;outline:none}
+.noh-record-row input[type=text]:focus,.noh-record-row input[type=date]:focus{border-color:#6ab48b}
+.noh-record-row .noh-record-label{flex-shrink:0;width:78px;font-size:13px;color:#8eb89a}
 .result-type-hdr{padding:6px 12px 3px;font-size:12px;color:#7070b0;font-weight:500;letter-spacing:.05em}
 .result-row{padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s}
 .result-row:active{background:#141420}
@@ -554,11 +555,12 @@ const TOKAIDO = [
 
 // ── 能の分類（五番立）データ ──────────────────────────────
 const NOH_ACTS={
-  1:{name:'神能',     color:'#c8a04a',label:'一番目',desc:'神事的・祝言的な曲'},
-  2:{name:'修羅能',   color:'#b04848',label:'二番目',desc:'武将の亡霊が修羅道の苦しみを語る'},
-  3:{name:'鬘能',     color:'#c074b0',label:'三番目',desc:'女性の霊や精が登場する優美な曲'},
-  4:{name:'雑能',     color:'#5c8c5c',label:'四番目',desc:'狂女物・現在物・人情物など'},
-  5:{name:'切能',     color:'#7a48a0',label:'五番目',desc:'鬼や怪異が登場する激しい曲'}
+  // 彩度を半減・明度は維持した薄色（タイトル一覧の曲名色）
+  1:{name:'神能',     color:'#A89469',label:'一番目',desc:'神事的・祝言的な曲'},
+  2:{name:'修羅能',   color:'#966161',label:'二番目',desc:'武将の亡霊が修羅道の苦しみを語る'},
+  3:{name:'鬘能',     color:'#AC87A4',label:'三番目',desc:'女性の霊や精が登場する優美な曲'},
+  4:{name:'雑能',     color:'#688068',label:'四番目',desc:'狂女物・現在物・人情物など'},
+  5:{name:'切能',     color:'#775E8A',label:'五番目',desc:'鬼や怪異が登場する激しい曲'}
 };
 const NOH_DATA=[
   // 一番目 神能（6）
@@ -599,7 +601,13 @@ const NOH_DATA=[
   {id:'dojoji',act:5,n:'道成寺',fg:'どうじょうじ',cls:'切能',alt:'鬼・怪異',shite_type:'怨霊・蛇体',shite:'執念の白拍子（蛇体に変化）',waki:'能力（道成寺の僧）',source:'大和物語・道成寺縁起',era:'室町中期',author:'不詳（世阿弥周辺か）',religion:'真言宗（道成寺）・法華経・女人禁制',notes:'舞台：紀伊国道成寺（現在の和歌山県日高川町）。安珍への執着から蛇体となった女性の情念を描く。「鐘入り」で有名な大曲。'},
   {id:'tsuchigumo',act:5,n:'土蜘蛛',fg:'つちぐも',cls:'切能',alt:'鬼・怪異',shite_type:'鬼・異形',shite:'土蜘蛛の精',waki:'源頼光・頼光の家臣',source:'源平盛衰記・土蜘蛛伝説',era:'室町中期',author:'不詳',religion:'神道（国津神的存在）・陰陽道',notes:'舞台：京都。病床の源頼光を襲う土蜘蛛の精との戦いを描く。大量の蜘蛛の糸を放つ演出で有名。'},
   {id:'nue',act:5,n:'鵺',fg:'ぬえ',cls:'切能',alt:'鬼・怪異',shite_type:'怨霊・異形',shite:'鵺（怪物）の霊',waki:'旅の僧',source:'平家物語（鵺退治）',era:'室町前期',author:'世阿弥（諸説あり）',religion:'陰陽道・法華経（成仏できない存在）',notes:'舞台：摂津国芦屋浜（現在の兵庫県芦屋市付近）。討伐された怪物・鵺の霊が現れ苦悩を語る。平家物語でも知られる妖怪。'},
-  {id:'momijigari',act:5,n:'紅葉狩',fg:'もみじがり',cls:'切能',alt:'鬼・怪異',shite_type:'鬼神',shite:'女に化けた鬼神',waki:'平惟茂・八幡神の使い',source:'今昔物語・更科日記',era:'室町中期〜後期',author:'不詳',religion:'神道（八幡信仰）・修験道',notes:'舞台：信濃国戸隠山（現在の長野県長野市）。美女に化けた鬼神と平維茂の戦いを描く。華麗な紅葉と鬼退治が見どころ。'}
+  {id:'momijigari',act:5,n:'紅葉狩',fg:'もみじがり',cls:'切能',alt:'鬼・怪異',shite_type:'鬼神',shite:'女に化けた鬼神',waki:'平惟茂・八幡神の使い',source:'今昔物語・更科日記',era:'室町中期〜後期',author:'不詳',religion:'神道（八幡信仰）・修験道',notes:'舞台：信濃国戸隠山（現在の長野県長野市）。美女に化けた鬼神と平維茂の戦いを描く。華麗な紅葉と鬼退治が見どころ。'},
+  // 追加分：三番目（小鍛冶・西行桜）と五番目（船弁慶・石橋・猩々）
+  {id:'kokaji',act:3,n:'小鍛冶',fg:'こかじ',cls:'神能・霊験物',alt:'三番目物',shite_type:'神',shite:'稲荷明神の化身',waki:'三条宗近',source:'刀剣伝説',era:'室町前期',author:'不詳',religion:'神道・神仏習合',notes:'舞台：山城国京都（現在の京都市）。名工三条宗近が勅命により刀を鍛える際、稲荷明神が童子の姿で現れて相槌を打つ。刀剣愛好家にも人気の高い曲。'},
+  {id:'saigyouzakura',act:3,n:'西行桜',fg:'さいぎょうざくら',cls:'鬘物・幽玄能',alt:'三番目物',shite_type:'精霊',shite:'老桜の精',waki:'西行法師',source:'西行伝説',era:'室町後期',author:'世阿弥',religion:'仏教（浄土思想）',notes:'舞台：東山西行庵（現在の京都市東山区付近）。花見客を避けて静かに暮らす西行の前に桜の精が現れる。桜と無常観を描く春の名曲。'},
+  {id:'funabenkei',act:5,n:'船弁慶',fg:'ふなべんけい',cls:'鬼神物・怨霊物',alt:'五番目物',shite_type:'武将の亡霊・怨霊',shite:'平知盛の霊',waki:'武蔵坊弁慶・源義経',source:'平家物語',era:'室町前期',author:'観世小次郎信光',religion:'仏教（怨霊信仰）',notes:'舞台：摂津国大物浦（現在の兵庫県尼崎市付近）。都落ちする義経一行を追って壇ノ浦で滅んだ平知盛の怨霊が海上に現れる。前場の静御前、後場の知盛という対比も見どころ。'},
+  {id:'shakkyou',act:5,n:'石橋',fg:'しゃっきょう',cls:'祝言物・獅子物',alt:'五番目物',shite_type:'霊獣',shite:'獅子',waki:'寂昭法師',source:'中国・清涼山伝説',era:'室町前期',author:'世阿弥（伝）',religion:'仏教（文殊信仰）',notes:'舞台：中国・清涼山。文殊菩薩の浄土へ通じる石橋に現れた獅子が牡丹に戯れ勇壮に舞う。能の「獅子物」の代表作で、祝賀性の高い人気曲。'},
+  {id:'shoujou',act:5,n:'猩々',fg:'しょうじょう',cls:'祝言物・唐人物',alt:'五番目物',shite_type:'霊獣・唐人',shite:'猩々',waki:'高風',source:'中国説話',era:'室町前期',author:'世阿弥（伝）',religion:'道教・中国伝承',notes:'舞台：中国・揚子江畔。酒売りの高風の徳に感じた猩々が現れ、尽きることのない酒壺を授ける。赤頭の舞が華やかな祝言能の代表作。'}
 ];
 // 鑑賞記録（localStorage 永続化）
 const NOH_REC_KEY='noh_records_v1';
@@ -1671,7 +1679,7 @@ function buildNohList(){
           <div class="noh-card-cls">${escHtml(p.cls)} ｜ ${escHtml(p.alt)}</div>
         </div>
         <div class="noh-card-check${done?' done':''}" title="鑑賞${done?'済':''}">
-          <i class="ti ti-${done?'check':'eye'}"></i>
+          <i class="ti ti-${done?'check':'chevron-right'}"></i>
         </div>`;
       card.addEventListener('click',()=>showNohDetail(p.id));
       sec.appendChild(card);
@@ -1718,7 +1726,7 @@ function showNohDetail(id){
       </div>
     </div>
   `;
-  // 入力時に自動保存
+  // 入力時に自動保存（localStorage に永続化）→ 一覧の鑑賞済みアイコンも追従
   const save=()=>{
     saveNohRecord(p.id,{
       watched:document.getElementById('noh-rec-watched').checked,
@@ -1726,6 +1734,8 @@ function showNohDetail(id){
       date:document.getElementById('noh-rec-date').value.trim(),
       memo:document.getElementById('noh-rec-memo').value.trim(),
     });
+    // 一覧画面の鑑賞ステータスアイコンを最新化（裏で再ビルド）
+    buildNohList();
   };
   ['noh-rec-watched','noh-rec-place','noh-rec-date','noh-rec-memo'].forEach(eid=>{
     const el=document.getElementById(eid);
