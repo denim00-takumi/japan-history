@@ -939,6 +939,10 @@ function setKuni(value,text){
   if(mapG) mapG.selectAll('.person-loc-marker').remove();
   if(value) personMapLocs=null;
   updateMapEra();
+  // 拡大中なら該当県群の中心へパン（沖縄県は除外。別表示）
+  if(value && mapScale>1 && selectedProvPrefs.length){
+    centerOnPrefs(selectedProvPrefs);
+  }
 }
 
 let mapRendered=false;
@@ -1045,6 +1049,7 @@ function renderMap(){
 
   updateMapEra();
   drawPersonLocsOnMap(rgCentroids); // rgCentroids_を常に更新。personMapLocsがnullなら内部でreturn
+  updateOkinaTransform(); // 沖縄領域に初期 transform を当てる（scale=1 の identity）
 }
 
 // rgCentroidsをモジュールレベルで保持
@@ -1137,6 +1142,31 @@ function mapApplyView(){
   mapVX=Math.max(0, Math.min(mapVX, mapW-vw));
   mapVY=Math.max(0, Math.min(mapVY, mapH-vh));
   document.getElementById('map-svg').setAttribute('viewBox', mapVX+' '+mapVY+' '+vw+' '+vh);
+  updateOkinaTransform(); // 沖縄領域を画面固定に保つ
+}
+// 沖縄ボックスを viewBox の影響を受けず常に同じ画面位置・サイズに保つ
+// transform: translate(vx, vy) scale(1/scale) によって、viewBox 変換を打ち消し
+// 画面ピクセル単位で oki-local 座標と一致させる。
+// clipPath は userSpaceOnUse でも oki-group transform を継承する内側 g のローカル空間で
+// 解釈されるため、rect は (2,2,140,140) 固定のままで OK。
+function updateOkinaTransform(){
+  if(!mapW)return;
+  const okiG=document.querySelector('.oki-group');
+  if(!okiG)return;
+  const inv=1/mapScale;
+  okiG.setAttribute('transform','translate('+mapVX+' '+mapVY+') scale('+inv+')');
+}
+// 拡大中、指定都道府県群の平均セントロイドを画面中央にパン
+function centerOnPrefs(prefNames){
+  if(mapScale<=1||!mapW||!prefNames||!prefNames.length)return;
+  const usable=prefNames.filter(n=>n!=='沖縄県'&&prefCentroids[n]);
+  if(!usable.length)return;
+  let sx=0, sy=0;
+  usable.forEach(n=>{sx+=prefCentroids[n][0]; sy+=prefCentroids[n][1];});
+  sx/=usable.length; sy/=usable.length;
+  const vw=mapW/mapScale, vh=mapH/mapScale;
+  mapVX=sx-vw/2; mapVY=sy-vh/2;
+  mapApplyView();
 }
 function mapZoomIn(){
   if(!mapW)return;
