@@ -92,7 +92,14 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .kuni-item.selected{color:#ff8040}
 .kuni-clear{padding:7px 12px;font-size:12px;color:#505080;cursor:pointer;border-bottom:.5px solid rgba(255,255,255,.06)}
 #map-svg-wrap{flex:1;background:#050c14;position:relative;overflow:hidden}
-#map-svg{width:100%;height:100%}
+#map-svg{width:100%;height:100%;touch-action:none}
+#map-svg.zoomed{cursor:grab}#map-svg.zoomed:active{cursor:grabbing}
+/* 沖縄の下に置く拡大/縮小ボタン */
+#map-zoom-ctrl{position:absolute;top:170px;left:8px;display:flex;gap:5px;z-index:5}
+#map-zoom-ctrl button{display:inline-flex;align-items:center;gap:3px;height:30px;padding:0 10px;border-radius:6px;background:rgba(5,12,20,0.88);border:.5px solid rgba(255,255,255,0.22);color:#dde;font-size:12px;cursor:pointer;font-family:inherit}
+#map-zoom-ctrl button:hover:not(:disabled){background:rgba(48,72,128,0.75);border-color:rgba(255,255,255,0.45);color:#fff}
+#map-zoom-ctrl button:disabled{opacity:0.35;cursor:default}
+#map-zoom-ctrl button i{font-size:14px}
 #map-badge{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(6,12,26,.92);border:.5px solid rgba(64,192,255,.3);border-radius:8px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .3s}
 #map-badge.show{opacity:1}
 #map-badge-title{font-size:14px;color:#60c0ff;font-weight:500;margin-bottom:3px}
@@ -247,9 +254,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div class="screen" id="tab-nenpyo">
     <div id="nenpyo-filter">
       <button class="cat-chip active" data-cat="all">すべて</button>
-      <button class="cat-chip" data-cat="wars">出来事</button>
       <button class="cat-chip" data-cat="religion">宗教</button>
-      <button class="cat-chip" data-cat="arts">芸能・文化</button>
+      <button class="cat-chip" data-cat="arts">芸能</button>
+      <button class="cat-chip" data-cat="wars">出来事</button>
     </div>
     <div id="nenpyo-list"></div>
   </div>
@@ -265,6 +272,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
     </div>
     <div id="map-svg-wrap">
       <svg id="map-svg"></svg>
+      <div id="map-zoom-ctrl">
+        <button id="map-zoom-in" onclick="mapZoomIn()" title="拡大"><i class="ti ti-zoom-in"></i>拡大</button>
+        <button id="map-zoom-out" onclick="mapZoomOut()" title="縮小" disabled><i class="ti ti-zoom-out"></i>縮小</button>
+      </div>
       <div id="map-tt"></div>
       <div id="map-badge"><div id="map-badge-title"></div><div id="map-badge-desc"></div></div>
     </div>
@@ -705,8 +716,9 @@ function switchTab(tab){
   });
   if(tab==='chizu'){
     mapRendered=false;
-    setKuni('','— 旧国名を選択 —');
-    // hide back button (only shown when navigating from person detail)
+    // 地図を縮小サイズ・非選択状態にリセット
+    mapScale=1; mapVX=0; mapVY=0;
+    clearMap(); // setKuni を含む（旧国・マーカー・ハイライト解除）
     const mapBackBtn=document.getElementById('map-back-btn');
     if(mapBackBtn) mapBackBtn.style.display='none';
     requestAnimationFrame(()=>requestAnimationFrame(renderMap));
@@ -938,7 +950,13 @@ function renderMap(){
   const wrap=document.getElementById('map-svg-wrap');
   const w=wrap.clientWidth,h=wrap.clientHeight;
   if(!w||!h){mapRendered=false;return;}
+  // ズーム用に元サイズを保持
+  mapW=w; mapH=h; mapScale=1; mapVX=0; mapVY=0;
   const svg=d3.select('#map-svg').attr('viewBox','0 0 '+w+' '+h);
+  document.getElementById('map-svg').classList.remove('zoomed');
+  document.getElementById('map-zoom-in').disabled=false;
+  document.getElementById('map-zoom-out').disabled=true;
+  initMapDrag();
 
   const allFeat=topojson.feature(TOPO,TOPO.objects.japan);
   // 手動投影：日本本土（130-146°E, 30.9-45.5°N）が縦90%に収まるようスケール算出
@@ -1108,6 +1126,72 @@ function clearMap(){
   setKuni('','— 旧国名を選択 —'); // kuni選択クリア＋updateMapEra（pref-highlighted リセット）
   if(mapG) mapG.selectAll('.person-loc-marker').remove();
   personMapLocs=null;
+}
+
+// ── 地図ズーム＆パン（300% ズーム、ドラッグでパン） ─────────
+let mapW=0, mapH=0, mapScale=1, mapVX=0, mapVY=0;
+let mapDrag=false, mapDragX=0, mapDragY=0, _mapDragInit=false;
+function mapApplyView(){
+  if(!mapW||!mapH)return;
+  const vw=mapW/mapScale, vh=mapH/mapScale;
+  mapVX=Math.max(0, Math.min(mapVX, mapW-vw));
+  mapVY=Math.max(0, Math.min(mapVY, mapH-vh));
+  document.getElementById('map-svg').setAttribute('viewBox', mapVX+' '+mapVY+' '+vw+' '+vh);
+}
+function mapZoomIn(){
+  if(!mapW)return;
+  mapScale=3;
+  // 中央付近を初期表示（本州中央あたり）
+  mapVX=mapW*1/3; mapVY=mapH*1/3;
+  mapApplyView();
+  document.getElementById('map-svg').classList.add('zoomed');
+  document.getElementById('map-zoom-in').disabled=true;
+  document.getElementById('map-zoom-out').disabled=false;
+}
+function mapZoomOut(){
+  mapScale=1; mapVX=0; mapVY=0;
+  mapApplyView();
+  document.getElementById('map-svg').classList.remove('zoomed');
+  document.getElementById('map-zoom-in').disabled=false;
+  document.getElementById('map-zoom-out').disabled=true;
+}
+function initMapDrag(){
+  if(_mapDragInit)return;
+  _mapDragInit=true;
+  const svgEl=document.getElementById('map-svg');
+  // マウス
+  svgEl.addEventListener('mousedown',e=>{
+    if(mapScale<=1)return;
+    // 沖縄ボックス・ズームボタン上のクリックは無視（祖先 #map-zoom-ctrl チェック）
+    if(e.target.closest('#map-zoom-ctrl'))return;
+    mapDrag=true; mapDragX=e.clientX; mapDragY=e.clientY; e.preventDefault();
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!mapDrag)return;
+    const dx=e.clientX-mapDragX, dy=e.clientY-mapDragY;
+    mapDragX=e.clientX; mapDragY=e.clientY;
+    mapVX -= dx/mapScale; mapVY -= dy/mapScale;
+    mapApplyView();
+  });
+  window.addEventListener('mouseup',()=>{mapDrag=false;});
+  // タッチ
+  let lastTX=0, lastTY=0;
+  svgEl.addEventListener('touchstart',e=>{
+    if(mapScale<=1)return;
+    if(e.touches.length>1)return;
+    if(e.target.closest('#map-zoom-ctrl'))return;
+    const t=e.touches[0]; lastTX=t.clientX; lastTY=t.clientY;
+  },{passive:true});
+  svgEl.addEventListener('touchmove',e=>{
+    if(mapScale<=1)return;
+    if(e.touches.length>1)return;
+    const t=e.touches[0];
+    const dx=t.clientX-lastTX, dy=t.clientY-lastTY;
+    lastTX=t.clientX; lastTY=t.clientY;
+    mapVX -= dx/mapScale; mapVY -= dy/mapScale;
+    mapApplyView();
+    e.preventDefault();
+  },{passive:false});
 }
 
 function updateMapEra(){
