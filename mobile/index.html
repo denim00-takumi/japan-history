@@ -334,8 +334,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
       <div id="search-initial">
         <div style="font-size:12px;color:#333;font-weight:500;margin-bottom:8px;letter-spacing:.05em">コンテンツ</div>
         <div class="search-shortcut" data-goto="noh">
-          <i class="ti ti-masks-theater" style="color:#c8a04a"></i>
-          <div><div class="search-shortcut-t">能の分類と解説</div><div class="search-shortcut-s">五番立 全34曲 — 神能・修羅・鬘・雑・切</div></div>
+          <div><div class="search-shortcut-t">能の分類と記録</div><div class="search-shortcut-s">五番立 全39曲 — 神能・修羅・鬘・雑・切</div></div>
         </div>
         <div class="search-shortcut" data-goto="tokaido">
           <i class="ti ti-road"></i>
@@ -442,7 +441,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div class="screen hidden" id="screen-noh-list">
     <div class="nav-row">
       <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索TOP</button>
-      <span class="nav-title">能の分類と解説</span>
+      <span class="nav-title">能の分類と記録</span>
     </div>
     <div id="noh-list-scroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#0a0a14"></div>
   </div>
@@ -1556,6 +1555,25 @@ function doSearch(){
     });
   }
 
+  // 能曲（漢字 includes + ふりがな先頭一致）
+  const nohs=NOH_DATA.filter(p=>{
+    const nm=q.length===1?p.n.startsWith(q):p.n.includes(q);
+    const fm=p.fg&&p.fg.startsWith(ql);
+    return nm||fm;
+  });
+  if(nohs.length){
+    html+='<div class="result-type-hdr">能曲（'+nohs.length+'件）</div>';
+    nohs.slice(0,10).forEach(p=>{
+      const a=NOH_ACTS[p.act]||{color:'#888',label:'',name:''};
+      html+=`<div class="result-row" data-type="noh" data-id="${escHtml(p.id)}">
+        <i class="ti ti-masks-theater result-icon" style="color:${a.color}"></i>
+        <div><div class="result-main">${hlText(p.n,q)} <span style="color:#888;font-size:11px">(${escHtml(p.fg)})</span></div>
+        <div class="result-sub">${escHtml(a.label)} ${escHtml(a.name)} ｜ ${escHtml(p.cls)}</div></div>
+        <span class="result-badge" style="background:${a.color}33;color:${a.color}">${escHtml(a.label)}</span>
+      </div>`;
+    });
+  }
+
   if(!html) html='<div class="no-results">「'+escHtml(q)+'」の検索結果はありません</div>';
   searchResults.innerHTML=html;
 
@@ -1589,6 +1607,9 @@ function doSearch(){
         const special=row.dataset.special==='1';
         const s=TOKAIDO.find(x=>x.num===num&&!!x.special===special);
         if(s){ activeStation=s; openTokaido(); }
+      } else if(type==='noh'){
+        openNoh();
+        setTimeout(()=>showNohDetail(row.dataset.id),200);
       }
     });
   });

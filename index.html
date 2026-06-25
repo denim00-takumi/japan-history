@@ -355,7 +355,7 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
     <!-- 能リストドロワー（能タブ起動時に中央ペインを覆う） -->
     <div id="noh-list-drawer">
       <div id="noh-list-hd">
-        <span class="noh-title">🎭 能の分類と解説</span>
+        <span class="noh-title">能の分類と記録</span>
         <button onclick="switchBtmTab('noh')" title="閉じる">✕</button>
       </div>
       <div id="noh-list-bd"></div>
@@ -458,8 +458,8 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
     <button class="btm-tab" id="btm-tk-tab" onclick="switchBtmTab('tokaido')" title="東海道五十三次">
       東海道53次 <span class="tab-arrow">▼</span>
     </button>
-    <button class="btm-tab" id="btm-noh-tab" onclick="switchBtmTab('noh')" title="能の分類と解説">
-      🎭 能 <span class="tab-arrow">▼</span>
+    <button class="btm-tab" id="btm-noh-tab" onclick="switchBtmTab('noh')" title="能の分類と記録">
+      能の分類と記録 <span class="tab-arrow">▼</span>
     </button>
   </div>
   <div id="btm-inner">
@@ -2439,6 +2439,24 @@ function doSrch(){
         +'<span class="srch-bdg" style="background:#201810;color:#a07030">'+lbl+'</span></div>';
     });
   }
+  // 能曲（漢字 includes + ふりがな先頭一致）
+  var nohs=NOH_DATA.filter(function(p){
+    var nm=q.length===1?p.n.indexOf(q)===0:p.n.indexOf(q)>=0;
+    var fm=p.fg&&p.fg.toLowerCase().indexOf(ql)===0;
+    return nm||fm;
+  });
+  if(nohs.length){
+    html+='<div class="srch-hdr">能曲 ('+nohs.length+'件)</div>';
+    nohs.slice(0,10).forEach(function(p){
+      var a=NOH_ACTS[p.act]||{color:'#888',label:'',name:''};
+      html+='<div class="srch-row" data-type="noh" data-id="'+srchEsc(p.id)+'">'
+        +'<div class="srch-ico" style="background:'+a.color+'33;color:'+a.color+'">能</div>'
+        +'<div class="srch-main"><div class="srch-mn">'+srchHl(p.n,q)
+        +'<span class="srch-fg">('+srchEsc(p.fg)+')</span></div>'
+        +'<div class="srch-ms">'+srchEsc(a.label)+' '+srchEsc(a.name)+' ｜ '+srchEsc(p.cls)+'</div></div>'
+        +'<span class="srch-bdg" style="background:'+a.color+';color:#fff">'+srchEsc(a.label)+'</span></div>';
+    });
+  }
   if(!html)html='<div class="srch-none">「'+srchEsc(q)+'」に一致する項目はありません</div>';
   results.innerHTML=html;
   // クリック動作のバインド
@@ -2470,6 +2488,10 @@ function doSrch(){
         var idx=parseInt(row.dataset.idx);
         if(_btmTab!=='tokaido'){switchBtmTab('tokaido');}
         setTimeout(function(){selTokaidoStation(idx);},260);
+      } else if(t==='noh'){
+        // 能タブを開いて該当曲の詳細を表示
+        if(_btmTab!=='noh'){switchBtmTab('noh');}
+        setTimeout(function(){showNohDetail(row.dataset.id);},260);
       }
     });
   });

@@ -1,5 +1,5 @@
 // バージョンを上げるたびに古いキャッシュが自動削除される
-const CACHE = 'jhm-v30';
+const CACHE = 'jhm-v31';
 const ASSETS = [
   '/japan-history/mobile/',
   '/japan-history/mobile/index.html',
