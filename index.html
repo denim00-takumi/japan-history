@@ -88,7 +88,7 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 #btm{height:156px;background:#1a1a22;border-top:0.5px solid #2a2a35;flex-shrink:0;display:flex;overflow:hidden}
 #btm.collapsed{height:32px!important}
 /* ── 左ペイン（人物）── 2列目 */
-#lp{background:#222228;border-right:0.5px solid #333340;border-left:0.5px solid #333340;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+#lp{background:#222228;border-right:0.5px solid #333340;border-left:0.5px solid #333340;display:flex;flex-direction:column;overflow:hidden;min-height:0;position:relative}
 .lph{padding:7px 10px;border-bottom:0.5px solid #333;font-size:10px;color:#888;flex-shrink:0}
 #lp-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent;min-height:0}
 .sec-hdr{padding:5px 9px 3px;font-size:10px;letter-spacing:0.04em;border-bottom:0.5px solid;margin-bottom:4px;margin-top:2px}
@@ -155,6 +155,50 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 .pop-era-tbl td.unit{color:#888;padding:4px 2px 4px 4px;white-space:nowrap}
 .pop-era-tbl td.note{color:#888;font-size:10.5px;white-space:nowrap}
 .pop-era-tbl tr.peak td.era,.pop-era-tbl tr.peak td.num{color:#e0e6ff;font-weight:500}
+/* ── 能 ドロワー（中央=リスト / 右=詳細） ── */
+#noh-list-drawer,#noh-detail-drawer{position:absolute;inset:0;background:#13131a;display:flex;flex-direction:column;transform:translateX(105%);transition:transform 0.28s cubic-bezier(0.32,0.72,0.35,1);z-index:50;overflow:hidden;border-left:0.5px solid #2a2a40}
+#noh-list-drawer.open,#noh-detail-drawer.open{transform:translateX(0)}
+#noh-list-hd,#noh-detail-hd{padding:11px 14px;border-bottom:0.5px solid #2a2a40;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0c0c14}
+#noh-list-hd .noh-title,#noh-detail-hd .noh-title{font-size:13px;font-weight:600;color:#cfd5f0;display:flex;align-items:center;gap:6px}
+#noh-list-hd button,#noh-detail-hd button{background:none;border:none;color:#888;cursor:pointer;font-size:17px;line-height:1;padding:0 4px}
+#noh-list-hd button:hover,#noh-detail-hd button:hover{color:#cfd5f0}
+#noh-list-bd,#noh-detail-bd{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.noh-detail-empty{padding:40px 16px;color:#666;font-size:12px;text-align:center;line-height:1.8}
+/* リスト：段ヘッダー / 曲カード */
+.noh-act-sec{margin:0 0 4px}
+.noh-act-hd{padding:9px 12px 5px;font-size:12px;letter-spacing:.04em;color:#bbb;border-bottom:0.5px solid rgba(255,255,255,0.08);background:#0a0a14;display:flex;align-items:center;gap:6px}
+.noh-act-hd .noh-act-bar{width:6px;height:16px;border-radius:2px;flex-shrink:0}
+.noh-act-hd .noh-act-desc{font-size:11px;color:#888;margin-left:auto}
+.noh-card-w{background:#141420;border-bottom:0.5px solid #1e1e30;padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background 0.15s}
+.noh-card-w:hover{background:#1a1a2c}
+.noh-card-w.sel{background:#1e2840}
+.noh-card-w .bar{width:5px;height:30px;border-radius:3px;flex-shrink:0}
+.noh-card-w .main{flex:1;min-width:0}
+.noh-card-w .name-row{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.noh-card-w .n{font-size:15px;font-weight:600;letter-spacing:.02em}
+.noh-card-w .fg{font-size:11px;color:#888}
+.noh-card-w .cls{font-size:10px;color:#777;margin-top:1px}
+.noh-card-w .check{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:1px solid #2a2a3a;display:flex;align-items:center;justify-content:center;color:#7090ff;font-size:11px;background:#0a0a14}
+.noh-card-w .check.done{background:#1e3050;border-color:#5090ff;color:#fff}
+/* 詳細 */
+.noh-det-wrap{padding:16px 16px 28px}
+.noh-det-title{font-size:22px;font-weight:700;letter-spacing:.04em;margin-bottom:3px}
+.noh-det-fg{font-size:13px;color:#888;margin-bottom:9px}
+.noh-det-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:11px;font-size:11px;margin-bottom:14px}
+.noh-det-field{margin-bottom:10px}
+.noh-det-fl{font-size:11px;color:#888;letter-spacing:.03em;margin-bottom:2px}
+.noh-det-fv{font-size:13px;color:#ddd;line-height:1.65}
+.noh-det-notes{font-size:13px;color:#aaa;line-height:1.8;padding:9px 11px;background:#0c0c14;border-radius:7px;border:0.5px solid #1e1e30}
+/* 鑑賞記録（薄緑） */
+.noh-rec{margin-top:16px;padding:12px 13px;border-radius:9px;background:#0a1410;border:0.5px solid #1e2c22}
+.noh-rec-hd{font-size:12px;color:#a8d8b8;letter-spacing:.04em;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.noh-rec-row{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.noh-rec-row label{font-size:13px;color:#c0e0c8;display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.noh-rec-row input[type=checkbox]{width:16px;height:16px;accent-color:#6ab48b;cursor:pointer}
+.noh-rec-row .noh-rec-lb{flex-shrink:0;width:72px;font-size:11px;color:#8eb89a}
+.noh-rec-row input[type=text],.noh-rec-row input[type=date]{flex:1;background:#101c14;border:0.5px solid #2a3a30;border-radius:5px;color:#c0e0c8;font-size:13px;padding:6px 8px;font-family:inherit;outline:none;box-sizing:border-box;height:30px;-webkit-appearance:none}
+.noh-rec-row textarea{background:#101c14;border:0.5px solid #2a3a30;border-radius:5px;color:#c0e0c8;font-size:13px;padding:6px 8px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;overflow:hidden;min-height:30px;display:block;width:100%;line-height:1.5}
+.noh-rec-row input[type=text]:focus,.noh-rec-row input[type=date]:focus,.noh-rec-row textarea:focus{border-color:#6ab48b}
 #rp-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent;min-height:0}
 .emp{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:300px;color:#666;text-align:center;padding:20px;gap:8px;font-size:11px}
 .det{padding:14px;position:relative}
@@ -308,6 +352,14 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 
 <div id="main">
   <div id="lp">
+    <!-- 能リストドロワー（能タブ起動時に中央ペインを覆う） -->
+    <div id="noh-list-drawer">
+      <div id="noh-list-hd">
+        <span class="noh-title">🎭 能の分類と解説</span>
+        <button onclick="switchBtmTab('noh')" title="閉じる">✕</button>
+      </div>
+      <div id="noh-list-bd"></div>
+    </div>
     <div class="lph"><span>人物</span><button class="lph-add" onclick="openDr(null)">＋追加</button></div>
     <div id="lp-scroll">
       <div id="lpb"></div>
@@ -342,6 +394,16 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
         <span>人物・天皇・為政者・<br>旧国名・タイムライン項目を<br>クリックして詳細表示</span>
       </div>
       <div id="dcon" style="display:none"></div>
+    </div>
+    <!-- 能 詳細ドロワー（能タブ起動時に右ペインを覆う） -->
+    <div id="noh-detail-drawer">
+      <div id="noh-detail-hd">
+        <span class="noh-title" id="noh-detail-title-text">曲を選んでください</span>
+        <button onclick="switchBtmTab('noh')" title="閉じる">✕</button>
+      </div>
+      <div id="noh-detail-bd">
+        <div class="noh-detail-empty">← 左の一覧から曲を選択してください</div>
+      </div>
     </div>
     <!-- 日本の人口ドロワー（人口タブと連動して右からスライドイン） -->
     <div id="pop-drawer">
@@ -395,6 +457,9 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
     </button>
     <button class="btm-tab" id="btm-tk-tab" onclick="switchBtmTab('tokaido')" title="東海道五十三次">
       東海道53次 <span class="tab-arrow">▼</span>
+    </button>
+    <button class="btm-tab" id="btm-noh-tab" onclick="switchBtmTab('noh')" title="能の分類と解説">
+      🎭 能 <span class="tab-arrow">▼</span>
     </button>
   </div>
   <div id="btm-inner">
@@ -560,7 +625,7 @@ var MAP_R=14, MAP_FS=11; // アイコン基本サイズ（80%化済: 18*0.8≈14
 var _birthYear=null;
 // データバージョン（japan_history_data.json の version で上書きされる）
 // JSON 側が localStorage より新しい場合に JSON を優先するための基準値。
-var DATA_VERSION_FALLBACK=15;  // JSON 取得失敗時に用いる既定バージョン
+var DATA_VERSION_FALLBACK=16;  // JSON 取得失敗時に用いる既定バージョン
 var REMOTE_VERSION=DATA_VERSION_FALLBACK; // 実際に採用したデータのバージョン
 var DATA_URL='japan_history_data.json';   // 同一リポジトリ内のデータファイル
 var _jsonLoaded=false; // JSON取得に成功したか（localStorage破棄判定のガード）
@@ -600,6 +665,8 @@ function loadJsonData(){
       if(d.rulers)   RULERS=d.rulers;
       if(d.religious)RELIGIOUS=d.religious;
       if(d.pms)      PMS=d.pms;
+      if(d.noh)      NOH_DATA=d.noh;
+      if(d.nohActs)  NOH_ACTS=d.nohActs;
       if(d.cats)     mergeCats(d.cats);
       REMOTE_VERSION = (typeof d.version==='number') ? d.version : DATA_VERSION_FALLBACK;
       _jsonLoaded = true; // 取得成功
@@ -2029,6 +2096,102 @@ function showDet(html){
 }
 
 // ════════════════════════════════════════════════════
+// 能の分類と解説（共有データを japan_history_data.json から読込）
+// ════════════════════════════════════════════════════
+var NOH_DATA=[];   // [{id,act,n,fg,cls,alt,shite_type,shite,waki,source,era,author,religion,notes}, ...]
+var NOH_ACTS={};   // {1:{name,color,label,desc}, ...}
+var NOH_REC_KEY='noh_records_v1'; // mobile版と共用
+function getNohRecord(id){try{var all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');return all[id]||{};}catch(e){return {};}}
+function saveNohRecord(id,rec){try{var all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');all[id]=rec;localStorage.setItem(NOH_REC_KEY,JSON.stringify(all));}catch(e){}}
+var _nohSelId=null;
+
+function buildNohList(){
+  var bd=document.getElementById('noh-list-bd');if(!bd)return;
+  bd.innerHTML='';
+  [1,2,3,4,5].forEach(function(actNum){
+    var a=NOH_ACTS[actNum];if(!a)return;
+    var sec=document.createElement('div');sec.className='noh-act-sec';
+    sec.innerHTML='<div class="noh-act-hd">'
+      +'<span class="noh-act-bar" style="background:'+a.color+'"></span>'
+      +'<span style="color:'+a.color+';font-weight:600">'+a.label+' '+a.name+'</span>'
+      +'<span class="noh-act-desc">'+a.desc+'</span></div>';
+    NOH_DATA.filter(function(p){return p.act===actNum;}).forEach(function(p){
+      var rec=getNohRecord(p.id);
+      var done=rec.watched;
+      var card=document.createElement('div');
+      card.className='noh-card-w'+(_nohSelId===p.id?' sel':'');
+      card.dataset.id=p.id;
+      card.innerHTML='<div class="bar" style="background:'+a.color+'"></div>'
+        +'<div class="main"><div class="name-row">'
+        +'<span class="n" style="color:'+a.color+'">'+p.n+'</span>'
+        +'<span class="fg">'+p.fg+'</span></div>'
+        +'<div class="cls">'+p.cls+' ｜ '+p.alt+'</div></div>'
+        +'<div class="check'+(done?' done':'')+'" title="'+(done?'鑑賞済':'未鑑賞')+'">'
+        +(done?'✓':'›')+'</div>';
+      card.onclick=(function(pid){return function(){showNohDetail(pid);};})(p.id);
+      sec.appendChild(card);
+    });
+    bd.appendChild(sec);
+  });
+}
+
+function showNohDetail(id){
+  var p=NOH_DATA.find(function(x){return x.id===id;});if(!p)return;
+  _nohSelId=id;
+  // 選択状態をリストに反映
+  document.querySelectorAll('#noh-list-bd .noh-card-w').forEach(function(c){
+    c.classList.toggle('sel',c.dataset.id===id);
+  });
+  var a=NOH_ACTS[p.act];
+  var bd=document.getElementById('noh-detail-bd');
+  document.getElementById('noh-detail-title-text').textContent=p.n;
+  var rec=getNohRecord(id);
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  bd.innerHTML='<div class="noh-det-wrap">'
+    +'<div class="noh-det-title" style="color:'+a.color+'">'+esc(p.n)+'</div>'
+    +'<div class="noh-det-fg">'+esc(p.fg)+'</div>'
+    +'<div class="noh-det-tag" style="background:'+a.color+'33;color:'+a.color+';border:0.5px solid '+a.color+'">'+a.label+' '+a.name+'（'+esc(p.cls)+'）</div>'
+    +'<div class="noh-det-field"><div class="noh-det-fl">主なシテ</div><div class="noh-det-fv">'+esc(p.shite_type)+'</div></div>'
+    +'<div class="noh-det-field"><div class="noh-det-fl">登場人物（シテ）</div><div class="noh-det-fv">'+esc(p.shite)+'</div></div>'
+    +'<div class="noh-det-field"><div class="noh-det-fl">登場人物（ワキ）</div><div class="noh-det-fv">'+esc(p.waki)+'</div></div>'
+    +'<div class="noh-det-field"><div class="noh-det-fl">引用・典拠</div><div class="noh-det-fv">'+esc(p.source)+'</div></div>'
+    +'<div class="noh-det-field"><div class="noh-det-fl">成立年代</div><div class="noh-det-fv">'+esc(p.era)+'</div></div>'
+    +'<div class="noh-det-field"><div class="noh-det-fl">作者</div><div class="noh-det-fv">'+esc(p.author)+'</div></div>'
+    +'<div class="noh-det-field"><div class="noh-det-fl">関連宗教・宗派</div><div class="noh-det-fv">'+esc(p.religion)+'</div></div>'
+    +'<div class="noh-det-field"><div class="noh-det-fl">注釈</div><div class="noh-det-notes">'+esc(p.notes)+'</div></div>'
+    +'<div class="noh-rec">'
+      +'<div class="noh-rec-hd">📑 鑑賞記録</div>'
+      +'<div class="noh-rec-row"><label><input type="checkbox" id="noh-rec-watched"'+(rec.watched?' checked':'')+'>鑑賞済み</label></div>'
+      +'<div class="noh-rec-row"><span class="noh-rec-lb">鑑賞場所</span>'
+        +'<input type="text" id="noh-rec-place" placeholder="例：能楽堂・神社・ホール名" value="'+esc(rec.place||'')+'"></div>'
+      +'<div class="noh-rec-row"><span class="noh-rec-lb">鑑賞年月日</span>'
+        +'<input type="date" id="noh-rec-date" value="'+esc(rec.date||'')+'"></div>'
+      +'<div class="noh-rec-row" style="flex-direction:column;align-items:stretch;gap:4px">'
+        +'<span class="noh-rec-lb" style="width:auto">メモ</span>'
+        +'<textarea id="noh-rec-memo" placeholder="感想・配役・流派など" rows="1">'+esc(rec.memo||'')+'</textarea></div>'
+    +'</div></div>';
+  // 入力ごとに保存＋リスト更新
+  function save(){
+    saveNohRecord(p.id,{
+      watched:document.getElementById('noh-rec-watched').checked,
+      place:document.getElementById('noh-rec-place').value.trim(),
+      date:document.getElementById('noh-rec-date').value.trim(),
+      memo:document.getElementById('noh-rec-memo').value.trim()
+    });
+    buildNohList();
+  }
+  ['noh-rec-watched','noh-rec-place','noh-rec-date','noh-rec-memo'].forEach(function(eid){
+    var el=document.getElementById(eid);
+    if(el) el.addEventListener(el.type==='checkbox'?'change':'input',save);
+  });
+  // textarea 自動拡張
+  var memoEl=document.getElementById('noh-rec-memo');
+  var autoGrow=function(){if(!memoEl||memoEl.offsetParent===null)return;memoEl.style.height='auto';memoEl.style.height=(memoEl.scrollHeight||30)+'px';};
+  memoEl.addEventListener('input',autoGrow);
+  setTimeout(autoGrow,0);setTimeout(autoGrow,80);setTimeout(autoGrow,200);
+}
+
+// ════════════════════════════════════════════════════
 // 日本人口グラフ
 // ════════════════════════════════════════════════════
 var POP_DATA=[
@@ -2404,33 +2567,72 @@ function switchBtmTab(name){
   var tkPanel  = document.getElementById('tokaido-panel');
   var popTab   = document.getElementById('btm-pop-tab');
   var tkTab    = document.getElementById('btm-tk-tab');
+  var nohTab   = document.getElementById('btm-noh-tab');
   var popDrawer = document.getElementById('pop-drawer');
+  var nohListDrawer = document.getElementById('noh-list-drawer');
+  var nohDetailDrawer = document.getElementById('noh-detail-drawer');
+  function closeAllTabs(){
+    popTab.classList.remove('active');
+    tkTab.classList.remove('active');
+    if(nohTab) nohTab.classList.remove('active');
+    if(popDrawer) popDrawer.classList.remove('open');
+    if(nohListDrawer) nohListDrawer.classList.remove('open');
+    if(nohDetailDrawer) nohDetailDrawer.classList.remove('open');
+  }
   if(_btmTab === name){
     // 同じタブ → 折り畳み
     _btmTab = null;
     btm.classList.add('collapsed');
-    popTab.classList.remove('active'); tkTab.classList.remove('active');
+    closeAllTabs();
     clearTokaidoRoute();
-    if(popDrawer) popDrawer.classList.remove('open'); // 人口ドロワーも閉じる
   } else {
     _btmTab = name;
     btm.classList.remove('collapsed');
+    closeAllTabs();
     if(name === 'pop'){
       popPanel.style.display = 'flex';
       tkPanel.style.display  = 'none';
-      popTab.classList.add('active'); tkTab.classList.remove('active');
+      popTab.classList.add('active');
       clearTokaidoRoute();
       setTimeout(buildPopChart, 250);
-      if(popDrawer) popDrawer.classList.add('open'); // 右カラムにドロワー展開
-    } else {
+      if(popDrawer) popDrawer.classList.add('open');
+    } else if(name === 'tokaido'){
       popPanel.style.display = 'none';
       tkPanel.style.display  = 'flex';
-      tkTab.classList.add('active'); popTab.classList.remove('active');
+      tkTab.classList.add('active');
       buildTokaidoPanel();
-      if(popDrawer) popDrawer.classList.remove('open'); // 東海道タブ時はドロワー閉じる
+    } else if(name === 'noh'){
+      // 能タブ: 下段は最小化したまま、中央と右ペインに能ドロワー
+      btm.classList.add('collapsed');
+      popPanel.style.display = 'none';
+      tkPanel.style.display  = 'none';
+      if(nohTab) nohTab.classList.add('active');
+      clearTokaidoRoute();
+      _nohSelId = null;
+      // 詳細ドロワーは初期状態に戻す
+      var dbd = document.getElementById('noh-detail-bd');
+      if(dbd) dbd.innerHTML = '<div class="noh-detail-empty">← 左の一覧から曲を選択してください</div>';
+      document.getElementById('noh-detail-title-text').textContent = '曲を選んでください';
+      buildNohList();
+      if(nohListDrawer) nohListDrawer.classList.add('open');
+      if(nohDetailDrawer) nohDetailDrawer.classList.add('open');
     }
   }
 }
+
+// 能ドロワー（リスト＋詳細）の外クリックで閉じる
+document.addEventListener('click', function(e){
+  var list=document.getElementById('noh-list-drawer');
+  if(!list||!list.classList.contains('open')) return;
+  // 能ドロワー（リスト/詳細）内 / 能タブボタン のクリックは無視
+  if(list.contains(e.target)) return;
+  var det=document.getElementById('noh-detail-drawer');
+  if(det&&det.contains(e.target)) return;
+  var nohTab=document.getElementById('btm-noh-tab');
+  if(nohTab&&nohTab.contains(e.target)) return;
+  // それ以外（上年表・地図・タイムライン等）→ 能タブを閉じる
+  switchBtmTab('noh');
+}, true);
 
 // 人口ドロワー外クリックで自動的に閉じる（上年表・左カラム・中央カラム等）
 // ドロワー内 / 人口タブボタン / 下段の人口グラフパネル のクリックは無視
