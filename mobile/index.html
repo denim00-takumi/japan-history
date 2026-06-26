@@ -440,9 +440,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
   <!-- L2: 能リスト -->
   <div class="screen hidden" id="screen-noh-list">
-    <div class="nav-row">
+    <div class="nav-row" style="display:flex;align-items:center;gap:6px">
       <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索TOP</button>
-      <span class="nav-title">🎭 能の分類と記録</span>
+      <span class="nav-title" style="flex:1">🎭 能の分類と記録</span>
+      <button onclick="exportNohRecords()" title="鑑賞記録を JSON 書出" style="font-size:11px;padding:4px 8px;border:.5px solid #4a6a4a;border-radius:5px;background:#0c1a10;color:#a8d8b8;font-family:inherit">💾 書出</button>
+      <label title="鑑賞記録 JSON 読込" style="font-size:11px;padding:4px 8px;border:.5px solid #4a6a4a;border-radius:5px;background:#0c1a10;color:#a8d8b8;cursor:pointer;font-family:inherit">📂 読込<input type="file" accept=".json" style="display:none" onchange="importNohRecords(this)"></label>
     </div>
     <div id="noh-list-scroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#0a0a14"></div>
   </div>
@@ -563,6 +565,43 @@ let NOH_DATA=[];  // initApp で DATA.noh から代入
 const NOH_REC_KEY='noh_records_v1';
 function getNohRecord(id){try{const all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');return all[id]||{};}catch(e){return {};}}
 function saveNohRecord(id,rec){try{const all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');all[id]=rec;localStorage.setItem(NOH_REC_KEY,JSON.stringify(all));}catch(e){}}
+// 鑑賞記録の書き出し/読み込み（Safari の履歴削除等で localStorage が消えた場合の復元用）
+function exportNohRecords(){
+  try{
+    const all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');
+    if(Object.keys(all).length===0){alert('鑑賞記録がまだありません。');return;}
+    const data={key:NOH_REC_KEY,version:1,exportedAt:new Date().toISOString(),records:all};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='noh_records_'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},100);
+  }catch(e){alert('書き出しに失敗: '+e.message);}
+}
+function importNohRecords(input){
+  if(!input.files||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      const records=d.records||d;
+      if(!records||typeof records!=='object'){alert('読込失敗：形式が不正');return;}
+      const existing=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');
+      let newCount=0,overwriteCount=0;
+      Object.keys(records).forEach(id=>{
+        if(existing[id])overwriteCount++; else newCount++;
+        existing[id]=records[id];
+      });
+      localStorage.setItem(NOH_REC_KEY,JSON.stringify(existing));
+      alert('読込完了：新規 '+newCount+' 件 / 上書き '+overwriteCount+' 件');
+      if(typeof buildNohList==='function') buildNohList();
+    }catch(err){alert('読込失敗: '+err.message);}
+    input.value='';
+  };
+  reader.readAsText(input.files[0]);
+}
 
 // population data (万人)
 const POP_DATA = [

@@ -356,7 +356,11 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
     <div id="noh-list-drawer">
       <div id="noh-list-hd">
         <span class="noh-title">🎭 能の分類と記録</span>
-        <button onclick="switchBtmTab('noh')" title="閉じる">✕</button>
+        <div style="display:flex;align-items:center;gap:4px">
+          <button onclick="exportNohRecords()" title="鑑賞記録を JSON ファイルに書き出し（Safari の履歴削除対策）" style="font-size:11px;padding:3px 8px;border:0.5px solid #4a6a4a;border-radius:4px;background:#0c1a10;color:#a8d8b8">💾 記録書出</button>
+          <label title="鑑賞記録 JSON を読み込み（履歴削除後の復元）" style="font-size:11px;padding:3px 8px;border:0.5px solid #4a6a4a;border-radius:4px;background:#0c1a10;color:#a8d8b8;cursor:pointer">📂 記録読込<input type="file" accept=".json" style="display:none" onchange="importNohRecords(this)"></label>
+          <button onclick="switchBtmTab('noh')" title="閉じる" style="font-size:17px;line-height:1;padding:0 4px;background:none;border:none;color:#888;cursor:pointer">✕</button>
+        </div>
       </div>
       <div id="noh-list-bd"></div>
     </div>
@@ -2139,6 +2143,45 @@ var NOH_ACTS={};   // {1:{name,color,label,desc}, ...}
 var NOH_REC_KEY='noh_records_v1'; // mobile版と共用
 function getNohRecord(id){try{var all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');return all[id]||{};}catch(e){return {};}}
 function saveNohRecord(id,rec){try{var all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');all[id]=rec;localStorage.setItem(NOH_REC_KEY,JSON.stringify(all));}catch(e){}}
+// 鑑賞記録の書き出し/読み込み（Safari 履歴削除等でlocalStorageが消えた場合の復元用）
+function exportNohRecords(){
+  try{
+    var all=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');
+    var count=Object.keys(all).length;
+    if(count===0){alert('鑑賞記録がまだありません。');return;}
+    var data={key:NOH_REC_KEY,version:1,exportedAt:new Date().toISOString(),records:all};
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='noh_records_'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},100);
+  }catch(e){alert('書き出しに失敗: '+e.message);}
+}
+function importNohRecords(input){
+  if(!input.files||!input.files[0])return;
+  var f=input.files[0];
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var d=JSON.parse(e.target.result);
+      var records=d.records||d; // 旧形式も許容
+      if(!records||typeof records!=='object'){alert('読み込み失敗: 形式が不正');return;}
+      var existing=JSON.parse(localStorage.getItem(NOH_REC_KEY)||'{}');
+      var newCount=0, overwriteCount=0;
+      Object.keys(records).forEach(function(id){
+        if(existing[id])overwriteCount++; else newCount++;
+        existing[id]=records[id];
+      });
+      localStorage.setItem(NOH_REC_KEY,JSON.stringify(existing));
+      alert('読込完了：新規 '+newCount+' 件 / 上書き '+overwriteCount+' 件');
+      if(typeof buildNohList==='function') buildNohList();
+    }catch(err){alert('読み込み失敗: '+err.message);}
+    input.value='';
+  };
+  reader.readAsText(f);
+}
 var _nohSelId=null;
 
 function buildNohList(){
