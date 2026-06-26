@@ -1355,6 +1355,8 @@ function buildJinbutsu(){
     {label:'為政者',   color:'#5090ff', sq:false, items:DATA.rulers},
     {label:'宗教者',   color:'#a878c8', sq:false, items:DATA.religious||[]},
     {label:'総理大臣', color:'#c08560', sq:false, items:DATA.pms||[]},
+    {label:'落語家',   color:'#6090c0', sq:false, items:DATA.rakugo||[]},
+    {label:'講談師',   color:'#a06848', sq:false, items:DATA.kodan||[]},
     {label:'人物',     color:'#80a050', sq:false, items:DATA.persons},
   ];
 
@@ -1503,7 +1505,7 @@ function doSearch(){
   let html='';
 
   // persons (fg support — furigana は先頭一致のみ)
-  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers,...(DATA.religious||[]),...(DATA.pms||[])].filter(p=>{
+  const persons=[...DATA.persons,...DATA.emperors,...DATA.rulers,...(DATA.religious||[]),...(DATA.pms||[]),...(DATA.rakugo||[]),...(DATA.kodan||[])].filter(p=>{
     return p.n.includes(q)||(p.fg&&p.fg.startsWith(ql))||(p.role&&p.role.includes(q));
   });
   if(persons.length){
@@ -1591,6 +1593,8 @@ function doSearch(){
           {arr:DATA.rulers,     color:'#5090ff', sq:false},
           {arr:DATA.religious||[],color:'#a878c8', sq:false},
           {arr:DATA.pms||[],    color:'#c08560', sq:false},
+          {arr:DATA.rakugo||[], color:'#6090c0', sq:false},
+          {arr:DATA.kodan||[],  color:'#a06848', sq:false},
         ];
         let p=null,col='#5090ff',sq=false;
         for(const g of all){ const hit=g.arr.find(x=>x.id===id); if(hit){p=hit;col=g.color;sq=g.sq;break;} }

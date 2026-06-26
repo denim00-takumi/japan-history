@@ -369,6 +369,8 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
       <button class="hist-btn" id="rl-btn" onclick="toggleHistFloat('ruler')" style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="3.5" r="2.8" fill="#5a8ab8"/><path d="M0.5 12.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="#5a8ab8" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>為政者</span><span style="font-size:9px;color:#555">▶</span></button>
       <button class="hist-btn" id="rg-btn" onclick="toggleHistFloat('religious')" style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="3.5" r="2.8" fill="#a878c8"/><path d="M0.5 12.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="#a878c8" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>宗教者</span><span style="font-size:9px;color:#555">▶</span></button>
       <button class="hist-btn" id="pm-btn" onclick="toggleHistFloat('pm')" style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="3.5" r="2.8" fill="#c08560"/><path d="M0.5 12.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="#c08560" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>総理大臣</span><span style="font-size:9px;color:#555">▶</span></button>
+      <button class="hist-btn" id="rk-btn" onclick="toggleHistFloat('rakugo')" style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="3.5" r="2.8" fill="#6090c0"/><path d="M0.5 12.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="#6090c0" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>落語家</span><span style="font-size:9px;color:#555">▶</span></button>
+      <button class="hist-btn" id="kd-btn" onclick="toggleHistFloat('kodan')" style="display:flex;justify-content:space-between;align-items:center"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="3.5" r="2.8" fill="#a06848"/><path d="M0.5 12.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="#a06848" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>講談師</span><span style="font-size:9px;color:#555">▶</span></button>
     </div>
   </div>
 
@@ -511,6 +513,22 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
   </div>
   <div class="hfloat-bd" id="pm-fbd"></div>
 </div>
+<!-- 落語家フローティングパネル -->
+<div class="hfloat" id="rk-float">
+  <div class="hfloat-hd">
+    <span>🎙 落語家</span>
+    <button class="hfloat-cls" onclick="closeHistFloat('rakugo')">✕</button>
+  </div>
+  <div class="hfloat-bd" id="rk-fbd"></div>
+</div>
+<!-- 講談師フローティングパネル -->
+<div class="hfloat" id="kd-float">
+  <div class="hfloat-hd">
+    <span>📜 講談師</span>
+    <button class="hfloat-cls" onclick="closeHistFloat('kodan')">✕</button>
+  </div>
+  <div class="hfloat-bd" id="kd-fbd"></div>
+</div>
 
 <!-- ドロワー -->
 <div id="dr-bg" onclick="closeDr()"></div>
@@ -616,7 +634,7 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 // ════════════════════════════════════════════════════
 var BY=250, END=2030, PY=0.405;
 var ZM=null, ZM_ERA=null, ZM_TW=0;
-var st={person:null, emperor:null, ruler:null, religious:null, pm:null, prov:null, curEra:null};
+var st={person:null, emperor:null, ruler:null, religious:null, pm:null, rakugo:null, kodan:null, prov:null, curEra:null};
 // 地図ズーム状態
 var _mapScale=1, _mapVX=0, _mapVY=0, _mapW=0, _mapH=0;
 var _mapDrag=false, _mapDragX=0, _mapDragY=0;
@@ -625,7 +643,7 @@ var MAP_R=14, MAP_FS=11; // アイコン基本サイズ（80%化済: 18*0.8≈14
 var _birthYear=null;
 // データバージョン（japan_history_data.json の version で上書きされる）
 // JSON 側が localStorage より新しい場合に JSON を優先するための基準値。
-var DATA_VERSION_FALLBACK=16;  // JSON 取得失敗時に用いる既定バージョン
+var DATA_VERSION_FALLBACK=17;  // JSON 取得失敗時に用いる既定バージョン
 var REMOTE_VERSION=DATA_VERSION_FALLBACK; // 実際に採用したデータのバージョン
 var DATA_URL='japan_history_data.json';   // 同一リポジトリ内のデータファイル
 var _jsonLoaded=false; // JSON取得に成功したか（localStorage破棄判定のガード）
@@ -665,6 +683,8 @@ function loadJsonData(){
       if(d.rulers)   RULERS=d.rulers;
       if(d.religious)RELIGIOUS=d.religious;
       if(d.pms)      PMS=d.pms;
+      if(d.rakugo)   RAKUGO=d.rakugo;
+      if(d.kodan)    KODAN=d.kodan;
       if(d.noh)      NOH_DATA=d.noh;
       if(d.nohActs)  NOH_ACTS=d.nohActs;
       if(d.cats)     mergeCats(d.cats);
@@ -686,7 +706,9 @@ function saveData(){
       emperors:EMPERORS,
       rulers:RULERS,
       religious:RELIGIOUS,
-      pms:PMS
+      pms:PMS,
+      rakugo:RAKUGO,
+      kodan:KODAN
     }));
   }catch(e){}
 }
@@ -709,6 +731,8 @@ function loadData(){
     if(saved.rulers)RULERS=saved.rulers;
     if(saved.religious)RELIGIOUS=saved.religious;
     if(saved.pms)PMS=saved.pms;
+    if(saved.rakugo)RAKUGO=saved.rakugo;
+    if(saved.kodan)KODAN=saved.kodan;
     mergeCats(saved.cats);
   }catch(e){}
 }
@@ -868,6 +892,10 @@ var PMS=[
    desc:'奈良出身。憲政史上初の女性首相で、2025年10月に就任した。',
    locs:[{r:'kinki',  tp:'birth',c:'#50cc50',lb:'奈良県（出生・地盤）'}]}
 ];
+
+// ★ 落語家 / 講談師 最小デフォルトseed。本番データは japan_history_data.json が正。
+var RAKUGO=[];
+var KODAN=[];
 
 // 天皇・為政者ふりがな辞書（fg フィールドが未定義の場合に参照）
 var HIST_FG={
@@ -1325,13 +1353,17 @@ var HFLOATS={
   emperor:  {f:'em-float',b:'em-btn',body:'em-fbd',arr:'EMPERORS'},
   ruler:    {f:'rl-float',b:'rl-btn',body:'rl-fbd',arr:'RULERS'},
   religious:{f:'rg-float',b:'rg-btn',body:'rg-fbd',arr:'RELIGIOUS'},
-  pm:       {f:'pm-float',b:'pm-btn',body:'pm-fbd',arr:'PMS'}
+  pm:       {f:'pm-float',b:'pm-btn',body:'pm-fbd',arr:'PMS'},
+  rakugo:   {f:'rk-float',b:'rk-btn',body:'rk-fbd',arr:'RAKUGO'},
+  kodan:    {f:'kd-float',b:'kd-btn',body:'kd-fbd',arr:'KODAN'}
 };
 function buildHistFloats(){
   buildHistList('em-fbd',EMPERORS,'emperor');
   buildHistList('rl-fbd',RULERS,'ruler');
   buildHistList('rg-fbd',RELIGIOUS,'religious');
   buildHistList('pm-fbd',PMS,'pm');
+  buildHistList('rk-fbd',RAKUGO,'rakugo');
+  buildHistList('kd-fbd',KODAN,'kodan');
 }
 
 function toggleHistFloat(type){
@@ -1397,10 +1429,12 @@ function selHistFig(id,arr,type){
   st.person=null;st.prov=null;
   document.querySelectorAll('.pc').forEach(function(c){c.classList.remove('sel');});
   document.getElementById('psel').value='';
-  if(type==='emperor'){st.emperor=id;st.ruler=null;st.religious=null;st.pm=null;}
-  else if(type==='ruler'){st.ruler=id;st.emperor=null;st.religious=null;st.pm=null;}
-  else if(type==='religious'){st.religious=id;st.emperor=null;st.ruler=null;st.pm=null;}
-  else if(type==='pm'){st.pm=id;st.emperor=null;st.ruler=null;st.religious=null;}
+  if(type==='emperor'){st.emperor=id;st.ruler=null;st.religious=null;st.pm=null;st.rakugo=null;st.kodan=null;}
+  else if(type==='ruler'){st.ruler=id;st.emperor=null;st.religious=null;st.pm=null;st.rakugo=null;st.kodan=null;}
+  else if(type==='religious'){st.religious=id;st.emperor=null;st.ruler=null;st.pm=null;st.rakugo=null;st.kodan=null;}
+  else if(type==='pm'){st.pm=id;st.emperor=null;st.ruler=null;st.religious=null;st.rakugo=null;st.kodan=null;}
+  else if(type==='rakugo'){st.rakugo=id;st.emperor=null;st.ruler=null;st.religious=null;st.pm=null;st.kodan=null;}
+  else if(type==='kodan'){st.kodan=id;st.emperor=null;st.ruler=null;st.religious=null;st.pm=null;st.rakugo=null;}
   document.querySelectorAll('.hc').forEach(function(c){c.classList.toggle('sel',c.dataset.id===id&&c.dataset.type===type);});
   clearMap();
   var p=arr.find(function(x){return x.id===id;});if(!p)return;
@@ -1413,7 +1447,7 @@ function selHistFig(id,arr,type){
     addMarker(loc.r,mc,loc.tp==='birth'?'生':loc.tp==='active'?'活':'流',i*0.1,loc.lb);
   });
   centerMapOnMarkers();
-  var tag=type==='emperor'?'天皇':(type==='ruler'?'為政者':(type==='religious'?'宗教者':'総理大臣'));
+  var tag=type==='emperor'?'天皇':(type==='ruler'?'為政者':(type==='religious'?'宗教者':(type==='pm'?'総理大臣':(type==='rakugo'?'落語家':'講談師'))));
   var locH=p.locs.map(function(l){
     var tpLb=l.tp==='birth'?'出生地':l.tp==='active'?'活躍の地':'流刑地';
     var dc=LOCTPCOLOR[l.tp]||l.c; // 詳細画面のドットも統一
@@ -1655,9 +1689,9 @@ function saveDr(){
   var existId=document.getElementById('dr-id').value;
   var drType=document.getElementById('dr-type').value; // 'emperor'|'ruler'|''
   var savedId;
-  if(drType==='emperor'||drType==='ruler'||drType==='religious'||drType==='pm'){
-    // EMPERORS / RULERS / RELIGIOUS / PMS を更新（追加はしない）
-    var harr=drType==='emperor'?EMPERORS:(drType==='ruler'?RULERS:(drType==='religious'?RELIGIOUS:PMS));
+  if(drType==='emperor'||drType==='ruler'||drType==='religious'||drType==='pm'||drType==='rakugo'||drType==='kodan'){
+    // EMPERORS / RULERS / RELIGIOUS / PMS / RAKUGO / KODAN を更新（追加はしない）
+    var harr=drType==='emperor'?EMPERORS:(drType==='ruler'?RULERS:(drType==='religious'?RELIGIOUS:(drType==='pm'?PMS:(drType==='rakugo'?RAKUGO:KODAN))));
     var hp=harr.find(function(x){return x.id===existId;});
     if(hp){
       hp.n=n;hp.fg=fg;hp.l=l;hp.role=r;hp.desc=d;hp.locs=locsSnap;
@@ -1707,9 +1741,9 @@ function deletePDirect(id){
 }
 function openHistDr(id,type){
   initDrEraSelect();
-  var arr=type==='emperor'?EMPERORS:(type==='ruler'?RULERS:(type==='religious'?RELIGIOUS:PMS));
+  var arr=type==='emperor'?EMPERORS:(type==='ruler'?RULERS:(type==='religious'?RELIGIOUS:(type==='pm'?PMS:(type==='rakugo'?RAKUGO:KODAN))));
   var p=arr.find(function(x){return x.id===id;});if(!p)return;
-  var tagLb=type==='emperor'?'天皇':(type==='ruler'?'為政者':(type==='religious'?'宗教者':'総理大臣'));
+  var tagLb=type==='emperor'?'天皇':(type==='ruler'?'為政者':(type==='religious'?'宗教者':(type==='pm'?'総理大臣':(type==='rakugo'?'落語家':'講談師'))));
   document.getElementById('dr-title').textContent=tagLb+'を編集';
   document.getElementById('dr-del-btn').style.display='none'; // プリセットは削除不可
   document.getElementById('dr-id').value=id;
@@ -1769,6 +1803,8 @@ function reapplyMapSelection(){
   else if(st.ruler)    selHistFig(st.ruler,     RULERS,    'ruler');
   else if(st.religious)selHistFig(st.religious, RELIGIOUS, 'religious');
   else if(st.pm)       selHistFig(st.pm,        PMS,       'pm');
+  else if(st.rakugo)   selHistFig(st.rakugo,    RAKUGO,    'rakugo');
+  else if(st.kodan)    selHistFig(st.kodan,     KODAN,     'kodan');
   else if(st.prov)     selProv(st.prov);
 }
 function buildMap(){
@@ -2286,7 +2322,7 @@ function buildPopChart(){
 function exportData(){
   // version をインクリメントして書き出す。リポジトリにこのJSONを差し替えてコミットすると、
   // 既存ユーザーの古い localStorage より新しくなり、更新が確実に反映される（JSON優先）。
-  var data={version:REMOTE_VERSION+1,persons:PERSONS,cats:CATS,emperors:EMPERORS,rulers:RULERS,religious:RELIGIOUS,pms:PMS};
+  var data={version:REMOTE_VERSION+1,persons:PERSONS,cats:CATS,emperors:EMPERORS,rulers:RULERS,religious:RELIGIOUS,pms:PMS,rakugo:RAKUGO,kodan:KODAN};
   var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');a.href=url;a.download='japan_history_data.json';a.click();
@@ -2303,6 +2339,8 @@ function importData(input){
       if(d.rulers)RULERS=d.rulers;
       if(d.religious)RELIGIOUS=d.religious;
       if(d.pms)PMS=d.pms;
+      if(d.rakugo)RAKUGO=d.rakugo;
+      if(d.kodan)KODAN=d.kodan;
       mergeCats(d.cats);
       if(typeof d.version==='number') REMOTE_VERSION=d.version; // バージョンを引き継ぐ
       saveData();buildTimeline();renderPersonList();buildHistFloats();
@@ -2369,13 +2407,15 @@ function doSrch(){
   var rHits=RULERS.filter(matchPerson).map(function(p){return{p:p,type:'ruler'};});
   var gHits=RELIGIOUS.filter(matchPerson).map(function(p){return{p:p,type:'religious'};});
   var mHits=PMS.filter(matchPerson).map(function(p){return{p:p,type:'pm'};});
-  var ppl=pHits.concat(eHits).concat(rHits).concat(gHits).concat(mHits);
+  var rkHits=RAKUGO.filter(matchPerson).map(function(p){return{p:p,type:'rakugo'};});
+  var kdHits=KODAN.filter(matchPerson).map(function(p){return{p:p,type:'kodan'};});
+  var ppl=pHits.concat(eHits).concat(rHits).concat(gHits).concat(mHits).concat(rkHits).concat(kdHits);
   if(ppl.length){
     html+='<div class="srch-hdr">人物 ('+ppl.length+'件)</div>';
     ppl.slice(0,12).forEach(function(o){
       var p=o.p, t=o.type;
-      var tagLb=t==='emperor'?'天皇':(t==='ruler'?'為政者':(t==='religious'?'宗教者':(t==='pm'?'総理大臣':'人物')));
-      var bg=t==='emperor'?'#3a2848':(t==='ruler'?'#283848':(t==='religious'?'#3a2840':(t==='pm'?'#3a2818':'#283248')));
+      var tagLb=t==='emperor'?'天皇':(t==='ruler'?'為政者':(t==='religious'?'宗教者':(t==='pm'?'総理大臣':(t==='rakugo'?'落語家':(t==='kodan'?'講談師':'人物')))));
+      var bg=t==='emperor'?'#3a2848':(t==='ruler'?'#283848':(t==='religious'?'#3a2840':(t==='pm'?'#3a2818':(t==='rakugo'?'#283848':(t==='kodan'?'#3a2818':'#283248')))));
       var fg=p.fg||HIST_FG[p.n]||'';
       html+='<div class="srch-row" data-type="'+t+'" data-id="'+srchEsc(p.id)+'">'
         +'<div class="srch-ico">人</div>'
@@ -2469,6 +2509,8 @@ function doSrch(){
       else if(t==='ruler'){selHistFig(row.dataset.id,RULERS,'ruler');}
       else if(t==='religious'){selHistFig(row.dataset.id,RELIGIOUS,'religious');}
       else if(t==='pm'){selHistFig(row.dataset.id,PMS,'pm');}
+      else if(t==='rakugo'){selHistFig(row.dataset.id,RAKUGO,'rakugo');}
+      else if(t==='kodan'){selHistFig(row.dataset.id,KODAN,'kodan');}
       else if(t==='event'){
         var cat=CATS.find(function(c){return c.id===row.dataset.cat;});
         var it=cat&&cat.items.find(function(i){return i.id===row.dataset.id;});
