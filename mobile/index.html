@@ -138,7 +138,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 #search-initial{padding:12px 10px}
 .search-shortcut{background:#141420;border-radius:10px;border:.5px solid #1e1e30;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;transition:background .15s}
 .search-shortcut:active{background:#1e1e2c}
-.search-shortcut i{font-size:22px;color:#5090ff;flex-shrink:0}
+.search-shortcut i,.search-shortcut-icon{font-size:22px;color:#5090ff;flex-shrink:0;width:26px;text-align:center;line-height:1}
 .search-shortcut-t{font-size:15px;color:#ddd;font-weight:500}
 .search-shortcut-s{font-size:12px;color:#aaa;margin-top:2px}
 #search-results{display:none;padding:0}
@@ -334,14 +334,15 @@ input,textarea{-webkit-user-select:text;user-select:text}
       <div id="search-initial">
         <div style="font-size:12px;color:#333;font-weight:500;margin-bottom:8px;letter-spacing:.05em">コンテンツ</div>
         <div class="search-shortcut" data-goto="noh">
+          <div class="search-shortcut-icon" style="color:#c8a04a">🎭</div>
           <div><div class="search-shortcut-t">能の分類と記録</div><div class="search-shortcut-s">五番立 全39曲 — 神能・修羅・鬘・雑・切</div></div>
         </div>
         <div class="search-shortcut" data-goto="tokaido">
-          <i class="ti ti-road"></i>
+          <div class="search-shortcut-icon" style="color:#5090ff">🌊</div>
           <div><div class="search-shortcut-t">東海道五十三次</div><div class="search-shortcut-s">江戸〜京都 53宿場を地図で巡る</div></div>
         </div>
         <div class="search-shortcut" data-goto="population">
-          <i class="ti ti-chart-line" style="color:#60c060"></i>
+          <div class="search-shortcut-icon" style="color:#60c060">📈</div>
           <div><div class="search-shortcut-t">日本の人口</div><div class="search-shortcut-s">縄文〜現代 2000年の人口推移</div></div>
         </div>
       </div>
@@ -369,7 +370,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div class="screen hidden" id="screen-tokaido-map">
     <div class="nav-row">
       <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索TOP</button>
-      <span class="nav-title">東海道五十三次</span>
+      <span class="nav-title">🌊 東海道五十三次</span>
       <button class="nav-action" id="tk-to-list-btn" style="color:#5090ff">宿場一覧</button>
     </div>
     <div id="tokaido-map-wrap">
@@ -395,7 +396,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div class="screen hidden" id="screen-tokaido-list">
     <div class="nav-row">
       <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索TOP</button>
-      <span class="nav-title">東海道五十三次</span>
+      <span class="nav-title">🌊 東海道五十三次</span>
       <button class="nav-action" id="tk-to-map-btn">地図</button>
     </div>
     <div id="tokaido-list-scroll"></div>
@@ -405,7 +406,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div class="screen hidden" id="screen-population">
     <div class="nav-row">
       <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索TOP</button>
-      <span class="nav-title">日本の人口</span>
+      <span class="nav-title">📈 日本の人口</span>
     </div>
     <div id="pop-canvas-wrap">
       <canvas id="pop-canvas"></canvas>
@@ -441,7 +442,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div class="screen hidden" id="screen-noh-list">
     <div class="nav-row">
       <button class="back-btn" data-back="kensaku"><i class="ti ti-chevron-left"></i>検索TOP</button>
-      <span class="nav-title">能の分類と記録</span>
+      <span class="nav-title">🎭 能の分類と記録</span>
     </div>
     <div id="noh-list-scroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#0a0a14"></div>
   </div>
