@@ -216,6 +216,13 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 .ld{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:2px}
 .ltp{font-size:9px;color:#666}.llb{font-size:11px;color:#ddd}
 .erab{display:inline-flex;align-items:center;padding:3px 10px;border-radius:14px;font-size:11px;color:rgba(255,255,255,0.88);margin-bottom:9px}
+/* 🔗 関連（refs） */
+.refs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.ref-link{display:inline-flex;align-items:center;padding:4px 10px;border:0.5px solid #2a5a85;background:#0e1a2c;border-radius:14px;color:#7bb8e8;font-size:11px;cursor:pointer;text-decoration:none;transition:background .15s,color .15s,border-color .15s;font-family:inherit}
+.ref-link:hover{background:#1a3a5c;color:#a8d4f0;border-color:#4a8ab8}
+.ref-role{color:#5a8ab8;margin-left:3px;font-size:10px}
+.det-ab.nav-back{background:#0e1a2c;border-color:#2a5a85;color:#7bb8e8}
+.det-ab.nav-back:hover{background:#1a3a5c;color:#a8d4f0;border-color:#4a8ab8}
 @keyframes mpop{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}.mk{animation:mpop 0.3s ease-out both}
 /* ── ドロワー ── */
 #dr-bg,#ci-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200}
@@ -638,7 +645,7 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 // ════════════════════════════════════════════════════
 var BY=250, END=2030, PY=0.405;
 var ZM=null, ZM_ERA=null, ZM_TW=0;
-var st={person:null, emperor:null, ruler:null, religious:null, pm:null, rakugo:null, kodan:null, prov:null, curEra:null};
+var st={person:null, emperor:null, ruler:null, religious:null, pm:null, rakugo:null, kodan:null, prov:null, curEra:null, cat:null};
 // 地図ズーム状態
 var _mapScale=1, _mapVX=0, _mapVY=0, _mapW=0, _mapH=0;
 var _mapDrag=false, _mapDragX=0, _mapDragY=0;
@@ -647,7 +654,7 @@ var MAP_R=14, MAP_FS=11; // アイコン基本サイズ（80%化済: 18*0.8≈14
 var _birthYear=null;
 // データバージョン（japan_history_data.json の version で上書きされる）
 // JSON 側が localStorage より新しい場合に JSON を優先するための基準値。
-var DATA_VERSION_FALLBACK=18;  // JSON 取得失敗時に用いる既定バージョン
+var DATA_VERSION_FALLBACK=20;  // JSON 取得失敗時に用いる既定バージョン
 var REMOTE_VERSION=DATA_VERSION_FALLBACK; // 実際に採用したデータのバージョン
 var DATA_URL='japan_history_data.json';   // 同一リポジトリ内のデータファイル
 var _jsonLoaded=false; // JSON取得に成功したか（localStorage破棄判定のガード）
@@ -667,9 +674,14 @@ function mergeCats(srcCats){
     } else {
       var dc=CATS.find(function(c){return c.id===sc.id;});
       if(dc){
-        var dcIds=dc.items.map(function(i){return i.id;});
         (sc.items||[]).forEach(function(si){
-          if(dcIds.indexOf(si.id)===-1) dc.items.push(si);
+          var existing=dc.items.find(function(i){return i.id===si.id;});
+          if(existing){
+            // 同じIDの項目は JSON 側のフィールドで上書き（refs / desc 等を反映）
+            Object.keys(si).forEach(function(k){ existing[k]=si[k]; });
+          } else {
+            dc.items.push(si);
+          }
         });
       }
     }
@@ -1430,7 +1442,7 @@ function buildHistList(bodyId,arr,type){
 }
 
 function selHistFig(id,arr,type){
-  st.person=null;st.prov=null;
+  st.person=null;st.prov=null;st.cat=null;
   document.querySelectorAll('.pc').forEach(function(c){c.classList.remove('sel');});
   document.getElementById('psel').value='';
   if(type==='emperor'){st.emperor=id;st.ruler=null;st.religious=null;st.pm=null;st.rakugo=null;st.kodan=null;}
@@ -1459,6 +1471,7 @@ function selHistFig(id,arr,type){
   }).join('');
   var eraEl=eraForYear(p.s);
   showDet('<div class="det-acts">'
+    +renderNavBackBtn()
     +'<button class="det-ab" onclick="openHistDr(\''+p.id+'\',\''+type+'\')">✎ 編集</button>'
     +'</div>'
     +'<div class="dtag">'+tag+'</div>'
@@ -1466,7 +1479,8 @@ function selHistFig(id,arr,type){
     +'<div class="dm">'+p.l+' ｜ '+p.role+'</div>'
     +(eraEl?'<div class="erab" style="background:'+eraEl.c+'66;border:0.5px solid '+eraEl.c+'">'+eraName(eraEl)+'</div>':'')
     +'<div class="hd"></div><div class="dd">'+p.desc+'</div>'
-    +'<div class="hd"></div><div class="st">足跡・ゆかりの地</div>'+locH);
+    +'<div class="hd"></div><div class="st">足跡・ゆかりの地</div>'+locH
+    +renderRefsBlock(p));
 }
 
 // ════════════════════════════════════════════════════
@@ -2045,8 +2059,126 @@ function centerMapOnPrefs(prefNames){
 // ════════════════════════════════════════════════════
 // インタラクション
 // ════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+// 相互参照 (refs) ＆ 履歴ナビゲーション
+// ════════════════════════════════════════════════════
+var REV_REFS={};   // {targetId: [{fromId, role}]}
+var navStack=[];   // [{kind, id, catId?}]
+
+function buildRevRefs(){
+  REV_REFS={};
+  function scan(arr){
+    if(!arr)return;
+    arr.forEach(function(e){
+      if(!e||!e.refs)return;
+      e.refs.forEach(function(r){
+        if(!r||!r.id)return;
+        if(!REV_REFS[r.id])REV_REFS[r.id]=[];
+        REV_REFS[r.id].push({fromId:e.id, role:r.role||''});
+      });
+    });
+  }
+  scan(PERSONS);scan(EMPERORS);scan(RULERS);scan(RELIGIOUS);
+  scan(PMS);scan(RAKUGO);scan(KODAN);scan(NOH_DATA);
+  CATS.forEach(function(c){scan(c.items);});
+}
+
+function findEntity(id){
+  var kinds=[
+    {arr:EMPERORS, kind:'emperor'},
+    {arr:RULERS,   kind:'ruler'},
+    {arr:RELIGIOUS,kind:'religious'},
+    {arr:PMS,      kind:'pm'},
+    {arr:RAKUGO,   kind:'rakugo'},
+    {arr:KODAN,    kind:'kodan'},
+    {arr:PERSONS,  kind:'person'}
+  ];
+  for(var i=0;i<kinds.length;i++){
+    var f=kinds[i].arr.find(function(p){return p.id===id;});
+    if(f)return {entity:f, kind:kinds[i].kind};
+  }
+  for(var j=0;j<CATS.length;j++){
+    var it=(CATS[j].items||[]).find(function(p){return p.id===id;});
+    if(it)return {entity:it, kind:'cat', cat:CATS[j]};
+  }
+  return null;
+}
+
+function currentDetState(){
+  if(st.emperor)   return {kind:'emperor',   id:st.emperor};
+  if(st.ruler)     return {kind:'ruler',     id:st.ruler};
+  if(st.religious) return {kind:'religious', id:st.religious};
+  if(st.pm)        return {kind:'pm',        id:st.pm};
+  if(st.rakugo)    return {kind:'rakugo',    id:st.rakugo};
+  if(st.kodan)     return {kind:'kodan',     id:st.kodan};
+  if(st.person)    return {kind:'person',    id:st.person};
+  if(st.cat)       return {kind:'cat', id:st.cat.itemId, catId:st.cat.catId};
+  return null;
+}
+
+function openRefById(id,_internal){
+  if(!_internal){
+    var cur=currentDetState();
+    if(cur)navStack.push(cur);
+  }
+  var hit=findEntity(id);
+  if(!hit)return;
+  if(hit.kind==='emperor')      selHistFig(id,EMPERORS, 'emperor');
+  else if(hit.kind==='ruler')   selHistFig(id,RULERS,   'ruler');
+  else if(hit.kind==='religious')selHistFig(id,RELIGIOUS,'religious');
+  else if(hit.kind==='pm')      selHistFig(id,PMS,      'pm');
+  else if(hit.kind==='rakugo')  selHistFig(id,RAKUGO,   'rakugo');
+  else if(hit.kind==='kodan')   selHistFig(id,KODAN,    'kodan');
+  else if(hit.kind==='person')  selPerson(id);
+  else if(hit.kind==='cat')     selCatItem(hit.cat, hit.entity);
+}
+
+function navBack(){
+  if(!navStack.length)return;
+  var prev=navStack.pop();
+  if(prev.kind==='cat'){
+    var c=CATS.find(function(x){return x.id===prev.catId;});
+    if(!c)return;
+    var it=(c.items||[]).find(function(x){return x.id===prev.id;});
+    if(it)selCatItem(c,it);
+    return;
+  }
+  openRefById(prev.id,true);
+}
+
+function htmlEsc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c];
+  });
+}
+
+function renderRefsBlock(entity){
+  if(!entity)return '';
+  var rows=[];
+  var seen={};
+  function push(targetId, role){
+    if(!targetId || seen[targetId])return;
+    seen[targetId]=true;
+    var hit=findEntity(targetId);
+    if(!hit)return;
+    var roleHtml=role ? '<span class="ref-role">（'+htmlEsc(role)+'）</span>' : '';
+    rows.push('<a class="ref-link" onclick="openRefById(\''+targetId+'\')">'+htmlEsc(hit.entity.n)+roleHtml+'</a>');
+  }
+  (entity.refs||[]).forEach(function(r){if(r)push(r.id, r.role);});
+  (REV_REFS[entity.id]||[]).forEach(function(r){if(r)push(r.fromId, r.role);});
+  if(!rows.length)return '';
+  return '<div class="hd"></div><div class="st">🔗 関連</div><div class="refs">'+rows.join('')+'</div>';
+}
+
+function renderNavBackBtn(){
+  return navStack.length ? '<button class="det-ab nav-back" onclick="navBack()">← 戻る</button>' : '';
+}
+
+// 左ペインのボタンや時代切替など、明示的な新規遷移時にナビ履歴をクリア
+function resetNav(){navStack=[];}
+
 function selPerson(id){
-  st.person=id;st.prov=null;st.emperor=null;st.ruler=null;
+  st.person=id;st.prov=null;st.emperor=null;st.ruler=null;st.cat=null;
   clearMap();document.getElementById('psel').value='';
   document.querySelectorAll('.pc').forEach(function(c){c.classList.toggle('sel',c.dataset.id===id);});
   document.querySelectorAll('.hc').forEach(function(c){c.classList.remove('sel');});
@@ -2077,6 +2209,7 @@ function selPerson(id){
     return'<div class="lr"><div class="ld" style="background:'+dc+'"></div><div><div class="ltp">'+tpLb+'</div><div class="llb">'+l.lb+'</div></div></div>';
   }).join('');
   showDet('<div class="det-acts">'
+    +renderNavBackBtn()
     +'<button class="det-ab" onclick="openDr(\''+p.id+'\')">✎ 編集</button>'
     +'<button class="det-ab del-ab" onclick="deletePDirect(\''+p.id+'\')">✕ 削除</button>'
     +'</div>'
@@ -2086,7 +2219,8 @@ function selPerson(id){
     +(era?'<div class="erab" style="background:'+era.c+'66;border:0.5px solid '+era.c+'">'+eraName(era)+'</div>':'')
     +'<div class="hd"></div><div class="dd">'+p.desc+'</div>'
     +'<div class="hd"></div><div class="st">足跡・ゆかりの地</div>'+lh
-    +'<div style="margin-top:8px;padding:6px 9px;background:#1a1a22;border-radius:5px;border:0.5px solid #333;font-size:10px;color:#666">● 生=出生地　活=活躍の地　流=流刑地</div>');
+    +'<div style="margin-top:8px;padding:6px 9px;background:#1a1a22;border-radius:5px;border:0.5px solid #333;font-size:10px;color:#666">● 生=出生地　活=活躍の地　流=流刑地</div>'
+    +renderRefsBlock(p));
 }
 
 function selProv(v){
@@ -2105,11 +2239,14 @@ function selProv(v){
 function selCatItem(cat,item){
   clearMap();_birthYear=null;drawBirthMarker();
   st.person=null;st.prov=null;st.emperor=null;st.ruler=null;
+  st.religious=null;st.pm=null;st.rakugo=null;st.kodan=null;
+  st.cat={catId:cat.id, itemId:item.id};
   document.querySelectorAll('.pc,.hc').forEach(function(c){c.classList.remove('sel');});
   document.getElementById('psel').value='';
   document.querySelectorAll('.ci').forEach(function(c){c.classList.toggle('sel',c.id==='ci-'+item.id);});
   // プリセット・追加カテゴリを問わず編集ボタンを表示。削除はユーザー追加カテゴリのみ。
   var actsHtml='<div class="det-acts">'
+    +renderNavBackBtn()
     +'<button class="det-ab" onclick="openCatItemDr(\''+cat.id+'\',\''+item.id+'\')">✎ 編集</button>'
     +(cat.builtin?'':'<button class="det-ab del-ab" onclick="deleteCatItemDirect(\''+cat.id+'\',\''+item.id+'\')">✕ 削除</button>')
     +'</div>';
@@ -2117,7 +2254,8 @@ function selCatItem(cat,item){
     +'<div class="dtag">'+cat.lb+'</div>'
     +'<div class="dn">'+item.n+(item.fg?'<span class="dfg">（'+item.fg+'）</span>':'')+'</div>'
     +'<div class="dm">'+item.s+'年〜'+(item.e&&item.e<2030?item.e+'年':'現在')+'</div>'
-    +'<div class="hd"></div><div class="dd">'+(item.desc||'説明データなし')+'</div>');
+    +'<div class="hd"></div><div class="dd">'+(item.desc||'説明データなし')+'</div>'
+    +renderRefsBlock(item));
 }
 // カテゴリ項目を詳細ペインから直接削除（追加カテゴリのみ）
 function deleteCatItemDirect(catId,itemId){
@@ -2887,6 +3025,7 @@ function clearTokaidoRoute(){
 // 初回は tls が描画された後に PY を計算するため rAF でラップ。
 function initApp(){
   loadData(); // localStorage（JSONより新しい場合のみ採用）
+  buildRevRefs(); // 相互参照の逆引きインデックスを構築
   requestAnimationFrame(function(){
     buildTimeline();
     renderPersonList();

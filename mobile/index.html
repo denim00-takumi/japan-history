@@ -199,6 +199,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .det-section{font-size:12px;color:#888;font-weight:500;margin-bottom:6px;margin-top:4px}
 .det-person-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#111120;border-radius:6px;border:.5px solid #1a1a2a;cursor:pointer;margin-right:5px;margin-bottom:5px}
 .det-scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
+/* 🔗 関連（refs） */
+.det-refs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
+.ref-link{display:inline-flex;align-items:center;padding:5px 12px;border:.5px solid #2a5a85;background:#0e1a2c;border-radius:16px;color:#7bb8e8;font-size:13px;cursor:pointer;text-decoration:none;font-family:inherit;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+.ref-link:active{background:#1a3a5c;color:#a8d4f0}
+.ref-role{color:#5a8ab8;margin-left:4px;font-size:11px}
 
 /* ── L2: 人物詳細 ── */
 .person-furigana{font-size:13px;color:#8888aa;margin-bottom:4px}
@@ -633,6 +638,7 @@ Promise.all([
   // 能データを JSON から取り込み（インライン定義は廃止）
   NOH_DATA = DATA.noh || [];
   NOH_ACTS = DATA.nohActs || {};
+  buildRevRefs(); // 相互参照の逆引きインデックス
   buildEraHeader();
   buildNenpyo();
   buildJinbutsu();
@@ -849,6 +855,8 @@ function closeAllScreens(){
 
 document.querySelectorAll('.back-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
+    // 詳細→詳細 のナビ履歴があればまずそちらを辿る（同一画面内の再描画）
+    if(tryDetailBack()) return;
     const back=btn.dataset.back;
     screenStack.pop();
     if(screenStack.length>0){
@@ -946,7 +954,121 @@ document.getElementById('nenpyo-filter').addEventListener('click',e=>{
 });
 
 // ── EVENT DETAIL ───────────────────────────────────────────
+// ── 相互参照（refs）＆ 詳細ナビゲーション ──
+const REV_REFS = {};
+function buildRevRefs(){
+  for(const k in REV_REFS) delete REV_REFS[k];
+  function scan(arr){
+    if(!arr) return;
+    arr.forEach(e=>{
+      if(!e||!e.refs) return;
+      e.refs.forEach(r=>{
+        if(!r||!r.id) return;
+        if(!REV_REFS[r.id]) REV_REFS[r.id]=[];
+        REV_REFS[r.id].push({fromId:e.id, role:r.role||''});
+      });
+    });
+  }
+  scan(DATA.persons); scan(DATA.emperors); scan(DATA.rulers);
+  scan(DATA.religious); scan(DATA.pms); scan(DATA.rakugo);
+  scan(DATA.kodan); scan(DATA.noh);
+  (DATA.cats||[]).forEach(c=>scan(c.items));
+}
+
+// kind→セクション設定（jinbutsu画面と同じ色味）
+function refKindToSection(kind){
+  return {
+    emperor:  {color:'#c8a84b', sq:true},
+    ruler:    {color:'#5a8ab8', sq:false},
+    religious:{color:'#a878c8', sq:false},
+    pm:       {color:'#c08560', sq:false},
+    rakugo:   {color:'#6090c0', sq:false},
+    kodan:    {color:'#a06848', sq:false},
+    person:   {color:'#80a050', sq:false}
+  }[kind];
+}
+
+function findEntityMobile(id){
+  const kinds = [
+    {arr:DATA.emperors,        kind:'emperor'},
+    {arr:DATA.rulers,          kind:'ruler'},
+    {arr:DATA.religious||[],   kind:'religious'},
+    {arr:DATA.pms||[],         kind:'pm'},
+    {arr:DATA.rakugo||[],      kind:'rakugo'},
+    {arr:DATA.kodan||[],       kind:'kodan'},
+    {arr:DATA.persons,         kind:'person'}
+  ];
+  for(const k of kinds){
+    const f = k.arr.find(p=>p.id===id);
+    if(f) return {entity:f, kind:k.kind};
+  }
+  for(const c of (DATA.cats||[])){
+    const it = (c.items||[]).find(p=>p.id===id);
+    if(it) return {entity:it, kind:'cat', cat:c};
+  }
+  return null;
+}
+
+// 詳細ナビ履歴: 'fresh'=新規(履歴クリア) / 'ref'=参照リンク経由(現在を履歴に積む) / 'back'=戻る(履歴に積まない)
+let _navMode = 'fresh';
+let _currentDetail = null;     // {kind:'person'|'event', args:[...]}
+const detailHistory = [];
+
+function trackDetail(record){
+  if(_navMode === 'ref' && _currentDetail){
+    detailHistory.push(_currentDetail);
+  } else if(_navMode === 'fresh'){
+    detailHistory.length = 0;
+  }
+  _currentDetail = record;
+  _navMode = 'fresh';
+}
+
+function openRefByIdMobile(id){
+  const hit = findEntityMobile(id);
+  if(!hit) return;
+  _navMode = 'ref';
+  if(hit.kind === 'cat'){
+    const era = ERAS.find(e=>hit.entity.s>=e.s && hit.entity.s<e.e) || ERAS[ERAS.length-1];
+    showEventDetail({...hit.entity, catLabel:hit.cat.lb}, era);
+  } else {
+    const sec = refKindToSection(hit.kind);
+    showPersonDetail(hit.entity, sec.color, sec.sq);
+  }
+}
+
+function tryDetailBack(){
+  if(!detailHistory.length) return false;
+  const prev = detailHistory.pop();
+  _navMode = 'back';
+  if(prev.kind === 'event'){
+    showEventDetail(...prev.args);
+  } else {
+    showPersonDetail(...prev.args);
+  }
+  return true;
+}
+
+function renderRefsBlockMobile(entity){
+  if(!entity) return '';
+  const rows = [];
+  const seen = {};
+  function push(targetId, role){
+    if(!targetId || seen[targetId]) return;
+    seen[targetId] = true;
+    const hit = findEntityMobile(targetId);
+    if(!hit) return;
+    const roleHtml = role ? `<span class="ref-role">（${escHtml(role)}）</span>` : '';
+    rows.push(`<a class="ref-link" onclick="openRefByIdMobile('${targetId}')">${escHtml(hit.entity.n)}${roleHtml}</a>`);
+  }
+  (entity.refs||[]).forEach(r=>{if(r) push(r.id, r.role);});
+  (REV_REFS[entity.id]||[]).forEach(r=>{if(r) push(r.fromId, r.role);});
+  if(!rows.length) return '';
+  return `<div class="det-divider"></div><div class="det-section">🔗 関連</div><div class="det-refs">${rows.join('')}</div>`;
+}
+
 function showEventDetail(ev, era){
+  trackDetail({kind:'event', args:[ev, era]});
   const body=document.getElementById('event-detail-body');
   const yr=ev.s===ev.e?ev.s+'年':ev.s+'–'+ev.e+'年';
   body.innerHTML=`
@@ -956,6 +1078,7 @@ function showEventDetail(ev, era){
     <div class="det-sub">${escHtml(yr)}</div>
     <div class="det-divider"></div>
     <div class="det-desc">${escHtml(ev.desc||'')}</div>
+    ${renderRefsBlockMobile(ev)}
   `;
   // set back nav label
   document.querySelector('#screen-event-detail .back-btn').dataset.back='nenpyo';
@@ -1431,6 +1554,7 @@ function buildJinbutsu(){
 }
 
 function showPersonDetail(p, color, sq){
+  trackDetail({kind:'person', args:[p, color, sq]});
   const era=ERAS.find(e=>e.id===p.era)||(p.s?eraForYear(p.s):null);
   const body=document.getElementById('person-detail-body');
   let locsHtml='';
@@ -1472,6 +1596,7 @@ function showPersonDetail(p, color, sq){
     <div class="det-divider"></div>
     <div class="det-desc">${escHtml(p.desc||'')}</div>
     ${locsSection}
+    ${renderRefsBlockMobile(p)}
   `;
   if(hasLocs){
     document.getElementById('person-map-btn').addEventListener('click',()=>{
