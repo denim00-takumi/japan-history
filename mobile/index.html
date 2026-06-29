@@ -199,11 +199,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .det-section{font-size:12px;color:#888;font-weight:500;margin-bottom:6px;margin-top:4px}
 .det-person-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#111120;border-radius:6px;border:.5px solid #1a1a2a;cursor:pointer;margin-right:5px;margin-bottom:5px}
 .det-scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
-/* 🔗 関連（refs） */
-.det-refs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
-.ref-link{display:inline-flex;align-items:center;padding:5px 12px;border:.5px solid #2a5a85;background:#0e1a2c;border-radius:16px;color:#7bb8e8;font-size:13px;cursor:pointer;text-decoration:none;font-family:inherit;-webkit-tap-highlight-color:rgba(0,0,0,0)}
-.ref-link:active{background:#1a3a5c;color:#a8d4f0}
-.ref-role{color:#5a8ab8;margin-left:4px;font-size:11px}
+/* 🔗 desc 内インラインリンク */
+.desc-link{color:#5090ff;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-weight:600;-webkit-tap-highlight-color:rgba(80,144,255,.2);padding:0 2px}
+.desc-link:active{color:#7ab0ff}
 
 /* ── L2: 人物詳細 ── */
 .person-furigana{font-size:13px;color:#8888aa;margin-bottom:4px}
@@ -1049,22 +1047,39 @@ function tryDetailBack(){
   return true;
 }
 
-function renderRefsBlockMobile(entity){
-  if(!entity) return '';
-  const rows = [];
+// desc 文字列内に refs/逆refs 対象の名前があれば、その箇所を青字リンクに置換して返す。
+function linkifyDescMobile(desc, entity){
+  if(!desc) return '';
+  if(!entity) return escHtml(desc);
+  const targets = [];
   const seen = {};
-  function push(targetId, role){
+  function addTarget(targetId){
     if(!targetId || seen[targetId]) return;
     seen[targetId] = true;
     const hit = findEntityMobile(targetId);
     if(!hit) return;
-    const roleHtml = role ? `<span class="ref-role">（${escHtml(role)}）</span>` : '';
-    rows.push(`<a class="ref-link" onclick="openRefByIdMobile('${targetId}')">${escHtml(hit.entity.n)}${roleHtml}</a>`);
+    targets.push({id:targetId, name:hit.entity.n});
   }
-  (entity.refs||[]).forEach(r=>{if(r) push(r.id, r.role);});
-  (REV_REFS[entity.id]||[]).forEach(r=>{if(r) push(r.fromId, r.role);});
-  if(!rows.length) return '';
-  return `<div class="det-divider"></div><div class="det-section">🔗 関連</div><div class="det-refs">${rows.join('')}</div>`;
+  (entity.refs||[]).forEach(r=>{if(r) addTarget(r.id);});
+  (REV_REFS[entity.id]||[]).forEach(r=>{if(r) addTarget(r.fromId);});
+  if(!targets.length) return escHtml(desc);
+  // 長い名前から先に処理（日蓮宗→日蓮 のような部分一致誤りを防止）
+  targets.sort((a,b)=>b.name.length-a.name.length);
+  let html = escHtml(desc);
+  const placeholders = [];
+  targets.forEach(t=>{
+    const nameEsc = escHtml(t.name);
+    const idx = html.indexOf(nameEsc);
+    if(idx < 0) return;
+    const ph = `\x01LINK${placeholders.length}\x02`;
+    placeholders.push({id:t.id, name:nameEsc});
+    html = html.slice(0,idx) + ph + html.slice(idx+nameEsc.length);
+  });
+  placeholders.forEach((p,i)=>{
+    const ph = `\x01LINK${i}\x02`;
+    html = html.replace(ph, `<a class="desc-link" onclick="openRefByIdMobile('${p.id}')">${p.name}</a>`);
+  });
+  return html;
 }
 
 function showEventDetail(ev, era){
@@ -1077,8 +1092,7 @@ function showEventDetail(ev, era){
     ${ev.fg?`<div class="person-furigana">${escHtml(ev.fg)}</div>`:''}
     <div class="det-sub">${escHtml(yr)}</div>
     <div class="det-divider"></div>
-    <div class="det-desc">${escHtml(ev.desc||'')}</div>
-    ${renderRefsBlockMobile(ev)}
+    <div class="det-desc">${linkifyDescMobile(ev.desc||'', ev)}</div>
   `;
   // set back nav label
   document.querySelector('#screen-event-detail .back-btn').dataset.back='nenpyo';
@@ -1594,9 +1608,8 @@ function showPersonDetail(p, color, sq){
     ${p.fg?`<div class="person-furigana">${escHtml(p.fg)}</div>`:''}
     <div class="person-period">${escHtml(p.l||'')}${p.role?' | '+escHtml(p.role):''}</div>
     <div class="det-divider"></div>
-    <div class="det-desc">${escHtml(p.desc||'')}</div>
+    <div class="det-desc">${linkifyDescMobile(p.desc||'', p)}</div>
     ${locsSection}
-    ${renderRefsBlockMobile(p)}
   `;
   if(hasLocs){
     document.getElementById('person-map-btn').addEventListener('click',()=>{

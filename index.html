@@ -216,12 +216,10 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 .ld{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:2px}
 .ltp{font-size:9px;color:#666}.llb{font-size:11px;color:#ddd}
 .erab{display:inline-flex;align-items:center;padding:3px 10px;border-radius:14px;font-size:11px;color:rgba(255,255,255,0.88);margin-bottom:9px}
-/* 🔗 関連（refs） */
-.refs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.ref-link{display:inline-flex;align-items:center;padding:4px 10px;border:0.5px solid #2a5a85;background:#0e1a2c;border-radius:14px;color:#7bb8e8;font-size:11px;cursor:pointer;text-decoration:none;transition:background .15s,color .15s,border-color .15s;font-family:inherit}
-.ref-link:hover{background:#1a3a5c;color:#a8d4f0;border-color:#4a8ab8}
-.ref-role{color:#5a8ab8;margin-left:3px;font-size:10px}
-.det-ab.nav-back{background:#0e1a2c;border-color:#2a5a85;color:#7bb8e8}
+/* 🔗 desc 内インラインリンク + 戻るボタン */
+.desc-link{color:#5090ff;text-decoration:underline;text-underline-offset:2px;cursor:pointer;font-weight:600}
+.desc-link:hover{color:#7ab0ff}
+.det-ab.nav-back{background:#0e1a2c;border-color:#2a5a85;color:#5090ff}
 .det-ab.nav-back:hover{background:#1a3a5c;color:#a8d4f0;border-color:#4a8ab8}
 @keyframes mpop{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}.mk{animation:mpop 0.3s ease-out both}
 /* ── ドロワー ── */
@@ -1478,9 +1476,8 @@ function selHistFig(id,arr,type){
     +'<div class="dn">'+p.n+((p.fg||HIST_FG[p.n])?'<span class="dfg">（'+(p.fg||HIST_FG[p.n])+'）</span>':'')+'</div>'
     +'<div class="dm">'+p.l+' ｜ '+p.role+'</div>'
     +(eraEl?'<div class="erab" style="background:'+eraEl.c+'66;border:0.5px solid '+eraEl.c+'">'+eraName(eraEl)+'</div>':'')
-    +'<div class="hd"></div><div class="dd">'+p.desc+'</div>'
-    +'<div class="hd"></div><div class="st">足跡・ゆかりの地</div>'+locH
-    +renderRefsBlock(p));
+    +'<div class="hd"></div><div class="dd">'+linkifyDesc(p.desc,p)+'</div>'
+    +'<div class="hd"></div><div class="st">足跡・ゆかりの地</div>'+locH);
 }
 
 // ════════════════════════════════════════════════════
@@ -2152,22 +2149,39 @@ function htmlEsc(s){
   });
 }
 
-function renderRefsBlock(entity){
-  if(!entity)return '';
-  var rows=[];
+// desc 文字列内に refs/逆refs 対象の名前があれば、その箇所を青字リンクに置換して返す。
+function linkifyDesc(desc, entity){
+  if(!desc) return '';
+  if(!entity) return htmlEsc(desc);
+  var targets=[];
   var seen={};
-  function push(targetId, role){
-    if(!targetId || seen[targetId])return;
+  function addTarget(targetId){
+    if(!targetId || seen[targetId]) return;
     seen[targetId]=true;
     var hit=findEntity(targetId);
-    if(!hit)return;
-    var roleHtml=role ? '<span class="ref-role">（'+htmlEsc(role)+'）</span>' : '';
-    rows.push('<a class="ref-link" onclick="openRefById(\''+targetId+'\')">'+htmlEsc(hit.entity.n)+roleHtml+'</a>');
+    if(!hit) return;
+    targets.push({id:targetId, name:hit.entity.n});
   }
-  (entity.refs||[]).forEach(function(r){if(r)push(r.id, r.role);});
-  (REV_REFS[entity.id]||[]).forEach(function(r){if(r)push(r.fromId, r.role);});
-  if(!rows.length)return '';
-  return '<div class="hd"></div><div class="st">🔗 関連</div><div class="refs">'+rows.join('')+'</div>';
+  (entity.refs||[]).forEach(function(r){if(r)addTarget(r.id);});
+  (REV_REFS[entity.id]||[]).forEach(function(r){if(r)addTarget(r.fromId);});
+  if(!targets.length) return htmlEsc(desc);
+  // 長い名前から先に処理（日蓮宗→日蓮 のような部分一致誤りを防止）
+  targets.sort(function(a,b){return b.name.length-a.name.length;});
+  var html=htmlEsc(desc);
+  var placeholders=[];
+  targets.forEach(function(t){
+    var nameEsc=htmlEsc(t.name);
+    var idx=html.indexOf(nameEsc);
+    if(idx<0) return;
+    var ph='\x01LINK'+placeholders.length+'\x02';
+    placeholders.push({id:t.id, name:nameEsc});
+    html=html.slice(0,idx)+ph+html.slice(idx+nameEsc.length);
+  });
+  placeholders.forEach(function(p,i){
+    var ph='\x01LINK'+i+'\x02';
+    html=html.replace(ph,'<a class="desc-link" onclick="openRefById(\''+p.id+'\')">'+p.name+'</a>');
+  });
+  return html;
 }
 
 function renderNavBackBtn(){
@@ -2217,10 +2231,9 @@ function selPerson(id){
     +'<div class="dn">'+p.n+(p.fg?'<span class="dfg">（'+p.fg+'）</span>':'')+'</div>'
     +'<div class="dm">'+p.l+' ｜ '+p.role+'</div>'
     +(era?'<div class="erab" style="background:'+era.c+'66;border:0.5px solid '+era.c+'">'+eraName(era)+'</div>':'')
-    +'<div class="hd"></div><div class="dd">'+p.desc+'</div>'
+    +'<div class="hd"></div><div class="dd">'+linkifyDesc(p.desc,p)+'</div>'
     +'<div class="hd"></div><div class="st">足跡・ゆかりの地</div>'+lh
-    +'<div style="margin-top:8px;padding:6px 9px;background:#1a1a22;border-radius:5px;border:0.5px solid #333;font-size:10px;color:#666">● 生=出生地　活=活躍の地　流=流刑地</div>'
-    +renderRefsBlock(p));
+    +'<div style="margin-top:8px;padding:6px 9px;background:#1a1a22;border-radius:5px;border:0.5px solid #333;font-size:10px;color:#666">● 生=出生地　活=活躍の地　流=流刑地</div>');
 }
 
 function selProv(v){
@@ -2254,8 +2267,7 @@ function selCatItem(cat,item){
     +'<div class="dtag">'+cat.lb+'</div>'
     +'<div class="dn">'+item.n+(item.fg?'<span class="dfg">（'+item.fg+'）</span>':'')+'</div>'
     +'<div class="dm">'+item.s+'年〜'+(item.e&&item.e<2030?item.e+'年':'現在')+'</div>'
-    +'<div class="hd"></div><div class="dd">'+(item.desc||'説明データなし')+'</div>'
-    +renderRefsBlock(item));
+    +'<div class="hd"></div><div class="dd">'+linkifyDesc(item.desc||'説明データなし',item)+'</div>');
 }
 // カテゴリ項目を詳細ペインから直接削除（追加カテゴリのみ）
 function deleteCatItemDirect(catId,itemId){

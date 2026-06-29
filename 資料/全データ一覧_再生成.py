@@ -404,6 +404,57 @@ else:
 autosize(ws, [18, 22, 14, 18, 36])
 ws.freeze_panes = 'A5'
 
+# ============== 📝 desc要編集 ==============
+# refs 先のエンティティ名が「元エンティティの desc 文字列」に出現しないものを検出。
+# 次回アップデートで文中インラインリンク化する際に、ユーザが desc を編集して
+# 該当名を文中に含めるための作業リスト。
+entity_by_id = {}
+def reg_entity(arr):
+    for p in arr:
+        if p.get('id'): entity_by_id[p['id']] = p
+for k, _ in people_cats: reg_entity(d[k])
+reg_entity(d['noh'])
+for c in d['cats']: reg_entity(c['items'])
+
+desc_missing = []  # (from_id, from_name, from_cat, desc_excerpt, to_id, to_name, to_cat, hint)
+for fi, fn, fc, ti, tn, tc, role in flat_refs:
+    from_ent = entity_by_id.get(fi)
+    if not from_ent: continue
+    desc = from_ent.get('desc') or ''
+    if tn and tn not in desc:
+        excerpt = desc[:70] + ('…' if len(desc) > 70 else '')
+        hint = f'desc 文中に「{tn}」を含めて編集してください'
+        desc_missing.append((fi, fn, fc, excerpt, ti, tn, tc, hint))
+
+ws = wb.create_sheet('📝 desc要編集')
+ws['A1'] = 'desc要編集（refs先の名前が元 desc に出てこないもの）'
+ws['A1'].font = FONT_TITLE
+ws.merge_cells('A1:H1')
+ws['A2'] = f'検出件数: {len(desc_missing)}'
+ws['A2'].font = Font(name='Yu Gothic', size=11, bold=True,
+                     color='B45F06' if desc_missing else '0F5132')
+ws['A3'] = '※ 次回アップデートで「文中インラインリンク」に切り替える前に、ここが 0件 になるよう desc を編集してください。'
+ws['A3'].font = FONT_NOTE
+ws.merge_cells('A3:H3')
+
+write_header(ws, ['元 id', '元 名前', '元 カテゴリ', '元 desc 冒頭', '先 id', '先 名前', '先 カテゴリ', '推奨対応'], row=5)
+if desc_missing:
+    for i, (fi, fn, fc, ex, ti, tn, tc, hint) in enumerate(desc_missing, 6):
+        for col, v in enumerate([fi, fn, fc, ex, ti, tn, tc, hint], 1):
+            c = ws.cell(row=i, column=col, value=v)
+            c.font = FONT_MONO if col in (1, 5) else FONT_BASE
+            c.fill = FILL_WARN
+            c.alignment = ALIGN_LEFT
+            c.border = BORDER
+        ws.row_dimensions[i].height = 30
+else:
+    c = ws.cell(row=6, column=1, value='全て desc 内に名前が含まれています — インラインリンク移行 OK')
+    c.font = Font(name='Yu Gothic', size=11, bold=True, color='0F5132')
+    c.fill = FILL_OK
+    ws.merge_cells('A6:H6')
+autosize(ws, [18, 22, 14, 50, 18, 22, 14, 36])
+ws.freeze_panes = 'A6'
+
 # ============== 整合性チェック（既存） ==============
 ws = wb.create_sheet('⚠ 整合性チェック')
 ws['A1'] = '整合性チェック結果'
