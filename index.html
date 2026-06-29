@@ -2100,6 +2100,11 @@ function findEntity(id){
 function openRefById(id){
   var hit=findEntity(id);
   if(!hit)return;
+  // 詳細パネルを更新する前に、開いている下段タブのドロワー（人口/東海道/能）を閉じる。
+  // ドロワーが開いたまま詳細だけ裏で更新されると UI が二重表示に見える不具合を防止。
+  if(typeof _btmTab !== 'undefined' && _btmTab && typeof switchBtmTab === 'function'){
+    switchBtmTab(_btmTab);
+  }
   if(hit.kind==='emperor')      selHistFig(id,EMPERORS, 'emperor');
   else if(hit.kind==='ruler')   selHistFig(id,RULERS,   'ruler');
   else if(hit.kind==='religious')selHistFig(id,RELIGIOUS,'religious');
