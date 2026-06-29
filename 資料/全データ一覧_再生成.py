@@ -36,14 +36,67 @@ def yrtxt(v):
 
 HIRA = re.compile(r'^[぀-ゟー・\s]+$')
 
-# ----- スタイル -----
-FONT_BASE = Font(name='Yu Gothic', size=11)
-FONT_HEADER = Font(name='Yu Gothic', size=11, bold=True, color='FFFFFF')
-FONT_TITLE = Font(name='Yu Gothic', size=14, bold=True)
-FONT_MONO = Font(name='Menlo', size=10)
-FONT_LINK = Font(name='Menlo', size=10, color='1F6FB8')
-FONT_NOTE = Font(name='Yu Gothic', size=10, italic=True, color='6C757D')
-FONT_ERR = Font(name='Yu Gothic', size=11, bold=True, color='B02A37')
+# ----- フォント既定値 -----
+DEFAULT_FONTS = {
+    'base':    {'name': 'Yu Gothic', 'size': 11},
+    'header':  {'name': 'Yu Gothic', 'size': 11},
+    'title':   {'name': 'Yu Gothic', 'size': 14},
+    'mono':    {'name': 'Menlo',     'size': 10},
+}
+DEFAULT_ROW_HEIGHT = 22
+
+# ----- ユーザフォント自動検出 -----
+# 既存 xlsx のフォント/サイズ/行高を読み取り、再生成時に同じ体裁を保つ。
+# Excel でフォントを変更して保存 → 次回再生成でその変更が引き継がれる。
+def _detect_user_styling(path):
+    out = {'fonts': dict(DEFAULT_FONTS), 'row_height': DEFAULT_ROW_HEIGHT}
+    if not os.path.exists(path):
+        return out
+    try:
+        from openpyxl import load_workbook as _lw
+        wb_old = _lw(path)
+        def take(sn, r, c):
+            if sn not in wb_old.sheetnames: return None
+            ws = wb_old[sn]
+            if r > ws.max_row or c > ws.max_column: return None
+            cell = ws.cell(row=r, column=c)
+            if cell.font and cell.font.name:
+                return {'name': cell.font.name, 'size': float(cell.font.size) if cell.font.size else None}
+            return None
+        # サマリー A1 → TITLE
+        t = take('サマリー', 1, 1)
+        if t: out['fonts']['title'] = t
+        # 👤 人物 を参照（必ず存在）
+        h = take('👤 人物', 1, 3)
+        if h: out['fonts']['header'] = h
+        b = take('👤 人物', 2, 3)
+        if b: out['fonts']['base'] = b
+        m = take('👤 人物', 2, 2)
+        if m: out['fonts']['mono'] = m
+        # データ行の行高
+        if '👤 人物' in wb_old.sheetnames:
+            ws = wb_old['👤 人物']
+            rd = ws.row_dimensions.get(2)
+            if rd and rd.height:
+                out['row_height'] = float(rd.height)
+    except Exception as e:
+        print(f'warning: ユーザフォント検出失敗（既定値を使用）: {e}')
+    return out
+
+_user = _detect_user_styling(OUT)
+_F = _user['fonts']
+ROW_H = _user['row_height']
+
+# ----- スタイル（ユーザ設定を反映） -----
+FONT_BASE   = Font(name=_F['base']['name'],   size=_F['base']['size']   or 11)
+FONT_HEADER = Font(name=_F['header']['name'], size=_F['header']['size'] or 11, bold=True, color='FFFFFF')
+FONT_TITLE  = Font(name=_F['title']['name'],  size=_F['title']['size']  or 14, bold=True)
+FONT_MONO   = Font(name=_F['mono']['name'],   size=_F['mono']['size']   or 10)
+FONT_LINK   = Font(name=_F['mono']['name'],   size=_F['mono']['size']   or 10, color='1F6FB8')
+FONT_NOTE   = Font(name=_F['base']['name'],   size=(_F['base']['size'] or 11) - 1, italic=True, color='6C757D')
+FONT_ERR    = Font(name=_F['base']['name'],   size=_F['base']['size']   or 11, bold=True, color='B02A37')
+
+print(f'フォント: base={_F["base"]["name"]} {_F["base"]["size"]}pt / mono={_F["mono"]["name"]} {_F["mono"]["size"]}pt / row高={ROW_H}')
 
 FILL_HEADER = PatternFill('solid', start_color='2F3E55')
 FILL_HEADER_REF = PatternFill('solid', start_color='1F6FB8')
@@ -246,7 +299,7 @@ def make_people_sheet(name, arr):
                    ref],
                   mono_cols=(2,), num_cols=(10,), zebra=(i % 2 == 0),
                   ref_col_idx=ref_col)
-        ws.row_dimensions[i].height = 22
+        ws.row_dimensions[i].height = ROW_H
     autosize(ws, [4, 18, 22, 22, 8, 8, 10, 22, 50, 6, 30])
     freeze_and_filter(ws, first_data_row=2, last_col=len(headers))
 
@@ -275,7 +328,7 @@ for i, n in enumerate(d['noh'], 2):
                n.get('notes', ''), ref],
               mono_cols=(2,), num_cols=(5,), zebra=(i % 2 == 0),
               ref_col_idx=ref_col)
-    ws.row_dimensions[i].height = 22
+    ws.row_dimensions[i].height = ROW_H
 autosize(ws, [4, 18, 20, 20, 5, 20, 12, 20, 20, 18, 14, 16, 14, 30, 30])
 freeze_and_filter(ws, first_data_row=2, last_col=len(headers))
 
@@ -309,7 +362,7 @@ def make_cat_sheet(c):
                    ref],
                   mono_cols=(2,), zebra=(i % 2 == 0),
                   ref_col_idx=ref_col)
-        ws.row_dimensions[i].height = 22
+        ws.row_dimensions[i].height = ROW_H
     autosize(ws, [4, 18, 22, 22, 8, 8, 10, 50, 30])
     freeze_and_filter(ws, first_data_row=2, last_col=len(headers))
 
@@ -370,7 +423,7 @@ if flat_refs:
             c.alignment = ALIGN_CENTER if col == 4 else ALIGN_LEFT
             c.border = BORDER
             if zebra: c.fill = FILL_ZEBRA
-        ws.row_dimensions[i].height = 22
+        ws.row_dimensions[i].height = ROW_H
 else:
     c = ws.cell(row=6, column=1, value='（まだ 参照 が入力されていません）')
     c.font = FONT_NOTE
@@ -395,7 +448,7 @@ if ref_errors:
             c.fill = FILL_ERR
             c.alignment = ALIGN_LEFT
             c.border = BORDER
-        ws.row_dimensions[i].height = 22
+        ws.row_dimensions[i].height = ROW_H
 else:
     c = ws.cell(row=5, column=1, value='エラーなし')
     c.font = Font(name='Yu Gothic', size=11, bold=True, color='0F5132')
@@ -506,7 +559,7 @@ if issues:
             c.border = BORDER
             c.alignment = ALIGN_LEFT
             c.fill = FILL_WARN
-        ws.row_dimensions[i].height = 22
+        ws.row_dimensions[i].height = ROW_H
 else:
     c = ws.cell(row=4, column=1, value='問題は検出されませんでした')
     c.font = FONT_BASE
