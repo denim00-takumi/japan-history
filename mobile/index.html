@@ -853,8 +853,6 @@ function closeAllScreens(){
 
 document.querySelectorAll('.back-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    // 詳細→詳細 のナビ履歴があればまずそちらを辿る（同一画面内の再描画）
-    if(tryDetailBack()) return;
     const back=btn.dataset.back;
     screenStack.pop();
     if(screenStack.length>0){
@@ -1007,25 +1005,9 @@ function findEntityMobile(id){
   return null;
 }
 
-// 詳細ナビ履歴: 'fresh'=新規(履歴クリア) / 'ref'=参照リンク経由(現在を履歴に積む) / 'back'=戻る(履歴に積まない)
-let _navMode = 'fresh';
-let _currentDetail = null;     // {kind:'person'|'event', args:[...]}
-const detailHistory = [];
-
-function trackDetail(record){
-  if(_navMode === 'ref' && _currentDetail){
-    detailHistory.push(_currentDetail);
-  } else if(_navMode === 'fresh'){
-    detailHistory.length = 0;
-  }
-  _currentDetail = record;
-  _navMode = 'fresh';
-}
-
 function openRefByIdMobile(id){
   const hit = findEntityMobile(id);
   if(!hit) return;
-  _navMode = 'ref';
   if(hit.kind === 'cat'){
     const era = ERAS.find(e=>hit.entity.s>=e.s && hit.entity.s<e.e) || ERAS[ERAS.length-1];
     showEventDetail({...hit.entity, catLabel:hit.cat.lb}, era);
@@ -1033,18 +1015,6 @@ function openRefByIdMobile(id){
     const sec = refKindToSection(hit.kind);
     showPersonDetail(hit.entity, sec.color, sec.sq);
   }
-}
-
-function tryDetailBack(){
-  if(!detailHistory.length) return false;
-  const prev = detailHistory.pop();
-  _navMode = 'back';
-  if(prev.kind === 'event'){
-    showEventDetail(...prev.args);
-  } else {
-    showPersonDetail(...prev.args);
-  }
-  return true;
 }
 
 // desc 文字列内に refs/逆refs 対象の名前があれば、その箇所を青字リンクに置換して返す。
@@ -1083,7 +1053,6 @@ function linkifyDescMobile(desc, entity){
 }
 
 function showEventDetail(ev, era){
-  trackDetail({kind:'event', args:[ev, era]});
   const body=document.getElementById('event-detail-body');
   const yr=ev.s===ev.e?ev.s+'年':ev.s+'–'+ev.e+'年';
   body.innerHTML=`
@@ -1568,7 +1537,6 @@ function buildJinbutsu(){
 }
 
 function showPersonDetail(p, color, sq){
-  trackDetail({kind:'person', args:[p, color, sq]});
   const era=ERAS.find(e=>e.id===p.era)||(p.s?eraForYear(p.s):null);
   const body=document.getElementById('person-detail-body');
   let locsHtml='';

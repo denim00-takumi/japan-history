@@ -216,11 +216,9 @@ body{font-family:-apple-system,'Hiragino Sans',sans-serif;background:#1a1a1e;col
 .ld{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:2px}
 .ltp{font-size:9px;color:#666}.llb{font-size:11px;color:#ddd}
 .erab{display:inline-flex;align-items:center;padding:3px 10px;border-radius:14px;font-size:11px;color:rgba(255,255,255,0.88);margin-bottom:9px}
-/* 🔗 desc 内インラインリンク + 戻るボタン */
+/* 🔗 desc 内インラインリンク */
 .desc-link{color:#5090ff;text-decoration:underline;text-underline-offset:2px;cursor:pointer;font-weight:600}
 .desc-link:hover{color:#7ab0ff}
-.det-ab.nav-back{background:#0e1a2c;border-color:#2a5a85;color:#5090ff}
-.det-ab.nav-back:hover{background:#1a3a5c;color:#a8d4f0;border-color:#4a8ab8}
 @keyframes mpop{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}.mk{animation:mpop 0.3s ease-out both}
 /* ── ドロワー ── */
 #dr-bg,#ci-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200}
@@ -1469,7 +1467,6 @@ function selHistFig(id,arr,type){
   }).join('');
   var eraEl=eraForYear(p.s);
   showDet('<div class="det-acts">'
-    +renderNavBackBtn()
     +'<button class="det-ab" onclick="openHistDr(\''+p.id+'\',\''+type+'\')">✎ 編集</button>'
     +'</div>'
     +'<div class="dtag">'+tag+'</div>'
@@ -2057,10 +2054,9 @@ function centerMapOnPrefs(prefNames){
 // インタラクション
 // ════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════
-// 相互参照 (refs) ＆ 履歴ナビゲーション
+// 相互参照 (refs)
 // ════════════════════════════════════════════════════
 var REV_REFS={};   // {targetId: [{fromId, role}]}
-var navStack=[];   // [{kind, id, catId?}]
 
 function buildRevRefs(){
   REV_REFS={};
@@ -2101,23 +2097,7 @@ function findEntity(id){
   return null;
 }
 
-function currentDetState(){
-  if(st.emperor)   return {kind:'emperor',   id:st.emperor};
-  if(st.ruler)     return {kind:'ruler',     id:st.ruler};
-  if(st.religious) return {kind:'religious', id:st.religious};
-  if(st.pm)        return {kind:'pm',        id:st.pm};
-  if(st.rakugo)    return {kind:'rakugo',    id:st.rakugo};
-  if(st.kodan)     return {kind:'kodan',     id:st.kodan};
-  if(st.person)    return {kind:'person',    id:st.person};
-  if(st.cat)       return {kind:'cat', id:st.cat.itemId, catId:st.cat.catId};
-  return null;
-}
-
-function openRefById(id,_internal){
-  if(!_internal){
-    var cur=currentDetState();
-    if(cur)navStack.push(cur);
-  }
+function openRefById(id){
   var hit=findEntity(id);
   if(!hit)return;
   if(hit.kind==='emperor')      selHistFig(id,EMPERORS, 'emperor');
@@ -2128,19 +2108,6 @@ function openRefById(id,_internal){
   else if(hit.kind==='kodan')   selHistFig(id,KODAN,    'kodan');
   else if(hit.kind==='person')  selPerson(id);
   else if(hit.kind==='cat')     selCatItem(hit.cat, hit.entity);
-}
-
-function navBack(){
-  if(!navStack.length)return;
-  var prev=navStack.pop();
-  if(prev.kind==='cat'){
-    var c=CATS.find(function(x){return x.id===prev.catId;});
-    if(!c)return;
-    var it=(c.items||[]).find(function(x){return x.id===prev.id;});
-    if(it)selCatItem(c,it);
-    return;
-  }
-  openRefById(prev.id,true);
 }
 
 function htmlEsc(s){
@@ -2184,13 +2151,6 @@ function linkifyDesc(desc, entity){
   return html;
 }
 
-function renderNavBackBtn(){
-  return navStack.length ? '<button class="det-ab nav-back" onclick="navBack()">← 戻る</button>' : '';
-}
-
-// 左ペインのボタンや時代切替など、明示的な新規遷移時にナビ履歴をクリア
-function resetNav(){navStack=[];}
-
 function selPerson(id){
   st.person=id;st.prov=null;st.emperor=null;st.ruler=null;st.cat=null;
   clearMap();document.getElementById('psel').value='';
@@ -2223,7 +2183,6 @@ function selPerson(id){
     return'<div class="lr"><div class="ld" style="background:'+dc+'"></div><div><div class="ltp">'+tpLb+'</div><div class="llb">'+l.lb+'</div></div></div>';
   }).join('');
   showDet('<div class="det-acts">'
-    +renderNavBackBtn()
     +'<button class="det-ab" onclick="openDr(\''+p.id+'\')">✎ 編集</button>'
     +'<button class="det-ab del-ab" onclick="deletePDirect(\''+p.id+'\')">✕ 削除</button>'
     +'</div>'
@@ -2259,7 +2218,6 @@ function selCatItem(cat,item){
   document.querySelectorAll('.ci').forEach(function(c){c.classList.toggle('sel',c.id==='ci-'+item.id);});
   // プリセット・追加カテゴリを問わず編集ボタンを表示。削除はユーザー追加カテゴリのみ。
   var actsHtml='<div class="det-acts">'
-    +renderNavBackBtn()
     +'<button class="det-ab" onclick="openCatItemDr(\''+cat.id+'\',\''+item.id+'\')">✎ 編集</button>'
     +(cat.builtin?'':'<button class="det-ab del-ab" onclick="deleteCatItemDirect(\''+cat.id+'\',\''+item.id+'\')">✕ 削除</button>')
     +'</div>';
