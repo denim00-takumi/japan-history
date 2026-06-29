@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-xlsx の「🔗 参照」列を japan_history_data.json の各エンティティの `refs` フィールドに反映する。
+xlsx の「🔗 参照」列、および 概要/名前/ふりがな/役 などのテキスト欄を
+japan_history_data.json の各エンティティに反映する。
 
 使い方:
     # ドライラン（差分プレビューのみ、ファイル変更なし）
@@ -12,7 +13,13 @@ xlsx の「🔗 参照」列を japan_history_data.json の各エンティティ
     # version bump を抑制したい場合
     python3 資料/参照_JSON反映.py --write --no-version-bump
 
-JSON への書き込み形式:
+反映対象カラム:
+    人物系シート: 名前(n) / ふりがな(fg) / 役/分類(role) / 概要(desc) / 🔗 参照(refs)
+    カテゴリ:     名称(n) / ふりがな(fg) / 概要(desc) / 🔗 参照(refs)
+    能曲:        曲名(n) / ふりがな(fg) / 分類(cls) / シテ類型 / シテ / ワキ / 出典 / 時代 /
+                 作者 / 宗教 / 注記(notes) / 🔗 参照(refs)
+
+JSON への書き込み形式（refs）:
     "refs": [
       {"id": "saicho", "role": "開祖"},
       {"id": "ennin"}                  # role が空のときは role キーを省略
@@ -27,6 +34,23 @@ XLSX_PATH = os.path.join(ROOT, '資料/全データ一覧_点検用.xlsx')
 
 TOKEN_RE = re.compile(r'^\s*([^()（）;；]+?)\s*(?:[（(]\s*([^)）]*?)\s*[)）])?\s*$')
 ID_PATTERN = re.compile(r'^[A-Za-z0-9_]+$')
+
+# ----- シート種別ごとに「ヘッダ表記 → JSON フィールド名」のマップ -----
+# ※ 年(s/e) や 時代(era for person/cat) は表示用に整形されるため反映対象外。
+FIELD_MAPS = {
+    'person': {'名前':'n', 'ふりがな':'fg', '役/分類':'role', '概要':'desc'},
+    'cat':    {'名称':'n', 'ふりがな':'fg', '概要':'desc'},
+    'noh':    {'曲名':'n', 'ふりがな':'fg', '分類':'cls', 'シテ類型':'shite_type',
+               'シテ':'shite', 'ワキ':'waki', '出典':'source', '時代':'era',
+               '作者':'author', '宗教':'religion', '注記':'notes'},
+}
+
+def _detect_sheet_type(headers):
+    """シートのヘッダ行からシート種別を判定。person / cat / noh / None。"""
+    if 'ピン数' in headers: return 'person'
+    if '曲名'   in headers: return 'noh'
+    if '名称'   in headers and '開始' in headers: return 'cat'
+    return None
 
 def parse_refs(text, gid, name_to_ids):
     """`token1(役割1); token2; token3(役割3)` → [{'id':..., 'role':...?}]
@@ -97,24 +121,41 @@ def main():
     reg(d['noh'], '能曲')
     for c in d['cats']: reg(c['items'], c.get('lb', c['id']))
 
-    # xlsx から 参照 を抜き出す
-    xlsx_refs = {}  # {id: text (raw)}
+    # xlsx から 参照 と編集可能テキスト欄を抜き出す
+    xlsx_refs = {}     # {id: text (raw)}
     xlsx_seen = set()  # 参照欄を持つエンティティ（空欄含む）
+    xlsx_fields = {}   # {id: {json_field: new_value}}
     wb = load_workbook(XLSX_PATH, data_only=True)
     for sn in wb.sheetnames:
         ws = wb[sn]
         hdrs = [ws.cell(row=1, column=c).value for c in range(1, ws.max_column+1)]
         id_col = next((i+1 for i,h in enumerate(hdrs) if h == 'id'), None)
         refs_col = next((i+1 for i,h in enumerate(hdrs) if h and '参照' in str(h)), None)
-        if not (id_col and refs_col): continue
+        stype = _detect_sheet_type(hdrs)
+        # フィールド列マップ {col_idx: json_field_name}
+        field_cols = {}
+        if stype and stype in FIELD_MAPS:
+            for i, h in enumerate(hdrs, 1):
+                if h in FIELD_MAPS[stype]:
+                    field_cols[i] = FIELD_MAPS[stype][h]
+        if not id_col: continue
         for r in range(2, ws.max_row+1):
             eid = ws.cell(row=r, column=id_col).value
             if not eid: continue
             eid = str(eid).strip()
-            xlsx_seen.add(eid)
-            v = ws.cell(row=r, column=refs_col).value
-            if v and str(v).strip():
-                xlsx_refs[eid] = str(v).strip()
+            # 参照
+            if refs_col:
+                xlsx_seen.add(eid)
+                v = ws.cell(row=r, column=refs_col).value
+                if v and str(v).strip():
+                    xlsx_refs[eid] = str(v).strip()
+            # 他のフィールド
+            for col, jf in field_cols.items():
+                v = ws.cell(row=r, column=col).value
+                if v is None: continue
+                v = str(v).strip()
+                if v == '': continue
+                xlsx_fields.setdefault(eid, {})[jf] = v
 
     # パース・検証
     parsed = {}      # {id: [refs]}
@@ -160,6 +201,18 @@ def main():
         elif cur != new:
             change.append((eid, p.get('n'), lb, cur, new))
 
+    # フィールド変更の差分計算
+    field_diffs = []  # (eid, name, label, field, old, new)
+    by_id = {p.get('id'): (p, lb) for p, lb in all_entities}
+    for eid, fields in xlsx_fields.items():
+        if eid not in by_id: continue
+        p, lb = by_id[eid]
+        for field, new_val in fields.items():
+            old_val = p.get(field)
+            old_str = '' if old_val is None else str(old_val)
+            if old_str != new_val:
+                field_diffs.append((eid, p.get('n'), lb, field, old_val, new_val))
+
     # ----- レポート -----
     print('=' * 60)
     print(f'xlsx: {XLSX_PATH}')
@@ -192,11 +245,29 @@ def main():
         for eid, n, lb, cur in remove:
             print(f'  - [{lb}] {eid} ({n}) refs（{fmt(cur)}）を削除')
 
+    # フィールド変更レポート
+    if field_diffs:
+        print(f'\nフィールド変更: {len(field_diffs)} 件')
+        # フィールドごとにグルーピング
+        by_field = {}
+        for d_ in field_diffs:
+            by_field.setdefault(d_[3], []).append(d_)
+        for field in sorted(by_field):
+            print(f'\n  [{field}]')
+            for eid, n, lb, _, old, new in by_field[field]:
+                # 長文は冒頭のみ表示
+                def trim(s):
+                    s = '' if s is None else str(s)
+                    return s if len(s) <= 60 else s[:60] + '…'
+                print(f'    ~ [{lb}] {eid} ({n})')
+                print(f'        旧: {trim(old)}')
+                print(f'        新: {trim(new)}')
+
     if errors:
         print('\n⚠️  エラーがあるため書き込みは行いません。xlsx を修正してください。', file=sys.stderr)
         sys.exit(1)
 
-    if not (add or change or remove):
+    if not (add or change or remove or field_diffs):
         print('\n差分なし。何もしません。')
         return
 
@@ -211,7 +282,7 @@ def main():
     shutil.copy(JSON_PATH, bak)
     print(f'\nbackup: {bak}')
 
-    # JSON 更新
+    # JSON 更新: refs
     for p, lb in all_entities:
         eid = p.get('id')
         if eid not in xlsx_seen: continue
@@ -220,6 +291,11 @@ def main():
             p['refs'] = new
         elif 'refs' in p:
             del p['refs']
+
+    # JSON 更新: その他のテキストフィールド
+    for eid, n, lb, field, old, new in field_diffs:
+        if eid in by_id:
+            by_id[eid][0][field] = new
 
     if not args.no_version_bump:
         old_ver = d.get('version', 0)
